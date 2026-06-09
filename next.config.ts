@@ -25,6 +25,12 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
     NEXT_PUBLIC_SITE_KEY: process.env.NEXT_PUBLIC_SITE_KEY,
+    // Server-only runtime secret (NOT NEXT_PUBLIC) — must be forwarded explicitly
+    // or the WEB_COMPUTE standalone server never sees it (registry trap
+    // `amplify-nextconfig-env`). Used by /api/revalidate (Strapi ISR webhook).
+    // NB: Wave-2 server secrets (STRAPI_API_TOKEN, LEAD_WEBHOOK_*, TURNSTILE_SECRET,
+    // POSTAL_*) must be added here too when S6/S3 + S8 wire them.
+    REVALIDATION_SECRET: process.env.REVALIDATION_SECRET,
   },
 };
 
