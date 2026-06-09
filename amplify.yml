@@ -1,9 +1,11 @@
 # Amplify build spec — Touch Vodka (Next.js SSR/ISR on platform WEB_COMPUTE).
-# The app is connected via the GitHub App; @vinny/* resolve from GitHub Packages
-# (npm.pkg.github.com) using the NODE_AUTH_TOKEN env var set on the Amplify app.
+# The app is connected via the GitHub App; @geniemarketing/* resolve from GitHub
+# Packages (npm.pkg.github.com) using the NODE_AUTH_TOKEN env var set on the app.
 # NOTE: the package.json `pnpm.overrides` link:../../vinny-platform/* entries are
-# for LOCAL dev only — they must be absent in the deployed branch so pnpm pulls
-# the published @vinny/* from the registry (see DEPLOY decision in HANDOFFS.md).
+# for LOCAL dev only — they must be absent in the deployed branch so pnpm pulls the
+# published @geniemarketing/* from the registry. The repo currently still uses the
+# @vinny/* scope; the rewire to @geniemarketing/* happens once S4 publishes the
+# packages (see DEPLOY-RUNBOOK.md Step 3 + the S4 release handoff in HANDOFFS.md).
 version: 1
 frontend:
   phases:

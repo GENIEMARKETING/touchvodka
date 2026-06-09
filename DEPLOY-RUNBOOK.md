@@ -13,45 +13,45 @@ one-time Amplify GitHub-App authorization.
 - ✅ Added **`amplify.yml`** (pnpm + WEB_COMPUTE build spec).
 - ✅ Verified `@vinny/foundation` + `@vinny/ui` build + `npm pack` clean (publish-ready).
 
-## The gate (why it's not live yet)
-1. **`@vinny/*` are unpublished.** The build resolves them from GitHub Packages
-   (`.npmrc` → `npm.pkg.github.com`), but nothing is published; local dev only works via
-   the `pnpm.overrides` `link:` to `vinny-platform/`. A standalone Amplify checkout has
-   neither → `pnpm install` fails. **Decision (Vinny, 2026-06-09): publish to GitHub Packages.**
-2. **No token has Packages scope.** The only GitHub token here is `gist/read:org/repo/workflow`
-   — no `write:packages` (publish) or `read:packages` (Amplify install). Needs a new PAT.
+## The gate (why it's not live yet) — UPDATED 2026-06-09
+Resolving the `@vinny/*` deps for a standalone Amplify build turned out to be a chain of
+blockers, ending in an S4-owned release. The Packages PAT is done (`~/.npmrc`); the rest:
+1. **`@vinny` scope can't publish to GitHub Packages.** GH Packages namespaces npm by
+   `@scope == owner`; there is no `vinny` org (`@vinny%2ffoundation` → `403 create_package`).
+   **Decision (Vinny): rename the scope to `@geniemarketing/*`.**
+2. **The rename can't be done in-place now.** `vinny-platform` is checked out on
+   `s10-landing-modules` and dirty with S10's live WIP (incl. `foundation`/`ui` package.json +
+   `pnpm-lock.yaml`) — renaming + `pnpm install` there would clobber S10 (shared-tree race).
+3. **There is no canonical `ui` to publish.** `main`'s `@vinny/ui` is a **stub**
+   (`0.0.0`, `private:true`); the real `0.1.0` `ui` exists only in S10's *uncommitted* tree.
+   Publishing it = releasing S4's package → **S4 must cut the release.**
+   **Decision (Vinny): wait for S4 to release.**
 
----
+➡️ **This deploy is now gated on the S4 handoff** ("Release `@geniemarketing/foundation` +
+`@geniemarketing/ui` to GitHub Packages") in `sessions/HANDOFFS.md`. Steps 1–3 below run
+**after** S4 publishes those two packages.
 
-## Step 1 — Mint the token  *(Vinny — one action)*
-Create a PAT (classic) or fine-grained token on `GENIEMARKETING` with **`write:packages`** +
-**`read:packages`** (fine-grained: Packages → Read **and** Write). Export it:
+## Step 1 — (DONE) Packages PAT
+A `write:packages` PAT (vinnyfds) is in `~/.npmrc` (`//npm.pkg.github.com/:_authToken=…`).
+S4 can reuse it (verify vinnyfds has org package-create in `GENIEMARKETING`) or use its own.
+
+## Step 2 — (S4) Publish the renamed packages
+S4 releases `@geniemarketing/foundation@0.1.0` + `@geniemarketing/ui@0.1.0` to
+`npm.pkg.github.com` from a clean tree (canonical `ui`, not S10's WIP). Verify:
+`gh api '/orgs/GENIEMARKETING/packages?package_type=npm' --jq '.[].name'` lists both.
+
+## Step 3 — Rewire + finalize the deploy branch  *(S2/operator, once Step 2 is live)*
+On `next-rebuild`, point touchvodka at the published org-scoped packages:
 ```bash
-export NODE_AUTH_TOKEN=<the-new-PAT>
-```
-
-## Step 2 — Publish the two packages  *(operator)*
-```bash
-cd vinny-platform/packages/foundation && pnpm build && npm publish        # @vinny/foundation@0.1.0
-cd ../ui                              && pnpm build && npm publish         # @vinny/ui@0.1.0
-```
-- The packages already carry `publishConfig.registry=npm.pkg.github.com` + `private:false` +
-  the `repository` link to `GENIEMARKETING/vinny-platform`, so they associate with the org.
-- ⚠️ If GitHub rejects the `@vinny` scope ("scope must match owner"), publish under the org
-  scope (`@geniemarketing/*`) OR add an org-level scope mapping; then keep the consumer
-  `.npmrc`/imports consistent. (Surface this; it's the most likely publish-time snag.)
-- Verify: `gh api /orgs/GENIEMARKETING/packages?package_type=npm --jq '.[].name'` lists both.
-
-## Step 3 — Finalize the deploy branch  *(operator)*
-On `next-rebuild`, make the repo standalone-installable:
-```bash
-# 1. Remove the LOCAL-ONLY workspace override block from package.json:
+# 1. Rename imports + deps across the repo (20 files): @vinny/  ->  @geniemarketing/
+#    - src/**/*.ts(x): import paths   - package.json: @vinny/foundation,@vinny/ui -> @geniemarketing/*
+#    - .npmrc: @vinny:registry=…      ->  @geniemarketing:registry=https://npm.pkg.github.com
+# 2. Remove the LOCAL-ONLY override block from package.json:
 #      "pnpm": { "overrides": { "@vinny/foundation": "link:…", "@vinny/ui": "link:…" } }
-#    (Pin @vinny/foundation + @vinny/ui to the published 0.1.0 in dependencies — already ^0.1.0.)
-# 2. Regenerate the lockfile against the registry (needs read:packages in NODE_AUTH_TOKEN):
-NODE_AUTH_TOKEN=$NODE_AUTH_TOKEN pnpm install        # rewrites pnpm-lock.yaml from npm.pkg.github.com
-pnpm build                                            # confirm a clean standalone build
-git commit -am "deploy: resolve @vinny/* from GitHub Packages (drop local link overrides)"
+# 3. Regenerate the lockfile against the registry (NODE_AUTH_TOKEN from ~/.npmrc):
+pnpm install        # rewrites pnpm-lock.yaml from npm.pkg.github.com
+pnpm build          # confirm a clean standalone build
+git commit -am "deploy: consume @geniemarketing/* from GitHub Packages (drop link overrides)"
 git push origin next-rebuild
 ```
 
