@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "description": "Auto-update the shared @vinny/* packages so this site rides the latest UI/motion + foundation. CI validates each bump before merge.",
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@vinny/"],
+      "groupName": "vinny shared packages",
+      "automerge": true,
+      "automergeType": "branch",
+      "schedule": ["before 6am on monday"]
+    }
+  ]
+}

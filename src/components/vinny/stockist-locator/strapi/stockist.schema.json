@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "stockists",
+  "info": {
+    "singularName": "stockist",
+    "pluralName": "stockists",
+    "displayName": "Stockist",
+    "description": "A retail location that carries a brand. Feeds the `stockist-locator` block (BOFU 'find a store'). Multi-tenant by `site`."
+  },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "site": {
+      "type": "string",
+      "required": true,
+      "comment": "Brand scope (SITE_KEY) — the multi-tenant filter."
+    },
+    "address": { "type": "string", "required": true },
+    "city": { "type": "string", "required": true },
+    "state": { "type": "string", "required": true },
+    "postalCode": { "type": "string" },
+    "country": { "type": "string", "default": "US" },
+    "lat": {
+      "type": "decimal",
+      "required": true,
+      "comment": "Geocoded latitude — set once at authoring (Strapi geocode hook or manual)."
+    },
+    "lng": { "type": "decimal", "required": true, "comment": "Geocoded longitude." },
+    "url": { "type": "string", "comment": "Optional link to the retailer's site/page." },
+    "phone": { "type": "string" }
+  }
+}

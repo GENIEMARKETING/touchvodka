@@ -1,0 +1,17 @@
+name: CI
+
+# Every client site delegates to the agency's reusable workflow (owned by S2 in
+# the GENIEMARKETING/.github repo). Sites run Lighthouse (run-lighthouse: true);
+# the library monorepo does not. Do not fork this — change the shared workflow.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    uses: GENIEMARKETING/.github/.github/workflows/ci.yml@main
+    secrets: inherit
+    with:
+      run-lighthouse: true

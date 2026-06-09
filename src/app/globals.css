@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand theme contract — @vinny/ui elements read these variables. Re-skin this
+   site by changing only these four values. preflight verifies they exist.
+
+   Touch Vodka = neo-brutalist: electric-blue accent on a high-contrast
+   black/white grid. Fonts come from next/font (Anton + Space Mono), exposed as
+   --font-display / --font-mono by layout.tsx.
+
+   NOTE (token gotcha, see LEARNINGS): the shared Footer block uses --brand-fg as
+   a *background*, while @vinny/ui Button uses it as on-brand *text*. Those are
+   only consistent for a LIGHT --brand (e.g. gold). Touch Vodka's --brand is a
+   DARK blue with WHITE on-text, so --brand-fg = white here and the copied Footer
+   is themed explicitly (it owns its colors) rather than via --brand-fg. */
+:root {
+  --brand: #0055ff; /* electric-blue accent — buttons, links, beacons */
+  --brand-fg: #ffffff; /* readable text ON --brand (white on blue) */
+  --surface: #ffffff; /* card / panel background */
+  --fg: #0a0a0a; /* default text (near-black) */
+
+  /* Touch Vodka extras (not part of the shared four-token contract) */
+  --accent: var(--brand);
+  --industrial: #f5f5f5;
+  --concrete: #e5e5e5;
+}
+
+html {
+  color: var(--fg);
+  background: var(--surface);
+}
+
+body {
+  font-family: var(--font-mono), monospace;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Neo-brutalist scrollbar (ported from the Vite build) */
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+::-webkit-scrollbar-thumb {
+  background: #000;
+  border: 3px solid #fff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand);
+}
+
+/* Respect reduced-motion globally as a floor, in addition to per-primitive guards. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

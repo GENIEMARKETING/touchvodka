@@ -1,0 +1,25 @@
+# Amplify build spec — Touch Vodka (Next.js SSR/ISR on platform WEB_COMPUTE).
+# The app is connected via the GitHub App; @vinny/* resolve from GitHub Packages
+# (npm.pkg.github.com) using the NODE_AUTH_TOKEN env var set on the Amplify app.
+# NOTE: the package.json `pnpm.overrides` link:../../vinny-platform/* entries are
+# for LOCAL dev only — they must be absent in the deployed branch so pnpm pulls
+# the published @vinny/* from the registry (see DEPLOY decision in HANDOFFS.md).
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - corepack enable
+        - corepack prepare pnpm@10.28.1 --activate
+        - pnpm install --frozen-lockfile
+    build:
+      commands:
+        - pnpm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .next/cache/**/*

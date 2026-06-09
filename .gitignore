@@ -1,0 +1,22 @@
+# deps
+node_modules/
+
+# build
+.next/
+out/
+dist/
+
+# test / coverage
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+*.log
