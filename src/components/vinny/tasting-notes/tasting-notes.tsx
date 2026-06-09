@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent, CardTitle } from '@vinny/ui';
-import { ScrollReveal } from '@vinny/ui/motion';
+import { Card, CardContent, CardTitle } from '@geniemarketing/ui';
+import { ScrollReveal } from '@geniemarketing/ui/motion';
 
 /**
  * TastingNotes — a staggered grid of nose / palate / finish notes for a spirits

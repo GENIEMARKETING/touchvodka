@@ -7,7 +7,7 @@ so the next project (or AI) reproduces the feel without re-deriving it.
 |---|---|
 | **Sequence** | 1. backdrop parallax begins immediately (scrub) · 2. headline words rise in on load · 3. sublead + CTA fade up shortly after |
 | **Trigger** | headline: on mount (above the fold); sublead/CTA: ScrollReveal `top 85%` |
-| **Easing** | `brandEase` (from `@vinny/foundation`) |
+| **Easing** | `brandEase` (from `@geniemarketing/foundation`) |
 | **Duration** | `durations.base` per word; stagger `stagger.base` |
 | **Perf budget** | LCP element is the headline text, not the image → keep `/hero.jpg` `priority` + sized; CLS target < 0.1 (parallax frame is `overflow-hidden`, fixed footprint) |
 | **Reduced motion** | parallax + word-split disabled by the primitives; headline, sublead, CTA render statically |

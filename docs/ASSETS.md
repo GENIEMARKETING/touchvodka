@@ -1,7 +1,7 @@
 # Assets & media (S5)
 
 How Touch Vodka's media is optimized and where it lives. Driven by
-`@vinny/assets-pipeline` (sharp/SVGO/ffmpeg).
+`@geniemarketing/assets-pipeline` (sharp/SVGO/ffmpeg).
 
 ## What changed in the rebuild
 

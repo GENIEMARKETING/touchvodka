@@ -1,6 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "extends": ["@vinny/foundation/biome"],
+  "extends": ["@geniemarketing/foundation/biome"],
   "files": {
     "ignore": [
       ".next/**",

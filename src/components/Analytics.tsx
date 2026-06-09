@@ -5,14 +5,14 @@
  *
  * THE COMPLIANCE FIX (T25 onboarding): the Vite build fired `gtag` on every page
  * load with NO consent gate (a live GDPR gap flagged in ONBOARDING.md). Here both
- * trackers are registered through `@vinny/foundation`'s consent-gated loaders:
+ * trackers are registered through `@geniemarketing/foundation`'s consent-gated loaders:
  *   • PostHog (analytics category) — initPostHog only injects after opt-in.
  *   • Google gtag (marketing category) — pixels.google() via tagLoader; nothing
  *     loads until the visitor accepts marketing in the consent banner.
  * Nothing tracks before consent; withdrawing consent opts back out.
  */
-import { tagLoader } from '@vinny/foundation/tracking';
-import { initPostHog, pixels } from '@vinny/foundation/tracking';
+import { tagLoader } from '@geniemarketing/foundation/tracking';
+import { initPostHog, pixels } from '@geniemarketing/foundation/tracking';
 import { useEffect } from 'react';
 
 export default function Analytics() {

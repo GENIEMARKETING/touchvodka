@@ -1,7 +1,7 @@
 # Touch Vodka — touchvodka.com
 
 Premium craft vodka, neo-brutalist. **Rebuilt on the Vinny platform** (Next.js
-15 + `@vinny/foundation` + `@vinny/ui` + `@vinny/blocks`) from the original
+15 + `@geniemarketing/foundation` + `@geniemarketing/ui` + `@geniemarketing/blocks`) from the original
 Vite/React build at `projects/touchvodka`. This was the **T25 onboarding pilot** —
 the first site brought end-to-end onto the platform; the runbook + gotchas it
 produced live in [`LEARNINGS.md`](./LEARNINGS.md) and the agency
@@ -23,7 +23,7 @@ produced live in [`LEARNINGS.md`](./LEARNINGS.md) and the agency
 ## Develop
 
 ```bash
-pnpm install         # @vinny/* link to the workspace via pnpm.overrides (offline-ok)
+pnpm install         # @geniemarketing/* link to the workspace via pnpm.overrides (offline-ok)
 pnpm dev             # http://localhost:3000
 pnpm typecheck && pnpm lint && pnpm preflight   # the quality floor
 pnpm build           # production build (25 routes, products + blog SSG)

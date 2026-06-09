@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand theme contract — @vinny/ui elements read these variables. Re-skin this
+/* Brand theme contract — @geniemarketing/ui elements read these variables. Re-skin this
    site by changing only these four values. preflight verifies they exist.
 
    Touch Vodka = neo-brutalist: electric-blue accent on a high-contrast
@@ -10,7 +10,7 @@
    --font-display / --font-mono by layout.tsx.
 
    NOTE (token gotcha, see LEARNINGS): the shared Footer block uses --brand-fg as
-   a *background*, while @vinny/ui Button uses it as on-brand *text*. Those are
+   a *background*, while @geniemarketing/ui Button uses it as on-brand *text*. Those are
    only consistent for a LIGHT --brand (e.g. gold). Touch Vodka's --brand is a
    DARK blue with WHITE on-text, so --brand-fg = white here and the copied Footer
    is themed explicitly (it owns its colors) rather than via --brand-fg. */

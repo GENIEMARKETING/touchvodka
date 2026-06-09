@@ -2,8 +2,8 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // @vinny/ui ships ESM with 'use client' banners; transpile it through Next.
-  transpilePackages: ['@vinny/ui', '@vinny/foundation'],
+  // @geniemarketing/ui ships ESM with 'use client' banners; transpile it through Next.
+  transpilePackages: ['@geniemarketing/ui', '@geniemarketing/foundation'],
   images: {
     // Registry trap `nextjs-image-remote-host-allowlist`: every next/image host
     // must be allowlisted. Heavy media is served from the shared CDN (S5) +

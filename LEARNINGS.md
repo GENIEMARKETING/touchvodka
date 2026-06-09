@@ -10,9 +10,9 @@ Format: **Symptom · Cause · Fix · Promote?**
 
 ## vinny-init ships an a11y test importing a non-existent foundation export
 - **Symptom:** a freshly scaffolded site fails `pnpm typecheck`/CI immediately:
-  `Cannot find module '@vinny/foundation/axe'`.
+  `Cannot find module '@geniemarketing/foundation/axe'`.
 - **Cause:** `e2e/a11y.spec.ts` imports `expectNoA11yViolations` from
-  `@vinny/foundation/axe`, but `@vinny/foundation`'s `exports` map has no `/axe`
+  `@geniemarketing/foundation/axe`, but `@geniemarketing/foundation`'s `exports` map has no `/axe`
   entry (only `.`, `/easings`, `/lead-contract`, `/consent`, `/tracking`, `/geo`,
   `/biome`, `/lighthouse`).
 - **Fix:** assert directly with `@axe-core/playwright` (already a devDependency).
@@ -47,7 +47,7 @@ Format: **Symptom · Cause · Fix · Promote?**
 - **Symptom:** with Touch Vodka's tokens the shared Footer would render
   white-on-white.
 - **Cause:** the `footer` block uses `--brand-fg` as a *background* (assumes a
-  dark brand color), while `@vinny/ui` Button uses `--brand-fg` as on-brand
+  dark brand color), while `@geniemarketing/ui` Button uses `--brand-fg` as on-brand
   *text*. Only consistent when `--brand` is light (e.g. gold). Touch Vodka's
   `--brand` is dark blue with WHITE on-text, so `--brand-fg=#fff`.
 - **Fix:** kept a bespoke `SiteFooter` themed explicitly (we own copied blocks).
@@ -55,9 +55,9 @@ Format: **Symptom · Cause · Fix · Promote?**
 
 ## Commerce blocks are coupled to Medusa
 - **Symptom:** `product-grid`/`product-card` blocks won't build for a brand-only
-  site (`Cannot find module '@vinny/commerce'`).
+  site (`Cannot find module '@geniemarketing/commerce'`).
 - **Cause:** they import `StoreProduct`/`formatPrice`/`discountPercent` from
-  `@vinny/commerce` — they're Medusa PLP tiles, not brand-showcase cards.
+  `@geniemarketing/commerce` — they're Medusa PLP tiles, not brand-showcase cards.
 - **Fix:** dropped them; built a bespoke brand product card/grid from the seed.
 - **Promote?:** yes → registry `commerce-blocks-require-medusa` (reuse guidance).
 
@@ -129,10 +129,10 @@ Format: **Symptom · Cause · Fix · Promote?**
 ---
 
 ## Confirmed working (not mistakes — the runbook paying off)
-- **Consent gate:** PostHog + gtag never load pre-consent (`@vinny/foundation`
+- **Consent gate:** PostHog + gtag never load pre-consent (`@geniemarketing/foundation`
   `tagLoader`/`initPostHog`); e2e asserts no tracker script before opt-in. This
   CLOSES the live GDPR gap the Vite build had (raw ungated gtag).
-- **Local workspace link:** `pnpm.overrides` → `link:` resolves `@vinny/*`
+- **Local workspace link:** `pnpm.overrides` → `link:` resolves `@geniemarketing/*`
   offline without the GitHub Packages `NODE_AUTH_TOKEN`. Essential for local dev.
 - **next/font + asset prune:** self-hosted fonts; `public/` 2.8 MB → 624 KB by
   pruning unused letter-SVG logos; assets-pipeline showed 58% raster savings.

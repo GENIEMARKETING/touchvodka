@@ -7,7 +7,7 @@
  * is populated. Touch Vodka is a Fat Dog Spirits brand (Tampa, FL); these are
  * representative FL/Southeast accounts — replace with the real account list.
  */
-import type { GeoPoint } from '@vinny/foundation/geo';
+import type { GeoPoint } from '@geniemarketing/foundation/geo';
 
 export type Stockist = GeoPoint & {
   name: string;

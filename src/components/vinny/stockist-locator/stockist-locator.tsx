@@ -4,9 +4,9 @@
 // what foundation/geo exports (verified in-tree). The *map rendering* is not a
 // foundation export (S7 built its live-map inside agency-ops), so we render with
 // react-simple-maps here. See COORDINATION.md.
-import { type GeoPoint, distanceKm } from '@vinny/foundation/geo';
-import { Button, cn } from '@vinny/ui';
-import { ScrollReveal } from '@vinny/ui/motion';
+import { type GeoPoint, distanceKm } from '@geniemarketing/foundation/geo';
+import { Button, cn } from '@geniemarketing/ui';
+import { ScrollReveal } from '@geniemarketing/ui/motion';
 import { useMemo, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 

@@ -7,7 +7,7 @@ minimal so it never competes with the single CTA.
 |---|---|---|---|
 | Card enter | none on the card itself | — | The card is the page's payload; it must be present at first paint (no reveal-delay on the conversion point). |
 | Success swap | fade + 8px rise of the success line | `ScrollReveal` default (`brandEase`, ~500ms) | Replaces the form on `200`; the only celebratory beat. |
-| Submit button | inherits `@vinny/ui` Button press/disabled states | — | No extra spinner motion; label switches to "Sending…". |
+| Submit button | inherits `@geniemarketing/ui` Button press/disabled states | — | No extra spinner motion; label switches to "Sending…". |
 | Error line | no motion; `aria-live="polite"` announces it | — | Errors must be readable, not animated away. |
 
 **Reduced motion:** the only animation (success reveal) comes from

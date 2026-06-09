@@ -2,7 +2,7 @@ import { type Page, test as base, expect } from '@playwright/test';
 
 /**
  * Testing backbone — standardized from the tikaram-spirits pilot.
- * Sets `window.__E2E__` before app JS so @vinny/ui/motion exposes the GSAP
+ * Sets `window.__E2E__` before app JS so @geniemarketing/ui/motion exposes the GSAP
  * timeline, and provides `freezeMotion` for deterministic snapshots.
  */
 export const test = base.extend({

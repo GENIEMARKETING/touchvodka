@@ -4,7 +4,7 @@
 # NOTE: the package.json `pnpm.overrides` link:../../vinny-platform/* entries are
 # for LOCAL dev only — they must be absent in the deployed branch so pnpm pulls the
 # published @geniemarketing/* from the registry. The repo currently still uses the
-# @vinny/* scope; the rewire to @geniemarketing/* happens once S4 publishes the
+# @geniemarketing/* scope; the rewire to @geniemarketing/* happens once S4 publishes the
 # packages (see DEPLOY-RUNBOOK.md Step 3 + the S4 release handoff in HANDOFFS.md).
 version: 1
 frontend:

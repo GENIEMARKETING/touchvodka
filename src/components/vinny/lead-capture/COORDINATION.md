@@ -1,11 +1,11 @@
 # lead-capture — cross-session contracts (S10 ⇄ S7, S8)
 
 This block is the funnel's keystone and depends on contracts owned by S7 + S8.
-**Status: reconciled against the in-tree code** (S7's `@vinny/foundation/consent`
-+ S8's `@vinny/foundation/lead-contract`) — the block serializes to S8's exact
+**Status: reconciled against the in-tree code** (S7's `@geniemarketing/foundation/consent`
++ S8's `@geniemarketing/foundation/lead-contract`) — the block serializes to S8's exact
 `LeadPayload`. Keep these seams in sync if either side changes.
 
-## 1. `/api/lead` — owned by **S8** (`@vinny/foundation/lead-contract`)
+## 1. `/api/lead` — owned by **S8** (`@geniemarketing/foundation/lead-contract`)
 
 The block builds and POSTs S8's `LeadPayload` verbatim:
 
@@ -27,7 +27,7 @@ Spam gate is S8's requirement: **Turnstile** (`turnstileSiteKey` prop → widget
 hidden `cf-turnstile-response` we read from the form) + **honeypot**
 (`company_website`, hidden). S8's n8n flow verifies both server-side.
 
-## 2. `useConsent()` — owned by **S7** (`@vinny/foundation/consent`)
+## 2. `useConsent()` — owned by **S7** (`@geniemarketing/foundation/consent`)
 
 We use the real API: `const { hasConsent, record } = useConsent()`.
 - `consent.marketing` = the explicit opt-in checkbox **or** `hasConsent('marketing')`

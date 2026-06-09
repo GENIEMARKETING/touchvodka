@@ -7,7 +7,7 @@ import { openConsentPreferences } from './vinny/consent-banner/consent-banner';
 /**
  * SiteFooter — Touch Vodka's bespoke neo-brutalist footer.
  *
- * REUSE DECISION (S4): the shared @vinny `footer` block hardcodes its palette to
+ * REUSE DECISION (S4): the shared @geniemarketing `footer` block hardcodes its palette to
  * `--brand-fg` (background) + `--surface` (text), which only works when
  * `--brand-fg` is a DARK brand color. Touch Vodka's `--brand-fg` is WHITE (it's
  * the on-blue button text), so the shared footer would render white-on-white.

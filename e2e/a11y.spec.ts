@@ -4,7 +4,7 @@ import { expect, gotoStable, test } from './support/test';
 // WCAG 2.1 A/AA accessibility floor.
 //
 // SCAFFOLD FIX (see LEARNINGS: vinny-init-a11y-import): vinny-init ships this test
-// importing `expectNoA11yViolations` from `@vinny/foundation/axe`, but the
+// importing `expectNoA11yViolations` from `@geniemarketing/foundation/axe`, but the
 // foundation package exposes no `/axe` export — so a freshly scaffolded site
 // fails typecheck/CI out of the box. Until the foundation adds that helper, we
 // assert directly with @axe-core/playwright (already a devDependency).

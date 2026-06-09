@@ -163,7 +163,7 @@ Nodes (5): Assets & media (S5), CDN (S5/T33, gated on S6 "prod up"), Tests, Tier
 
 ### Community 21 - "Community 21"
 Cohesion: 0.33
-Nodes (5): 1. `/api/lead` — owned by **S8** (`@vinny/foundation/lead-contract`), 2. `useConsent()` — owned by **S7** (`@vinny/foundation/consent`), 3. PostHog — owned by **S7** (consent-gated loader), code:ts ({), lead-capture — cross-session contracts (S10 ⇄ S7, S8)
+Nodes (5): 1. `/api/lead` — owned by **S8** (`@geniemarketing/foundation/lead-contract`), 2. `useConsent()` — owned by **S7** (`@geniemarketing/foundation/consent`), 3. PostHog — owned by **S7** (consent-gated loader), code:ts ({), lead-capture — cross-session contracts (S10 ⇄ S7, S8)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.33

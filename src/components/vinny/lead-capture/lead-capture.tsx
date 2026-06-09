@@ -1,9 +1,9 @@
 'use client';
 
-import { CONSENT_VERSION, useConsent } from '@vinny/foundation/consent';
-import type { LeadBrand, LeadPayload } from '@vinny/foundation/lead-contract';
-import { Button, Input, cn } from '@vinny/ui';
-import { ScrollReveal } from '@vinny/ui/motion';
+import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
+import type { LeadBrand, LeadPayload } from '@geniemarketing/foundation/lead-contract';
+import { Button, Input, cn } from '@geniemarketing/ui';
+import { ScrollReveal } from '@geniemarketing/ui/motion';
 import { type FormEvent, useEffect, useId, useState } from 'react';
 
 /**

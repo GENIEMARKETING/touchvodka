@@ -9,7 +9,7 @@
  *     LEARNINGS.md, the reusable CI call, the CSS-var theme contract).
  *
  *  2. QUALITY FLOOR: the motion-lint rule (anticipatePin / will-change) runs over
- *     local source — the same rule @vinny/ui enforces, vendored here so the
+ *     local source — the same rule @geniemarketing/ui enforces, vendored here so the
  *     lesson is enforced in client repos too.
  *
  * It also prints the GraphRAG reuse reminder: before building a new section,
@@ -44,7 +44,7 @@ if (!lintOnly) {
   if (ci && !/GENIEMARKETING\/\.github\/\.github\/workflows\/ci\.yml/.test(ci)) {
     problems.push('.github/workflows/ci.yml does not call the shared reusable workflow');
   }
-  // The CSS-var theme contract @vinny/ui depends on.
+  // The CSS-var theme contract @geniemarketing/ui depends on.
   const css = safeRead('src/app/globals.css');
   for (const v of ['--brand', '--brand-fg', '--surface', '--fg']) {
     if (css && !css.includes(v)) problems.push(`globals.css is missing the ${v} theme token`);
@@ -62,7 +62,7 @@ if (problems.length > 0) {
 
 if (!lintOnly) {
   console.log('\n📚 Reuse before you build: check the catalog (Storybook on Amplify) + the');
-  console.log('   global graph, then `npx @vinny/blocks add <name>` or install @vinny/ui.\n');
+  console.log('   global graph, then `npx @geniemarketing/blocks add <name>` or install @geniemarketing/ui.\n');
 }
 console.log('✓ preflight passed');
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { consentStore } from '@vinny/foundation/consent';
+import { consentStore } from '@geniemarketing/foundation/consent';
 import { useEffect } from 'react';
 import * as CookieConsent from 'vanilla-cookieconsent';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
@@ -9,7 +9,7 @@ import 'vanilla-cookieconsent/dist/cookieconsent.css';
  * ConsentBanner — the keystone of the tracking stack (S7 / T16).
  *
  * Wraps orestbida `vanilla-cookieconsent` (MIT, framework-agnostic) and bridges
- * its decision into `@vinny/foundation`'s `consentStore`, which every tracker —
+ * its decision into `@geniemarketing/foundation`'s `consentStore`, which every tracker —
  * the pixel loader, PostHog, the geo-map beacon — is gated on. NOTHING tracks
  * until the visitor opts in here.
  *

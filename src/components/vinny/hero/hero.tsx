@@ -1,7 +1,7 @@
 'use client';
 
-import { buttonVariants } from '@vinny/ui';
-import { ParallaxImage, ScrollReveal, TextSplit } from '@vinny/ui/motion';
+import { buttonVariants } from '@geniemarketing/ui';
+import { ParallaxImage, ScrollReveal, TextSplit } from '@geniemarketing/ui/motion';
 
 /**
  * Hero — full-bleed brand opener.

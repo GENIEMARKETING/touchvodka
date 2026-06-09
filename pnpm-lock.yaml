@@ -4,23 +4,19 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@vinny/foundation': link:../../vinny-platform/packages/foundation
-  '@vinny/ui': link:../../vinny-platform/packages/ui
-
 importers:
 
   .:
     dependencies:
+      '@geniemarketing/foundation':
+        specifier: ^0.2.0
+        version: 0.2.0(react@19.2.7)
+      '@geniemarketing/ui':
+        specifier: ^0.2.0
+        version: 0.2.0(@geniemarketing/foundation@0.2.0(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@gsap/react':
         specifier: ^2.1.1
         version: 2.1.2(gsap@3.15.0)(react@19.2.7)
-      '@vinny/foundation':
-        specifier: link:../../vinny-platform/packages/foundation
-        version: link:../../vinny-platform/packages/foundation
-      '@vinny/ui':
-        specifier: link:../../vinny-platform/packages/ui
-        version: link:../../vinny-platform/packages/ui
       gsap:
         specifier: ^3.12.5
         version: 3.15.0
@@ -314,6 +310,20 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@geniemarketing/foundation@0.2.0':
+    resolution: {integrity: sha512-V31jofMD/3Ru33feVp2bQO0p54gqo2OLR3DHWCmy/EUJVpWi/SF2IjYQ4ZR/9yvdzWkQxmdXeRADNAVGvqfxlA==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.0/6b14bbacf1498f018e042281b40bfb22fa9e7d61}
+    peerDependencies:
+      react: '>=18'
+
+  '@geniemarketing/ui@0.2.0':
+    resolution: {integrity: sha512-lmYbtUQsr4W8jdjD3WGnN3/7Sj8eWtvWaNqhT7oaechdRq7wxXLV+30ZGOvnETt2sz5I94k+iqGkogiAQ/TUxg==, tarball: https://npm.pkg.github.com/download/@geniemarketing/ui/0.2.0/984299391b6f27ff06f59807d2bbffb59aa43721}
+    peerDependencies:
+      '@geniemarketing/foundation': 0.2.0
+      '@gsap/react': ^2.1.1
+      gsap: ^3.12.5
+      react: '>=18'
+      react-dom: '>=18'
 
   '@gsap/react@2.1.2':
     resolution: {integrity: sha512-JqliybO1837UcgH2hVOM4VO+38APk3ECNrsuSM4MuXp+rbf+/2IG2K1YJiqfTcXQHH7XlA0m3ykniFYstfq0Iw==}
@@ -672,8 +682,15 @@ packages:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
 
+  class-variance-authority@0.7.1:
+    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
+
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+
+  clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
@@ -1304,6 +1321,9 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  tailwind-merge@2.6.1:
+    resolution: {integrity: sha512-Oo6tHdpZsGpkKG88HJ8RR1rg/RdnEkQEfMoEk2x1XRI3F1AxeU+ijRXpiVUF4UbLfcxxRGw6TbUINKYdWVsQTQ==}
+
   tailwindcss@3.4.19:
     resolution: {integrity: sha512-3ofp+LL8E+pK/JuPLPggVAIaEuhvIz4qNcf3nA1Xn2o/7fb7s/TYpHhwGDv1ZU3PkBluUVaF8PyCHcm48cKLWQ==}
     engines: {node: '>=14.0.0'}
@@ -1518,6 +1538,21 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.0':
     optional: true
+
+  '@geniemarketing/foundation@0.2.0(react@19.2.7)':
+    dependencies:
+      react: 19.2.7
+
+  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.2.0(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@geniemarketing/foundation': 0.2.0(react@19.2.7)
+      '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.7)
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      gsap: 3.15.0
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      tailwind-merge: 2.6.1
 
   '@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7)':
     dependencies:
@@ -1813,7 +1848,13 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
+  class-variance-authority@0.7.1:
+    dependencies:
+      clsx: 2.1.1
+
   client-only@0.0.1: {}
+
+  clsx@2.1.1: {}
 
   comma-separated-tokens@2.0.3: {}
 
@@ -2695,6 +2736,8 @@ snapshots:
       ts-interface-checker: 0.1.13
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  tailwind-merge@2.6.1: {}
 
   tailwindcss@3.4.19(tsx@4.22.4):
     dependencies:

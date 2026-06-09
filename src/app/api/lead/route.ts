@@ -11,7 +11,7 @@
  *
  * All secrets (TURNSTILE_SECRET, LEAD_WEBHOOK_SECRET) stay server-side.
  */
-import { validateLeadPayload } from '@vinny/foundation/lead-contract';
+import { validateLeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { type NextRequest, NextResponse } from 'next/server';
 
 async function verifyTurnstile(token: string, ip: string | null): Promise<boolean> {

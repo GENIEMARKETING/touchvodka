@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Dialog, DialogFooter } from '@vinny/ui';
+import { Button, Dialog, DialogFooter } from '@geniemarketing/ui';
 import { useEffect, useState } from 'react';
 
 /**

@@ -1,6 +1,6 @@
 'use client';
 
-import { buttonVariants, cn } from '@vinny/ui';
+import { buttonVariants, cn } from '@geniemarketing/ui';
 import { useEffect, useState } from 'react';
 
 /**

@@ -11,18 +11,18 @@ one-time Amplify GitHub-App authorization.
 - ✅ Added **`src/app/api/revalidate/route.ts`** (secret-gated Strapi ISR webhook target) +
   `REVALIDATION_SECRET` in `.env.example`. Typecheck green.
 - ✅ Added **`amplify.yml`** (pnpm + WEB_COMPUTE build spec).
-- ✅ Verified `@vinny/foundation` + `@vinny/ui` build + `npm pack` clean (publish-ready).
+- ✅ Verified `@geniemarketing/foundation` + `@geniemarketing/ui` build + `npm pack` clean (publish-ready).
 
 ## The gate (why it's not live yet) — UPDATED 2026-06-09
-Resolving the `@vinny/*` deps for a standalone Amplify build turned out to be a chain of
+Resolving the `@geniemarketing/*` deps for a standalone Amplify build turned out to be a chain of
 blockers, ending in an S4-owned release. The Packages PAT is done (`~/.npmrc`); the rest:
-1. **`@vinny` scope can't publish to GitHub Packages.** GH Packages namespaces npm by
-   `@scope == owner`; there is no `vinny` org (`@vinny%2ffoundation` → `403 create_package`).
+1. **`@geniemarketing` scope can't publish to GitHub Packages.** GH Packages namespaces npm by
+   `@scope == owner`; there is no `vinny` org (`@geniemarketing%2ffoundation` → `403 create_package`).
    **Decision (Vinny): rename the scope to `@geniemarketing/*`.**
 2. **The rename can't be done in-place now.** `vinny-platform` is checked out on
    `s10-landing-modules` and dirty with S10's live WIP (incl. `foundation`/`ui` package.json +
    `pnpm-lock.yaml`) — renaming + `pnpm install` there would clobber S10 (shared-tree race).
-3. **There is no canonical `ui` to publish.** `main`'s `@vinny/ui` is a **stub**
+3. **There is no canonical `ui` to publish.** `main`'s `@geniemarketing/ui` is a **stub**
    (`0.0.0`, `private:true`); the real `0.1.0` `ui` exists only in S10's *uncommitted* tree.
    Publishing it = releasing S4's package → **S4 must cut the release.**
    **Decision (Vinny): wait for S4 to release.**
@@ -43,11 +43,11 @@ S4 releases `@geniemarketing/foundation@0.1.0` + `@geniemarketing/ui@0.1.0` to
 ## Step 3 — Rewire + finalize the deploy branch  *(S2/operator, once Step 2 is live)*
 On `next-rebuild`, point touchvodka at the published org-scoped packages:
 ```bash
-# 1. Rename imports + deps across the repo (20 files): @vinny/  ->  @geniemarketing/
-#    - src/**/*.ts(x): import paths   - package.json: @vinny/foundation,@vinny/ui -> @geniemarketing/*
-#    - .npmrc: @vinny:registry=…      ->  @geniemarketing:registry=https://npm.pkg.github.com
+# 1. Rename imports + deps across the repo (20 files): @geniemarketing/  ->  @geniemarketing/
+#    - src/**/*.ts(x): import paths   - package.json: @geniemarketing/foundation,@geniemarketing/ui -> @geniemarketing/*
+#    - .npmrc: @geniemarketing:registry=…      ->  @geniemarketing:registry=https://npm.pkg.github.com
 # 2. Remove the LOCAL-ONLY override block from package.json:
-#      "pnpm": { "overrides": { "@vinny/foundation": "link:…", "@vinny/ui": "link:…" } }
+#      "pnpm": { "overrides": { "@geniemarketing/foundation": "link:…", "@geniemarketing/ui": "link:…" } }
 # 3. Regenerate the lockfile against the registry (NODE_AUTH_TOKEN from ~/.npmrc):
 pnpm install        # rewrites pnpm-lock.yaml from npm.pkg.github.com
 pnpm build          # confirm a clean standalone build
@@ -96,5 +96,5 @@ aws amplify create-domain-association --app-id <NEW_ID> --domain-name touchvodka
 - Register the Strapi ISR webhook → `https://touchvodka.com/api/revalidate?secret=<REVALIDATION_SECRET>`
   (this is also referenced in the S6/S3 Wave-2 cutover).
 - **Emit `TV-NEXT DEPLOYED`** in `TOUCHVODKA-GOLIVE.md` §5; flip §6 "Wave 1: tv-next deployed" ✅; log §7.
-- Capture any publish/connection gotcha into `mistakes-registry/` (esp. the `@vinny` scope-vs-org
+- Capture any publish/connection gotcha into `mistakes-registry/` (esp. the `@geniemarketing` scope-vs-org
   publish snag and the Amplify GitHub-App-vs-access-token connection).

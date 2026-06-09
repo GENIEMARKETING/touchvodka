@@ -2,11 +2,11 @@
 
 S10's brief: **reuse S7's geo stack for the locator — don't rebuild it.** This
 block reuses S7's shared geo util. **Status: reconciled against the in-tree
-`@vinny/foundation/geo`.**
+`@geniemarketing/foundation/geo`.**
 
 ## What S10 reuses from S7 (verified exports)
 
-`import { distanceKm, type GeoPoint } from '@vinny/foundation/geo'`
+`import { distanceKm, type GeoPoint } from '@geniemarketing/foundation/geo'`
 
 | Symbol | Used for |
 |---|---|
@@ -24,7 +24,7 @@ S7's geo util exports data/projection helpers (`distanceKm`, `mercator`,
 as a foundation export. So the locator renders with **`react-simple-maps`**
 (a declared dependency) rather than importing a non-existent `MapCanvas`.
 
-If S7 later promotes a reusable `<MapCanvas>` to `@vinny/foundation/geo`, swap the
+If S7 later promotes a reusable `<MapCanvas>` to `@geniemarketing/foundation/geo`, swap the
 `react-simple-maps` usage here for it — that's the only change needed.
 
 ## Boundaries (no overlap)

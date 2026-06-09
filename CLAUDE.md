@@ -17,14 +17,14 @@ consumes shared packages and the shared backend — it does not reinvent them.
 
 Before creating any new section or component:
 1. Browse the **catalog** (Storybook on Amplify) and the **global graph**.
-2. If it exists → install `@vinny/ui` or `npx @vinny/blocks add <name>`.
+2. If it exists → install `@geniemarketing/ui` or `npx @geniemarketing/blocks add <name>`.
 3. If new → build it here with a motion spec + story + test. Once it's used 3×,
-   extract it to `@vinny/ui` / `@vinny/blocks` so the next project finds it.
+   extract it to `@geniemarketing/ui` / `@geniemarketing/blocks` so the next project finds it.
 
 ## Shared, not owned
 
-- **UI/motion:** `@vinny/ui` (auto-updates via Renovate) + `@vinny/ui/motion`.
-- **Tokens:** `@vinny/foundation` (easings, durations, stagger) — import, never copy.
+- **UI/motion:** `@geniemarketing/ui` (auto-updates via Renovate) + `@geniemarketing/ui/motion`.
+- **Tokens:** `@geniemarketing/foundation` (easings, durations, stagger) — import, never copy.
 - **Backend:** the shared Strapi (content) + Medusa (commerce) on Layer 0. This
   site has **no database of its own**; scope shared data by this site's key.
 - **Assets:** heavy media (image sequences, Lottie, hero video) live on the CDN

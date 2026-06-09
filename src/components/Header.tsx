@@ -7,7 +7,7 @@ import { useState } from 'react';
 /**
  * Header — Touch Vodka's bespoke neo-brutalist nav.
  *
- * REUSE DECISION (S4): the shared @vinny `navbar` block is transparent-over-a-
+ * REUSE DECISION (S4): the shared @geniemarketing `navbar` block is transparent-over-a-
  * dark-hero with white text — it suits image-led heroes, not Touch Vodka's
  * light, high-contrast brutalist grid. So the brand *chrome* stays bespoke while
  * the *functional* blocks (consent, leads, locator, tasting-notes) are reused.

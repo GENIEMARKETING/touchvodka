@@ -1,10 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "description": "Auto-update the shared @vinny/* packages so this site rides the latest UI/motion + foundation. CI validates each bump before merge.",
+  "description": "Auto-update the shared @geniemarketing/* packages so this site rides the latest UI/motion + foundation. CI validates each bump before merge.",
   "packageRules": [
     {
-      "matchPackagePatterns": ["^@vinny/"],
+      "matchPackagePatterns": ["^@geniemarketing/"],
       "groupName": "vinny shared packages",
       "automerge": true,
       "automergeType": "branch",

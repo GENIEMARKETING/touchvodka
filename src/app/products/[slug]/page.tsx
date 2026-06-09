@@ -86,7 +86,7 @@ export default async function ProductDetailPage({ params }: Params) {
         </div>
       </section>
 
-      {/* REUSED shared block (S4): tasting-notes from @vinny/blocks */}
+      {/* REUSED shared block (S4): tasting-notes from @geniemarketing/blocks */}
       <TastingNotes heading={`${product.name} — Tasting Notes`} notes={toTastingNotes(product)} />
 
       <section className="mx-auto max-w-5xl px-6 pb-8">

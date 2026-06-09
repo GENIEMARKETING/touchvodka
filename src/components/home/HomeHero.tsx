@@ -1,7 +1,7 @@
 'use client';
 
 import type { Product } from '@/data/products';
-import { capture } from '@vinny/foundation/tracking';
+import { capture } from '@geniemarketing/foundation/tracking';
 import { ArrowRight, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
