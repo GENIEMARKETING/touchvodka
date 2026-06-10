@@ -32,7 +32,17 @@ export function commerceConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY);
 }
 
-const medusa = createMedusaClient();
+// Pass the config explicitly. `@geniemarketing/commerce` resolves its URL via a
+// DYNAMIC `process.env[key]` read at runtime, which Next can't inline and the
+// Amplify WEB_COMPUTE runtime doesn't expose for NEXT_PUBLIC_* — so an
+// argument-less client falls back to the shared `commerce.vinny.agency` default.
+// Reading the vars STATICALLY here lets Next inline them at build, so the client
+// targets this brand's shop-api/channel. (Proven live 2026-06-10; see registry
+// `medusa-client-needs-explicit-config-on-amplify`.)
+const medusa = createMedusaClient({
+  medusaUrl: process.env.NEXT_PUBLIC_MEDUSA_URL,
+  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+});
 const search = createSearchClient();
 
 /** PLP catalog for this channel. Empty (not an error) until commerce is wired. */
