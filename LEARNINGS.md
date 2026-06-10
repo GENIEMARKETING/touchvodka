@@ -171,3 +171,33 @@ Format: **Symptom · Cause · Fix · Promote?**
   send). Corrected to **🟡** with a blocked note. Same spirit as
   `milestone-emitted-not-deployed`: authored ≠ verified; a column flips ✅ only
   after an end-to-end test, not after the code/config exists.
+
+## S4·I commerce/seo wiring — two gotchas (→ S1 mistakes-registry)
+- **No fake $0 Offer for a brand-only Product** (`seo-product-schema-needs-real-price`):
+  `@geniemarketing/seo`'s `productSchema` *requires* `price`+`currency` and always
+  emits an `offers` Offer. Touch Vodka is brand-only (no Medusa channel yet), so
+  feeding `price: 0` would ship a misleading Offer that trips Google Rich Results
+  validation. Fix: `lib/seo.productJsonLd` emits a **truthful Product WITHOUT an
+  Offer** until a real commerce price exists; the Offer (price/availability/rating)
+  lights up automatically once S6/S3 wires Medusa + `lib/commerce.priceOf` returns a
+  value. General rule: only emit `Offer`/`AggregateRating` when the data is real.
+- **A package on `main` is not a package on the registry**
+  (`commerce-seo-unpublished-after-pr9`): `@geniemarketing/commerce`+`seo` landed on
+  `main` via PR vinny-platform#9 *after* the #8 release pass, so the GH Packages
+  registry still has only `foundation`/`ui`. `npm view @geniemarketing/commerce` →
+  **404 "package does not exist"** (a published-but-private package returns **401**
+  instead — the 401/404 split is the quick "is it published?" probe). A site can wire
+  + locally build-verify the deps (build them from `origin/main`), but a CI/Amplify
+  `pnpm install` 404s until they're `npm publish`ed. Landing on main ≠ installable.
+- **CDN media migration = one `mediaUrl()` indirection + `NEXT_PUBLIC_MEDIA_BASE`,
+  with a local fallback** (`next-image-mediaurl-indirection-preserves-local-fallback`):
+  S5's production-media tier routes every `next/image` `src` (and OG / Product-JSON-LD
+  image strings) through `src/lib/media.ts#mediaUrl()`. It (a) passes absolute Strapi/CDN
+  URLs through untouched, (b) prefixes site-relative paths with `NEXT_PUBLIC_MEDIA_BASE`
+  when set, (c) **falls back to the committed `public/` path when unset**. So the migration
+  is a single env-var flip and the site renders at *every* intermediate state — dev, pre-CDN
+  prod, and while the CloudFront edge is still deferred. The resolved host must be in
+  `next.config.ts` `images.remotePatterns` (pairs with `nextjs-image-remote-host-allowlist`).
+  **Do NOT `git rm` the committed media until CDN serving is confirmed** (non-destructive
+  guardrail from `assets-pipeline/MIGRATION-assets.md`) — the fallback is what keeps the
+  site safe during the cutover.

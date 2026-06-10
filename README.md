@@ -15,7 +15,7 @@ produced live in [`LEARNINGS.md`](./LEARNINGS.md) and the agency
 | **S4** UI | bespoke brutalist chrome + reused blocks (tasting-notes, locator, lead-capture, consent, age-gate) | `src/components/` |
 | **S6** CMS | shared Strapi client scoped by `client=touch-vodka`, seed fallback | `src/lib/strapi.ts`, `infrastructure/cms/onboarding/touch-vodka.md` |
 | **S7** consent | consent banner + PostHog + **consent-gated gtag** (closes the GDPR gap) | `src/app/layout.tsx`, `src/components/Analytics.tsx` |
-| **S8** leads/email | forms → `/api/lead` → n8n/Twenty/Mautic; email nodemailer→Postal (old path kept) | `src/app/api/`, `src/lib/email.ts` |
+| **S8** leads/email | forms → `/api/lead` → n8n/Twenty/Mautic; email nodemailer→SMTP2GO (old Office365 path kept) | `src/app/api/`, `src/lib/email.ts` |
 | **S9** analytics | brand spine `touch-vodka` confirmed in the warehouse | `agency-ops/analytics/onboarding/touch-vodka.md` |
 | **S10** modules | stockist locator + 21+ age-gate | `src/app/find-us/`, `src/app/layout.tsx` |
 | **S5** assets | optimized (58%), pruned, next/font, visual tests | `docs/ASSETS.md`, `e2e/` |
