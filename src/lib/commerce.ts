@@ -42,6 +42,12 @@ export function commerceConfigured(): boolean {
 const medusa = createMedusaClient({
   medusaUrl: process.env.NEXT_PUBLIC_MEDUSA_URL,
   publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+  // Medusa v2 needs a region to price the catalog: without it,
+  // `*variants.calculated_price` reads 400 ("Missing required pricing context
+  // - region_id"). Read statically here so Next inlines it (the dynamic
+  // process.env read inside the package can't be inlined on Amplify WEB_COMPUTE,
+  // same reason as medusaUrl/publishableKey above). @geniemarketing/commerce@0.1.1+.
+  regionId: process.env.NEXT_PUBLIC_MEDUSA_REGION_ID,
 });
 const search = createSearchClient();
 
