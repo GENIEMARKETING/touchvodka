@@ -1,7 +1,7 @@
-# Graph Report - touchvodka-next  (2026-06-09)
+# Graph Report - touchvodka-next  (2026-06-10)
 
 ## Corpus Check
-- 92 files · ~34,116 words
+- 92 files · ~34,284 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `04f8b577`
+- Built from commit: `e0faad25`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

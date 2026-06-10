@@ -2959,7 +2959,7 @@
       "label": "medusa",
       "file_type": "code",
       "source_file": "src/lib/commerce.ts",
-      "source_location": "L35",
+      "source_location": "L42",
       "id": "lib_commerce_medusa",
       "community": 7,
       "norm_label": "medusa"
@@ -2968,7 +2968,7 @@
       "label": "search",
       "file_type": "code",
       "source_file": "src/lib/commerce.ts",
-      "source_location": "L36",
+      "source_location": "L52",
       "id": "lib_commerce_search",
       "community": 2,
       "norm_label": "search"
@@ -2977,7 +2977,7 @@
       "label": "getCommerceProducts()",
       "file_type": "code",
       "source_file": "src/lib/commerce.ts",
-      "source_location": "L39",
+      "source_location": "L55",
       "id": "lib_commerce_getcommerceproducts",
       "community": 2,
       "norm_label": "getcommerceproducts()"
@@ -2986,7 +2986,7 @@
       "label": "getCommerceProduct()",
       "file_type": "code",
       "source_file": "src/lib/commerce.ts",
-      "source_location": "L51",
+      "source_location": "L67",
       "id": "lib_commerce_getcommerceproduct",
       "community": 2,
       "norm_label": "getcommerceproduct()"
@@ -2995,7 +2995,7 @@
       "label": "searchProducts()",
       "file_type": "code",
       "source_file": "src/lib/commerce.ts",
-      "source_location": "L62",
+      "source_location": "L78",
       "id": "lib_commerce_searchproducts",
       "community": 2,
       "norm_label": "searchproducts()"
@@ -3004,7 +3004,7 @@
       "label": "priceOf()",
       "file_type": "code",
       "source_file": "src/lib/commerce.ts",
-      "source_location": "L70",
+      "source_location": "L86",
       "id": "lib_commerce_priceof",
       "community": 2,
       "norm_label": "priceof()"
@@ -10426,9 +10426,9 @@
       "source_file": "WAVE2-OPERATOR-PASS.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "wave2_operator_pass_md",
-      "target": "touchvodka_next_wave2_operator_pass_wave_2_consolidated_operator_pass_touchvodka",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_wave2_operator_pass_wave_2_consolidated_operator_pass_touchvodka"
     },
     {
       "relation": "contains",
@@ -10436,9 +10436,9 @@
       "source_file": "WAVE2-OPERATOR-PASS.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_wave2_operator_pass_wave_2_consolidated_operator_pass_touchvodka",
-      "target": "touchvodka_next_wave2_operator_pass_order_of_operations",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_wave2_operator_pass_order_of_operations"
     },
     {
       "relation": "contains",
@@ -10446,9 +10446,9 @@
       "source_file": "WAVE2-OPERATOR-PASS.md",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_wave2_operator_pass_wave_2_consolidated_operator_pass_touchvodka",
-      "target": "touchvodka_next_wave2_operator_pass_the_merged_amplify_env_map_app_d1yhwh9axgn9ty_set_all_of_these_in_one_update",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_wave2_operator_pass_the_merged_amplify_env_map_app_d1yhwh9axgn9ty_set_all_of_these_in_one_update"
     },
     {
       "relation": "contains",
@@ -10456,9 +10456,9 @@
       "source_file": "WAVE2-OPERATOR-PASS.md",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_wave2_operator_pass_wave_2_consolidated_operator_pass_touchvodka",
-      "target": "touchvodka_next_wave2_operator_pass_detailed_steps_live_in_do_not_duplicate_execute_these",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_wave2_operator_pass_detailed_steps_live_in_do_not_duplicate_execute_these"
     },
     {
       "relation": "contains",
@@ -10466,9 +10466,9 @@
       "source_file": "WAVE2-OPERATOR-PASS.md",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_wave2_operator_pass_wave_2_consolidated_operator_pass_touchvodka",
-      "target": "touchvodka_next_wave2_operator_pass_then_wave_3_sessions_touchvodka_golive_md_wave_3_emit_touchvodka_live",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_wave2_operator_pass_then_wave_3_sessions_touchvodka_golive_md_wave_3_emit_touchvodka_live"
     },
     {
       "relation": "contains",
@@ -11076,9 +11076,9 @@
       "source_file": "S5-WAVE2J-MEDIA-RUNBOOK.md",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_s5_wave2j_media_runbook_step_2_point_the_site_at_the_base_route_b_or_to_switch_cdn_host",
-      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_4",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_4"
     },
     {
       "relation": "contains",
@@ -11106,9 +11106,9 @@
       "source_file": "S5-WAVE2J-MEDIA-RUNBOOK.md",
       "source_location": "L131",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_s5_wave2j_media_runbook_step_3_verify_media_serves_from_the_cdn_strapi_base",
-      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_6",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_6"
     },
     {
       "relation": "contains",
@@ -11126,9 +11126,9 @@
       "source_file": "S5-WAVE2J-MEDIA-RUNBOOK.md",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_s5_wave2j_media_runbook_step_4_remove_the_bulk_from_git_only_after_step_3_is_green",
-      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_7",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_7"
     },
     {
       "relation": "contains",
@@ -11146,9 +11146,9 @@
       "source_file": "S5-WAVE2J-MEDIA-RUNBOOK.md",
       "source_location": "L157",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "touchvodka_next_s5_wave2j_media_runbook_step_5_visual_regression_baselines",
-      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_8",
-      "confidence_score": 1.0
+      "target": "touchvodka_next_s5_wave2j_media_runbook_codeblock_8"
     },
     {
       "relation": "contains",
@@ -12352,5 +12352,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "04f8b5776142b51a15773407ff3dff8bfb0bcd56"
+  "built_at_commit": "e0faad2549818379d519e3effa19801a36fa7111"
 }
