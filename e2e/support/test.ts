@@ -14,8 +14,14 @@ export const test = base.extend({
   },
 });
 
-export async function freezeMotion(page: Page) {
-  await page.evaluate(async () => {
+/**
+ * Freeze all motion deterministically and seek any GSAP timeline to `progress`
+ * (0 = start … 1 = end). Defaults to the end state (1) so existing full-page
+ * snapshots are unchanged; the keyframe suite drives it to 0/0.5/1 so a broken
+ * animation can't pass silently (S5 Wave 2·J — paused-timeline keyframes).
+ */
+export async function freezeMotion(page: Page, progress = 1) {
+  await page.evaluate(async (p) => {
     const style = document.createElement('style');
     style.textContent =
       '*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}';
@@ -28,17 +34,17 @@ export async function freezeMotion(page: Page) {
     };
     try {
       for (const t of w.__ScrollTrigger?.getAll?.() ?? []) {
-        if (t.animation?.progress) t.animation.progress(1);
-        else t.progress?.(1);
+        if (t.animation?.progress) t.animation.progress(p);
+        else t.progress?.(p);
       }
-      w.__gsap?.globalTimeline?.progress(1);
+      w.__gsap?.globalTimeline?.progress(p);
       w.__gsap?.globalTimeline?.pause();
     } catch {
       /* nothing to freeze */
     }
     const fonts = (document as unknown as { fonts?: { ready?: Promise<unknown> } }).fonts;
     await fonts?.ready?.catch(() => {});
-  });
+  }, progress);
   await page.waitForTimeout(300);
 }
 

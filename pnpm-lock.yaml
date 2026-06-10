@@ -8,12 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@geniemarketing/commerce':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@geniemarketing/foundation':
-        specifier: ^0.2.0
-        version: 0.2.0(react@19.2.7)
+        specifier: ^0.2.1
+        version: 0.2.1(react@19.2.7)
+      '@geniemarketing/seo':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@geniemarketing/ui':
         specifier: ^0.2.0
-        version: 0.2.0(@geniemarketing/foundation@0.2.0(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 0.2.0(@geniemarketing/foundation@0.2.1(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@gsap/react':
         specifier: ^2.1.1
         version: 2.1.2(gsap@3.15.0)(react@19.2.7)
@@ -311,10 +317,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@geniemarketing/foundation@0.2.0':
-    resolution: {integrity: sha512-V31jofMD/3Ru33feVp2bQO0p54gqo2OLR3DHWCmy/EUJVpWi/SF2IjYQ4ZR/9yvdzWkQxmdXeRADNAVGvqfxlA==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.0/6b14bbacf1498f018e042281b40bfb22fa9e7d61}
+  '@geniemarketing/commerce@0.1.0':
+    resolution: {integrity: sha512-ij3LgdpOOoRX6OLZwU4j1I7RYRkIoLSL7bPYJEsY4JDPxkERi9yNvVu0sjI+H5uGYfeWfnBhtlHwCVfmxE796Q==, tarball: https://npm.pkg.github.com/download/@geniemarketing/commerce/0.1.0/56327b02298e92881891e6587bd5a69ae88fadad}
+
+  '@geniemarketing/foundation@0.2.1':
+    resolution: {integrity: sha512-fmJYsNbGgW3HQ4lUxOOIufGYdz3sRgU7Pi0Tzua5RuTudCIDVTUeScsLEfXirFGryt1vaG6lqFshvU5H8M3Gkw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.1/28570dce15b13153b8d7cc1069cf6356f4742acb}
     peerDependencies:
       react: '>=18'
+
+  '@geniemarketing/seo@0.1.0':
+    resolution: {integrity: sha512-bYBYv96mTw75rnW546QbmXsRml4ILId8CCgNZ2Tge+7yO9Xf1Pr80mFeqiLX25bIT7PsXpQE6f3laPATd6cuWw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/seo/0.1.0/57a668c4752eb50a1dfa03ea7fd2248216b8ddd6}
 
   '@geniemarketing/ui@0.2.0':
     resolution: {integrity: sha512-lmYbtUQsr4W8jdjD3WGnN3/7Sj8eWtvWaNqhT7oaechdRq7wxXLV+30ZGOvnETt2sz5I94k+iqGkogiAQ/TUxg==, tarball: https://npm.pkg.github.com/download/@geniemarketing/ui/0.2.0/984299391b6f27ff06f59807d2bbffb59aa43721}
@@ -1539,13 +1551,17 @@ snapshots:
   '@esbuild/win32-x64@0.28.0':
     optional: true
 
-  '@geniemarketing/foundation@0.2.0(react@19.2.7)':
+  '@geniemarketing/commerce@0.1.0': {}
+
+  '@geniemarketing/foundation@0.2.1(react@19.2.7)':
     dependencies:
       react: 19.2.7
 
-  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.2.0(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@geniemarketing/seo@0.1.0': {}
+
+  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.2.1(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@geniemarketing/foundation': 0.2.0(react@19.2.7)
+      '@geniemarketing/foundation': 0.2.1(react@19.2.7)
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.7)
       class-variance-authority: 0.7.1
       clsx: 2.1.1

@@ -12,6 +12,7 @@
  */
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import { mediaUrl } from '@/lib/media';
 
 const BLOG_DIR = join(process.cwd(), 'src/content/blog');
 
@@ -62,7 +63,7 @@ async function readPost(file: string): Promise<BlogPost> {
     author: String(data.author ?? ''),
     category: String(data.category ?? 'General'),
     tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
-    image: String(data.image ?? ''),
+    image: mediaUrl(String(data.image ?? '')),
     body,
   };
 }

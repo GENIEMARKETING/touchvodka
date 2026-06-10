@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import SiteFooter from '@/components/SiteFooter';
 import HomeHero from '@/components/home/HomeHero';
+import { mediaUrl } from '@/lib/media';
 import { getSiteProducts } from '@/lib/strapi';
 import { Droplets, Sprout, Waves } from 'lucide-react';
 import Image from 'next/image';
@@ -46,7 +47,7 @@ export default async function Home() {
               <div className="relative mb-6 aspect-[3/4] overflow-hidden border border-neutral-200 bg-neutral-100">
                 <Image
                   alt={product.name}
-                  src={product.image}
+                  src={mediaUrl(product.image)}
                   fill
                   sizes="(max-width:1024px) 50vw, 20vw"
                   className="scale-90 object-contain p-4 grayscale transition-all duration-500 group-hover:scale-100 group-hover:grayscale-0"

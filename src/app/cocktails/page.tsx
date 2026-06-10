@@ -1,5 +1,6 @@
 import PageShell, { PageHero } from '@/components/PageShell';
 import { COCKTAILS } from '@/data/cocktails';
+import { mediaUrl } from '@/lib/media';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 
@@ -32,7 +33,7 @@ export default function CocktailsPage() {
               </div>
               <Image
                 alt={c.name}
-                src={c.image}
+                src={mediaUrl(c.image)}
                 width={80}
                 height={110}
                 className="h-28 w-auto object-contain"

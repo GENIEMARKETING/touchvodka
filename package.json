@@ -19,7 +19,9 @@
     "test:update": "playwright test --update-snapshots"
   },
   "dependencies": {
-    "@geniemarketing/foundation": "^0.2.0",
+    "@geniemarketing/commerce": "^0.1.0",
+    "@geniemarketing/foundation": "^0.2.1",
+    "@geniemarketing/seo": "^0.1.0",
     "@geniemarketing/ui": "^0.2.0",
     "gsap": "^3.12.5",
     "@gsap/react": "^2.1.1",

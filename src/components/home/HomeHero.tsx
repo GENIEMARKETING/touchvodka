@@ -1,6 +1,7 @@
 'use client';
 
 import type { Product } from '@/data/products';
+import { mediaUrl } from '@/lib/media';
 import { capture } from '@geniemarketing/foundation/tracking';
 import { ArrowRight, X } from 'lucide-react';
 import Image from 'next/image';
@@ -78,7 +79,7 @@ export default function HomeHero({ products }: { products: Product[] }) {
           >
             <Image
               alt={active.name}
-              src={active.image}
+              src={mediaUrl(active.image)}
               width={600}
               height={800}
               priority

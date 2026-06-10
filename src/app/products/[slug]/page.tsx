@@ -1,7 +1,11 @@
 import PageShell from '@/components/PageShell';
+import { AddToCart } from '@/components/vinny/commerce/add-to-cart';
 import { TastingNotes } from '@/components/vinny/tasting-notes/tasting-notes';
 import { COCKTAILS } from '@/data/cocktails';
 import { PRODUCTS, getProductBySlug, toTastingNotes } from '@/data/products';
+import { getCommerceProduct, priceOf } from '@/lib/commerce';
+import { mediaUrl } from '@/lib/media';
+import { breadcrumbJsonLd, jsonLdScript, pageMetadata, productJsonLd } from '@/lib/seo';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,15 +22,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) return { title: 'Not found' };
-  return {
+  return pageMetadata({
     title: product.name,
     description: product.description,
-    openGraph: {
-      title: `${product.name} | Touch Vodka`,
-      description: product.description,
-      images: [product.image],
-    },
-  };
+    path: `/products/${slug}`,
+    ogType: 'product',
+    images: [{ url: mediaUrl(product.image), alt: product.name }],
+  });
 }
 
 export default async function ProductDetailPage({ params }: Params) {
@@ -36,29 +38,45 @@ export default async function ProductDetailPage({ params }: Params) {
 
   const cocktails = COCKTAILS.filter((c) => product.relatedCocktailIds?.includes(c.id));
 
+  // Hydrate price/availability from Medusa when this brand has a sales channel
+  // (S6/S3 + S10). Until then `commerce` is null and the Product JSON-LD emits
+  // truthfully with no Offer — see lib/seo.productJsonLd.
+  const commerce = await getCommerceProduct(slug);
+  const price = commerce ? priceOf(commerce) : null;
+
+  // schema.org Product + BreadcrumbList via @geniemarketing/seo (SSR; was hand-rolled
+  // client-side in the Vite build, which drifted from the catalog).
+  const productLd = productJsonLd({
+    name: product.name,
+    description: product.description,
+    image: [mediaUrl(product.image)],
+    path: `/products/${slug}`,
+    ...(price
+      ? { price: price.amount, currency: price.currency_code, availability: 'InStock' as const }
+      : {}),
+    ...(commerce?.rating && commerce.rating.count > 0
+      ? { rating: { value: commerce.rating.average, count: commerce.rating.count } }
+      : {}),
+  });
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'The Collection', path: '/products' },
+    { name: product.name, path: `/products/${slug}` },
+  ]);
+
   return (
     <PageShell>
-      {/* schema.org Product (SEO; the Vite build set this client-side, here it's SSR) */}
       <script
         type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            description: product.description,
-            brand: { '@type': 'Brand', name: 'Touch Vodka' },
-            category: product.category,
-          }),
-        }}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD; jsonLdScript escapes "<".
+        dangerouslySetInnerHTML={{ __html: jsonLdScript([productLd, breadcrumbLd]) }}
       />
 
       <section className="grid grid-cols-1 border-black border-b-4 lg:grid-cols-2">
         <div className="relative flex items-center justify-center border-black border-b-4 bg-neutral-50 p-12 lg:border-r-4 lg:border-b-0">
           <Image
             alt={product.name}
-            src={product.image}
+            src={mediaUrl(product.image)}
             width={500}
             height={700}
             priority
@@ -83,6 +101,14 @@ export default async function ProductDetailPage({ params }: Params) {
               <dd className="lowercase">{product.distillationProcess}</dd>
             </div>
           </dl>
+
+          {/* S10: DTC buy box — only renders when this brand has a live Medusa
+              channel (commerce != null); otherwise the PDP stays brand-only. */}
+          {commerce ? (
+            <div className="mt-8">
+              <AddToCart product={commerce} />
+            </div>
+          ) : null}
         </div>
       </section>
 

@@ -1,6 +1,9 @@
 import Analytics from '@/components/Analytics';
 import { AgeGate } from '@/components/vinny/age-gate/age-gate';
+import { CartProvider } from '@/components/vinny/commerce/cart-context';
+import { CartDrawer } from '@/components/vinny/commerce/cart-drawer';
 import { ConsentBanner } from '@/components/vinny/consent-banner/consent-banner';
+import { jsonLdScript, organizationJsonLd } from '@/lib/seo';
 import type { Metadata } from 'next';
 import { Anton, Space_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
@@ -62,9 +65,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
       <body>
+        {/* schema.org Organization (@geniemarketing/seo, S4·I) — site-wide knowledge-panel node. */}
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD; jsonLdScript escapes "<".
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationJsonLd()) }}
+        />
         {/* S10: age-gate (21+) for the regulated spirits category. */}
         <AgeGate brand="Touch Vodka" minAge={21} />
-        {children}
+        {/* S10: DTC cart state + slide-over (inert until Medusa is wired). */}
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
         {/* S7: consent banner — the keystone the trackers are gated on. */}
         <ConsentBanner
           brand="Touch Vodka"

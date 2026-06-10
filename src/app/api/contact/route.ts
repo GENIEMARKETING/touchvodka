@@ -3,11 +3,11 @@ import { sendEmail } from '@/lib/email';
  * POST /api/contact — LEGACY transactional contact path, ported from the Vite
  * build's Express `server/routes/contact.ts`.
  *
- * MIGRATION (S8 / T26): the email transport is migrated off nodemailer/Office365
- * to the OSS Postal path via `lib/email.ts`, but this endpoint is KEPT LIVE as a
- * safety net during cutover so transactional mail never breaks. The primary
- * capture form now posts to /api/lead (CRM + Mautic). Retire this route once the
- * Postal path is verified delivering. See LEARNINGS: email-cutover-keep-old-path-live.
+ * MIGRATION (S8 / T26): the email transport is migrated off the legacy Office365
+ * nodemailer path to **SMTP2GO** via `lib/email.ts`, but this endpoint is KEPT
+ * LIVE as a safety net during cutover so transactional mail never breaks. The
+ * primary capture form now posts to /api/lead (CRM + Mautic). Retire this route
+ * once the SMTP2GO path is verified delivering. See LEARNINGS: email-cutover-keep-old-path-live.
  */
 import { type NextRequest, NextResponse } from 'next/server';
 
