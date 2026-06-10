@@ -12,14 +12,14 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@geniemarketing/foundation':
-        specifier: ^0.2.1
-        version: 0.2.1(react@19.2.7)
+        specifier: ^0.2.2
+        version: 0.2.2(react@19.2.7)
       '@geniemarketing/seo':
         specifier: ^0.1.0
         version: 0.1.0
       '@geniemarketing/ui':
         specifier: ^0.2.0
-        version: 0.2.0(@geniemarketing/foundation@0.2.1(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 0.2.0(@geniemarketing/foundation@0.2.2(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@gsap/react':
         specifier: ^2.1.1
         version: 2.1.2(gsap@3.15.0)(react@19.2.7)
@@ -320,13 +320,10 @@ packages:
   '@geniemarketing/commerce@0.1.1':
     resolution: {integrity: sha512-zceOaX0PTny7E0jtbD8gfuXqvlLfsDOLSnDrqyiFiLqJNmm6B9fOKj8dpmDMsZn6Et6RVJ0SiNPY3kbKGE5nSQ==, tarball: https://npm.pkg.github.com/download/@geniemarketing/commerce/0.1.1/bdd07a679d1671912e4a7321f6b9d5c2563f6abf}
 
-  '@geniemarketing/foundation@0.2.1':
-    resolution: {integrity: sha512-fmJYsNbGgW3HQ4lUxOOIufGYdz3sRgU7Pi0Tzua5RuTudCIDVTUeScsLEfXirFGryt1vaG6lqFshvU5H8M3Gkw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.1/28570dce15b13153b8d7cc1069cf6356f4742acb}
+  '@geniemarketing/foundation@0.2.2':
+    resolution: {integrity: sha512-xBSdcULaSoDsspwWIPxWgFtOvXuTJHK7PLFWXKBcZdrLET4xlD+y5LYRbOA4EVzGuYQ10SlinTF0VkO+aom9Rw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.2/097d04a8cfceb8ca228d09f2e5755014f371389b}
     peerDependencies:
       react: '>=18'
-    peerDependenciesMeta:
-      react:
-        optional: true
 
   '@geniemarketing/seo@0.1.0':
     resolution: {integrity: sha512-bYBYv96mTw75rnW546QbmXsRml4ILId8CCgNZ2Tge+7yO9Xf1Pr80mFeqiLX25bIT7PsXpQE6f3laPATd6cuWw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/seo/0.1.0/57a668c4752eb50a1dfa03ea7fd2248216b8ddd6}
@@ -1556,15 +1553,15 @@ snapshots:
 
   '@geniemarketing/commerce@0.1.1': {}
 
-  '@geniemarketing/foundation@0.2.1(react@19.2.7)':
-    optionalDependencies:
+  '@geniemarketing/foundation@0.2.2(react@19.2.7)':
+    dependencies:
       react: 19.2.7
 
   '@geniemarketing/seo@0.1.0': {}
 
-  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.2.1(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.2.2(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@geniemarketing/foundation': 0.2.1(react@19.2.7)
+      '@geniemarketing/foundation': 0.2.2(react@19.2.7)
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.7)
       class-variance-authority: 0.7.1
       clsx: 2.1.1
