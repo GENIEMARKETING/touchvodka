@@ -8,21 +8,28 @@ name: Visual baselines (keyframes)
 # @geniemarketing reads · `playwright install --with-deps chromium`. Same env ⇒
 # the committed baselines match what that pipeline renders.
 #
-#   • workflow_dispatch (update_snapshots = true)  → regenerate + COMMIT baselines
-#   • workflow_dispatch (false) / pull_request      → COMPARE against committed baselines
+# Modes:
+#   • baselines MISSING on a push, or workflow_dispatch(update_snapshots=true)
+#       → regenerate + COMMIT the baselines back to the branch (auto-bootstrap)
+#   • otherwise (push with baselines present / pull_request)
+#       → COMPARE against the committed baselines (the ongoing guard)
 #
 # It is a SEPARATE file (not ci.yml) on purpose: ci.yml only delegates to the
 # shared reusable workflow ("do not fork"), and a reusable-workflow `uses:` job
-# cannot host the extra build/commit steps this needs.
+# cannot host the extra build/commit steps this needs. A `push` trigger (not just
+# workflow_dispatch) is used because dispatch only registers from the default
+# branch (master), while this repo's working/deploy branch is next-rebuild.
 
 on:
+  push:
+    branches: [next-rebuild]
+  pull_request:
   workflow_dispatch:
     inputs:
       update_snapshots:
         description: 'Regenerate and commit the keyframe baselines'
         type: boolean
         default: false
-  pull_request:
 
 permissions:
   contents: write # commit the regenerated baselines back to the branch
@@ -60,8 +67,22 @@ jobs:
       - name: Install Playwright browser (chromium)
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Decide mode (update + commit, or compare)
+        id: mode
+        run: |
+          event="${{ github.event_name }}"
+          dispatch_update="${{ github.event_name == 'workflow_dispatch' && inputs.update_snapshots }}"
+          missing="false"; [ -z "$(ls -A e2e/__screenshots__ 2>/dev/null)" ] && missing="true"
+          if [ "$dispatch_update" = "true" ] || { [ "$event" = "push" ] && [ "$missing" = "true" ]; }; then
+            echo "update=1" >> "$GITHUB_OUTPUT"
+            echo "Mode: UPDATE + COMMIT baselines (event=$event, missing=$missing)"
+          else
+            echo "update=0" >> "$GITHUB_OUTPUT"
+            echo "Mode: COMPARE against committed baselines (event=$event, missing=$missing)"
+          fi
+
       - name: Generate + commit baselines
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_snapshots }}
+        if: ${{ steps.mode.outputs.update == '1' }}
         run: |
           pnpm exec playwright test keyframes.spec.ts --update-snapshots
           git config user.name  "github-actions[bot]"
@@ -75,7 +96,7 @@ jobs:
           fi
 
       - name: Compare against committed baselines
-        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.update_snapshots) }}
+        if: ${{ steps.mode.outputs.update == '0' }}
         run: pnpm exec playwright test keyframes.spec.ts
 
       - name: Upload report + diffs
