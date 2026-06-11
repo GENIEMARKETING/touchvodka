@@ -55,14 +55,17 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://npm.pkg.github.com
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # @geniemarketing/* are private org packages the workflow's GITHUB_TOKEN
+          # can't read (cross-repo 403). PACKAGES_READ_TOKEN is the classic read:packages
+          # PAT (same one Amplify uses) stored as a repo Actions secret.
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
       - name: Install Playwright browser (chromium)
         run: pnpm exec playwright install --with-deps chromium
