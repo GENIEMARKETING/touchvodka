@@ -82,10 +82,12 @@ test('DTC checkout completes a TEST order end-to-end (live)', async ({ page, con
   const isManual = await noCard.isVisible().catch(() => false);
   if (!isManual && STRIPE_TEST_CARD) {
     // Stripe path: fill the 4242 test card inside the Payment Element iframe.
-    await stripeFrame.getByPlaceholder(/card number/i).fill('4242 4242 4242 4242');
-    await stripeFrame.getByPlaceholder(/MM \/ YY/i).fill('12 / 34');
-    await stripeFrame.getByPlaceholder(/CVC/i).fill('123');
-    const zip = stripeFrame.getByPlaceholder(/ZIP|postal/i);
+    // Stripe Payment Element fields carry accessible NAMES (the placeholder is
+    // "1234 1234 1234 1234", so match by role+name, not placeholder).
+    await stripeFrame.getByRole('textbox', { name: /card number/i }).fill('4242424242424242');
+    await stripeFrame.getByRole('textbox', { name: /expiration/i }).fill('1234');
+    await stripeFrame.getByRole('textbox', { name: /security code|cvc/i }).fill('123');
+    const zip = stripeFrame.getByRole('textbox', { name: /zip|postal/i });
     if (await zip.count()) await zip.fill('78701');
   }
   test.info().annotations.push({
@@ -95,7 +97,7 @@ test('DTC checkout completes a TEST order end-to-end (live)', async ({ page, con
   await page.getByRole('button', { name: /Place order/i }).click();
 
   // ── 6 · Done · order confirmation with a #display_id, cart cleared ───────────
-  await expect(page.getByText(/Order placed|Thank you/i)).toBeVisible({ timeout: 40_000 });
+  await expect(page.getByRole('heading', { name: /Thank you/i })).toBeVisible({ timeout: 40_000 });
   const body = await page.locator('body').innerText();
   const m = body.match(/Order\s+#\s?(\d+)/i) ?? body.match(/#\s?(\d+)/);
   expect(m, 'order display_id present on confirmation').toBeTruthy();
