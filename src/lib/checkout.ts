@@ -17,6 +17,17 @@
  */
 import { type Cart, resolveConfig } from '@geniemarketing/commerce';
 
+// Read NEXT_PUBLIC_* STATICALLY so Next inlines them at build. The package's
+// `resolveConfig()` reads them DYNAMICALLY (`process.env[key]`), which Next can't
+// inline and the Amplify WEB_COMPUTE browser runtime doesn't expose — so a bare
+// `resolveConfig()` falls back to the shared `commerce.vinny.agency` default with
+// no publishable key, and every shim call "Failed to fetch". Same trap as
+// lib/commerce.ts (registry: medusa-client-needs-explicit-config-on-amplify).
+const STORE_CONFIG = {
+  medusaUrl: process.env.NEXT_PUBLIC_MEDUSA_URL,
+  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+} as const;
+
 export type Address = {
   first_name: string;
   last_name: string;
@@ -43,7 +54,7 @@ async function store<T>(
   path: string,
   opts: { method?: string; body?: unknown; params?: Record<string, string> } = {},
 ): Promise<T> {
-  const cfg = resolveConfig();
+  const cfg = resolveConfig(STORE_CONFIG);
   const url = new URL(`/store/${path}`, cfg.medusaUrl);
   for (const [k, v] of Object.entries(opts.params ?? {})) url.searchParams.set(k, v);
   const headers: Record<string, string> = {};

@@ -34,7 +34,15 @@ import { type FormEvent, useCallback, useRef, useState } from 'react';
 type Step = 'details' | 'delivery' | 'payment' | 'done';
 
 const STRIPE_PK = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-const payments = createPaymentsClient();
+// Pass config explicitly (static NEXT_PUBLIC_* reads → Next inlines them). A bare
+// createPaymentsClient() reads the URL/key dynamically inside the package and, on
+// Amplify WEB_COMPUTE, falls back to the shared commerce.vinny.agency default —
+// listProviders/initSession then hit the wrong host. Same trap as lib/commerce.ts
+// + lib/checkout.ts (registry: medusa-client-needs-explicit-config-on-amplify).
+const payments = createPaymentsClient({
+  medusaUrl: process.env.NEXT_PUBLIC_MEDUSA_URL,
+  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+});
 
 const EMPTY_ADDRESS: Address = {
   first_name: '',

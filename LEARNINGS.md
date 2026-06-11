@@ -201,3 +201,33 @@ Format: **Symptom · Cause · Fix · Promote?**
   **Do NOT `git rm` the committed media until CDN serving is confirmed** (non-destructive
   guardrail from `assets-pipeline/MIGRATION-assets.md`) — the fallback is what keeps the
   site safe during the cutover.
+- **vanilla-cookieconsent v3 `hideFromBots:true` hides the banner from Playwright**
+  (`cookieconsent-hidefrombots-webdriver-hides-banner`): the S7 live consent e2e saw
+  `#cc-main` count **0** / no "Accept all" button / no error and almost reported the banner
+  as broken on the deploy. Root cause: orestbida cookieconsent **v3 defaults `hideFromBots:true`**,
+  which skips generating the consent modal when `navigator.webdriver` is true — so the bot
+  is *never offered consent* and a "no tracker fired" result is a **false pass**. Fix the
+  TEST, not the gate: launch with `--disable-blink-features=AutomationControlled` +
+  `addInitScript` masking `navigator.webdriver` before `goto`, and **always pair the
+  pre-consent assertion with a post-consent positive control** (Accept → the SDK actually
+  loads). Reference suite: `e2e/consent-live.spec.ts` + `playwright.live.config.ts`. Verified
+  live 2026-06-10: 0 trackers pre-consent · Accept all → RudderStack CDP loads · Reject all → 0.
+- **The checkout shim + payments client `resolveConfig()` fallback breaks DTC checkout
+  on Amplify WEB_COMPUTE** (`medusa-client-needs-explicit-config-on-amplify`, recurrence):
+  `lib/checkout.ts` (`store()`) and `checkout.tsx`'s `createPaymentsClient()` originally
+  called `@geniemarketing/commerce`'s `resolveConfig()` / factory with **no config**.
+  The package reads `NEXT_PUBLIC_MEDUSA_URL` etc. *dynamically* (`process.env?.[key]`),
+  which Next can't inline and the Amplify WEB_COMPUTE **browser** runtime doesn't expose —
+  so it silently fell back to the shared default `https://commerce.vinny.agency` **with no
+  publishable key**. Result: the storefront's age-gate/PLP/PDP/add-to-cart all worked
+  (those go through `lib/commerce.ts`, which already passes config explicitly), but the
+  checkout dead-ended at **Details → Delivery** with a browser **"Failed to fetch"** (wrong
+  host + missing `x-publishable-api-key`). Caught only by a **real browser e2e**
+  (`e2e/checkout-live.spec.ts`) — the prior store-API proof used curl with the right host so
+  it never reproduced. Fix: read `NEXT_PUBLIC_MEDUSA_URL`/`_PUBLISHABLE_KEY` **statically**
+  and pass them as overrides (`resolveConfig({medusaUrl, publishableKey})` /
+  `createPaymentsClient({medusaUrl, publishableKey})`), exactly as `lib/commerce.ts` does.
+  Node-proven end-to-end against live Medusa (`e2e/checkout-pkg-verify.mjs` → order #2,
+  manual provider). Browser proof requires the Amplify redeploy (build-time inlining) AND
+  the deployed origin (shop-api `STORE_CORS` allowlists touchvodka.com, **not** localhost —
+  so a local browser e2e can't validate against live Medusa).
