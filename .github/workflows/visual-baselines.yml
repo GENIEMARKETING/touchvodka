@@ -1,0 +1,89 @@
+name: Visual baselines (keyframes)
+
+# Generates + commits the Linux Playwright KEYFRAME visual-regression baselines
+# (S5 Wave 2·J follow-up). Playwright snapshots are OS/font-specific, so they must
+# be produced in CI — not on a developer Mac. This deliberately MIRRORS the shared
+# reusable CI (GENIEMARKETING/.github → ci.yml): ubuntu-latest · pnpm ·
+# setup-node@v6 with npm.pkg.github.com · NODE_AUTH_TOKEN=GITHUB_TOKEN for
+# @geniemarketing reads · `playwright install --with-deps chromium`. Same env ⇒
+# the committed baselines match what that pipeline renders.
+#
+#   • workflow_dispatch (update_snapshots = true)  → regenerate + COMMIT baselines
+#   • workflow_dispatch (false) / pull_request      → COMPARE against committed baselines
+#
+# It is a SEPARATE file (not ci.yml) on purpose: ci.yml only delegates to the
+# shared reusable workflow ("do not fork"), and a reusable-workflow `uses:` job
+# cannot host the extra build/commit steps this needs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      update_snapshots:
+        description: 'Regenerate and commit the keyframe baselines'
+        type: boolean
+        default: false
+  pull_request:
+
+permissions:
+  contents: write # commit the regenerated baselines back to the branch
+  packages: read # @geniemarketing/* from GitHub Packages via GITHUB_TOKEN
+
+concurrency:
+  group: visual-baselines-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  keyframes:
+    name: keyframe visual-regression
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      # Media renders from the live CloudFront edge (matches production). Without
+      # this, mediaUrl() would emit the removed local /public paths → broken images.
+      NEXT_PUBLIC_MEDIA_BASE: https://img.fatdogspirits.com/touch-vodka
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Playwright browser (chromium)
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Generate + commit baselines
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_snapshots }}
+        run: |
+          pnpm exec playwright test keyframes.spec.ts --update-snapshots
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/__screenshots__
+          if git diff --cached --quiet; then
+            echo "No baseline changes to commit."
+          else
+            git commit -m "ci: commit Linux Playwright keyframe visual baselines (S5)"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Compare against committed baselines
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.update_snapshots) }}
+        run: pnpm exec playwright test keyframes.spec.ts
+
+      - name: Upload report + diffs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-keyframes
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

@@ -31,7 +31,8 @@ export default defineConfig({
   webServer: {
     command: 'pnpm build && pnpm start',
     url: BASE_URL,
-    timeout: 120_000,
+    // CI does a cold `next build` here, which can exceed 120s on a fresh runner.
+    timeout: 300_000,
     reuseExistingServer: !isCI,
   },
 });
