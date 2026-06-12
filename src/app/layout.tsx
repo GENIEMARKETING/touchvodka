@@ -3,7 +3,7 @@ import { AgeGate } from '@/components/vinny/age-gate/age-gate';
 import { CartProvider } from '@/components/vinny/commerce/cart-context';
 import { CartDrawer } from '@/components/vinny/commerce/cart-drawer';
 import { ConsentBanner } from '@/components/vinny/consent-banner/consent-banner';
-import { jsonLdScript, organizationJsonLd } from '@/lib/seo';
+import { brandJsonLd, jsonLdScript, organizationJsonLd } from '@/lib/seo';
 import type { Metadata } from 'next';
 import { Anton, Space_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
@@ -65,11 +65,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
       <body>
-        {/* schema.org Organization (@geniemarketing/seo, S4·I) — site-wide knowledge-panel node. */}
+        {/* schema.org Organization + Brand entity nodes (@geniemarketing/seo, S4·I + T46) —
+            site-wide knowledge-panel + AEO entity-resolution nodes (sameAs socials). */}
         <script
           type="application/ld+json"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD; jsonLdScript escapes "<".
-          dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdScript([organizationJsonLd(), brandJsonLd()]) }}
         />
         {/* S10: age-gate (21+) for the regulated spirits category. */}
         <AgeGate brand="Touch Vodka" minAge={21} />

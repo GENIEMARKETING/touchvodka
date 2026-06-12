@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import SiteFooter from '@/components/SiteFooter';
+import HomeFaq from '@/components/home/HomeFaq';
 import HomeHero from '@/components/home/HomeHero';
 import { mediaUrl } from '@/lib/media';
 import { getSiteProducts } from '@/lib/strapi';
@@ -116,6 +117,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* T46 (AEO): answer-shaped FAQ — visible Q&A + matching FAQPage JSON-LD. */}
+      <HomeFaq />
 
       <SiteFooter />
     </div>

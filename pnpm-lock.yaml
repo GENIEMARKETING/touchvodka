@@ -15,8 +15,8 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2(react@19.2.7)
       '@geniemarketing/seo':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       '@geniemarketing/ui':
         specifier: ^0.2.0
         version: 0.2.0(@geniemarketing/foundation@0.2.2(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -324,9 +324,12 @@ packages:
     resolution: {integrity: sha512-xBSdcULaSoDsspwWIPxWgFtOvXuTJHK7PLFWXKBcZdrLET4xlD+y5LYRbOA4EVzGuYQ10SlinTF0VkO+aom9Rw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.2/097d04a8cfceb8ca228d09f2e5755014f371389b}
     peerDependencies:
       react: '>=18'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
-  '@geniemarketing/seo@0.1.0':
-    resolution: {integrity: sha512-bYBYv96mTw75rnW546QbmXsRml4ILId8CCgNZ2Tge+7yO9Xf1Pr80mFeqiLX25bIT7PsXpQE6f3laPATd6cuWw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/seo/0.1.0/57a668c4752eb50a1dfa03ea7fd2248216b8ddd6}
+  '@geniemarketing/seo@0.2.0':
+    resolution: {integrity: sha512-4Xmh6Y0kUsfc6MrHTZPQwH5GALXizJdG5i16GZZoUUI5lbGQ5QjphqH9dR0UhMunC7XgJykMtdSdiqFPiuPReA==, tarball: https://npm.pkg.github.com/download/@geniemarketing/seo/0.2.0/93bbfbd8288bd4bc2d2c95ddc031d99b7976cd71}
 
   '@geniemarketing/ui@0.2.0':
     resolution: {integrity: sha512-lmYbtUQsr4W8jdjD3WGnN3/7Sj8eWtvWaNqhT7oaechdRq7wxXLV+30ZGOvnETt2sz5I94k+iqGkogiAQ/TUxg==, tarball: https://npm.pkg.github.com/download/@geniemarketing/ui/0.2.0/984299391b6f27ff06f59807d2bbffb59aa43721}
@@ -1554,10 +1557,10 @@ snapshots:
   '@geniemarketing/commerce@0.1.1': {}
 
   '@geniemarketing/foundation@0.2.2(react@19.2.7)':
-    dependencies:
+    optionalDependencies:
       react: 19.2.7
 
-  '@geniemarketing/seo@0.1.0': {}
+  '@geniemarketing/seo@0.2.0': {}
 
   '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.2.2(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
