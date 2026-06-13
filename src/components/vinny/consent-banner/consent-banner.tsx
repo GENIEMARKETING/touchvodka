@@ -1,7 +1,7 @@
 'use client';
 
 import { consentStore } from '@geniemarketing/foundation/consent';
-import { useEffect } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import * as CookieConsent from 'vanilla-cookieconsent';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
 
@@ -91,7 +91,9 @@ export function ConsentBanner({
               acceptAllBtn: 'Accept all',
               acceptNecessaryBtn: 'Reject all',
               showPreferencesBtn: 'Manage preferences',
-              footer: `<a href="${privacyHref}">Privacy Policy</a>`,
+              // CPRA: the "Do Not Sell or Share" control must be reachable from the
+              // banner too. The delegated handler below wires this anchor.
+              footer: `<a href="${privacyHref}">Privacy Policy</a> · <a href="#" data-gm-do-not-sell>Do Not Sell or Share My Personal Information</a>`,
             },
             preferencesModal: {
               title: 'Privacy preferences',
@@ -116,6 +118,17 @@ export function ConsentBanner({
         },
       },
     });
+
+    // The banner footer's "Do Not Sell or Share" anchor is rendered into the DOM
+    // by the library (not React), so wire it with a delegated click handler.
+    const onDocClick = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest('[data-gm-do-not-sell]');
+      if (!el) return;
+      e.preventDefault();
+      doNotSellAndShare();
+    };
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
   }, [brand, privacyHref, categories]);
 
   // The banner UI is rendered by the library into the document; this component
@@ -126,4 +139,72 @@ export function ConsentBanner({
 /** Re-open the preferences modal (wire to a footer "Cookie settings" link). */
 export function openConsentPreferences() {
   CookieConsent.showPreferences();
+}
+
+/**
+ * CPRA "Do Not Sell or Share My Personal Information" — a one-click opt-out of the
+ * `marketing` (targeted-advertising / "sale"/"share") category that PRESERVES the
+ * visitor's analytics/preferences choices. Drops `marketing` from the cookieconsent
+ * library (so the opt-out persists across reloads — onConsent re-syncs from it),
+ * records the authoritative store opt-out, then opens preferences to confirm.
+ *
+ * NOTE — kept in sync with `@geniemarketing/blocks` consent-banner@0.1.1, which
+ * uses `consentStore.doNotSell()` (foundation 0.2.3). This vendored copy inlines
+ * the same behavior on the published foundation 0.2.2 API so touchvodka ships
+ * without waiting on the 0.2.3 publish. When the fleet bumps to foundation 0.2.3,
+ * re-vendor this block and replace the inline below with `consentStore.doNotSell()`.
+ */
+export function doNotSellAndShare() {
+  try {
+    const accepted = CookieConsent.getUserPreferences().acceptedCategories ?? [];
+    CookieConsent.acceptCategory(accepted.filter((c) => c !== 'marketing'));
+  } catch {
+    /* library not initialised on this surface — the store write below is authoritative */
+  }
+  // marketing omitted → set() leaves it at the all-denied default (false), while
+  // analytics/preferences carry the visitor's existing grants forward.
+  const current = consentStore.getState();
+  consentStore.set({ analytics: current.analytics, preferences: current.preferences }, 'preferences');
+  try {
+    CookieConsent.showPreferences();
+  } catch {
+    /* no-op if the library isn't initialised */
+  }
+}
+
+export type DoNotSellLinkProps = {
+  /** Class applied to the link button — style it like your other footer links. */
+  className?: string;
+  /** Override the label (defaults to the CPRA-standard wording). */
+  children?: ReactNode;
+};
+
+/**
+ * The branded CPRA link every site that "sells"/"shares" personal info (ad pixels
+ * count) must surface — typically in the footer. Clicking it runs
+ * `doNotSellAndShare()`. When the browser asserts Global Privacy Control, it also
+ * confirms we already honored that signal.
+ */
+export function DoNotSellLink({ className, children }: DoNotSellLinkProps) {
+  const [gpc, setGpc] = useState(false);
+  // Read GPC after mount only (SSR-safe — navigator is undefined on the server).
+  useEffect(() => {
+    setGpc(
+      typeof navigator !== 'undefined' &&
+        (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true,
+    );
+  }, []);
+  return (
+    <>
+      <button type="button" className={className} onClick={doNotSellAndShare}>
+        {children ?? 'Do Not Sell or Share My Personal Information'}
+      </button>
+      {gpc ? (
+        <span role="status" data-gm-gpc-honored>
+          {' '}
+          We honored your browser&rsquo;s Global Privacy Control signal.
+        </span>
+      ) : null}
+    </>
+  );
 }
