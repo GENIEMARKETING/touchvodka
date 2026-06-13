@@ -2,7 +2,7 @@
 
 import { Instagram, Twitter } from 'lucide-react';
 import Link from 'next/link';
-import { openConsentPreferences } from './vinny/consent-banner/consent-banner';
+import { DoNotSellLink, openConsentPreferences } from './vinny/consent-banner/consent-banner';
 
 /**
  * SiteFooter — Touch Vodka's bespoke neo-brutalist footer.
@@ -69,13 +69,18 @@ export default function SiteFooter() {
                   </Link>
                 ))}
                 {col.heading === 'Legal' ? (
-                  <button
-                    type="button"
-                    onClick={openConsentPreferences}
-                    className="mt-1 text-left hover:text-accent hover:underline"
-                  >
-                    Cookie settings
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={openConsentPreferences}
+                      className="mt-1 text-left hover:text-accent hover:underline"
+                    >
+                      Cookie settings
+                    </button>
+                    {/* CPRA "Do Not Sell or Share" — opts out of marketing (ad pixels),
+                        preserves analytics/preferences; surfaces a GPC-honored note. */}
+                    <DoNotSellLink className="mt-1 text-left hover:text-accent hover:underline" />
+                  </>
                 ) : null}
               </nav>
             </div>
