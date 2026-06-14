@@ -1,19 +1,75 @@
 import Header from '@/components/Header';
-import SiteFooter from '@/components/SiteFooter';
+import SiteFooterData from '@/components/SiteFooterData';
 import HomeHero from '@/components/home/HomeHero';
 import { mediaUrl } from '@/lib/media';
-import { getSiteProducts } from '@/lib/strapi';
-import { Droplets, Sprout, Waves } from 'lucide-react';
+import { getPage, getSiteProducts } from '@/lib/strapi';
+import { Droplets, type LucideIcon, Sprout, Waves } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 /**
  * Home — composed server component. Products come from the shared Strapi (S6),
- * falling back to the local seed pre-migration. The interactive hero is the only
- * client island; the collection + process sections render on the server.
+ * falling back to the local seed pre-migration. The editable section copy
+ * (collection + process headings, the 3 process cards) comes from the Strapi
+ * `page` (slug=home) `sections`, falling back to the constants below. The
+ * interactive hero stays in code (Plasmic composes it; Strapi feeds its product
+ * data) — content-ownership boundary: Strapi owns text/data, code owns layout.
  */
+
+/** Fallback copy = the seed in infrastructure/cms/onboarding/touchvodka-pages.json (slug=home). */
+const FALLBACK = {
+  collectionEyebrow: '// 01_CATALOGUE',
+  collectionTitle: 'The Touch Collection',
+  processEyebrow: '// PROCESS_REPORT_04',
+  processTitle: 'The Art of Distillation',
+  processLead:
+    "Crafted with passion and precision, our proprietary process ensures the smoothest finish in every bottle. We don't just make spirits; we engineer experiences.",
+} as const;
+
+/** CMS may send an icon by name; resolve it to the component, else use the per-card default. */
+const PROCESS_ICONS: Record<string, LucideIcon> = { Sprout, Droplets, Waves };
+
+// Per-card presentation + default content stays in code (the 3-up grid is a fixed
+// brutalist layout); only icon name + title + body are editable from the CMS.
+const PROCESS_CARDS = [
+  {
+    Icon: Sprout,
+    wrapper:
+      'group border-black border-r-2 border-b-2 bg-white p-10 transition-colors hover:bg-accent hover:text-white',
+    bodyClass: 'font-mono text-sm lowercase opacity-70 group-hover:opacity-100',
+    title: 'Premium Grains',
+    body: 'Sourced from the finest local fields, our winter wheat provides a silky texture and a naturally sweet finish.',
+  },
+  {
+    Icon: Droplets,
+    wrapper:
+      'group border-black border-b-2 bg-neutral-50 p-10 transition-colors hover:bg-accent hover:text-white',
+    bodyClass: 'font-mono text-sm lowercase opacity-70 group-hover:opacity-100',
+    title: '10X Distilled',
+    body: 'Refined exactly ten times for exceptional clarity, then charcoal filtered to remove impurities while keeping character.',
+  },
+  {
+    Icon: Waves,
+    wrapper:
+      'group border-black border-r-2 bg-neutral-100 p-10 transition-colors hover:bg-accent hover:text-white sm:col-span-2',
+    bodyClass: 'max-w-md font-mono text-sm lowercase opacity-70 group-hover:opacity-100',
+    title: 'Pure Spring Water',
+    body: 'Blended with pristine, mineral-rich water from natural protected springs for a crisp, clean taste that defines our signature profile.',
+  },
+] as const;
+
+type CmsCard = { icon?: string; title?: string; body?: string };
+
 export default async function Home() {
-  const products = await getSiteProducts();
+  const [products, home] = await Promise.all([getSiteProducts(), getPage('home')]);
+  const s = (home?.sections ?? {}) as Record<string, unknown>;
+
+  const collectionEyebrow = (s.collectionEyebrow as string) || FALLBACK.collectionEyebrow;
+  const collectionTitle = (s.collectionTitle as string) || FALLBACK.collectionTitle;
+  const processEyebrow = home?.eyebrow || FALLBACK.processEyebrow;
+  const processTitle = (s.processTitle as string) || FALLBACK.processTitle;
+  const processLead = home?.lead || FALLBACK.processLead;
+  const cmsCards: CmsCard[] = Array.isArray(s.processCards) ? (s.processCards as CmsCard[]) : [];
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -25,9 +81,9 @@ export default async function Home() {
         <div className="flex flex-col items-start justify-between gap-6 border-black border-b-4 bg-neutral-50 p-8 md:flex-row md:items-center md:p-12">
           <div>
             <span className="mb-2 block font-bold text-accent text-sm tracking-[0.3em]">
-              {'// 01_CATALOGUE'}
+              {collectionEyebrow}
             </span>
-            <h2 className="text-5xl md:text-7xl">The Touch Collection</h2>
+            <h2 className="text-5xl md:text-7xl">{collectionTitle}</h2>
           </div>
           <Link
             href="/products"
@@ -73,13 +129,10 @@ export default async function Home() {
       {/* Process */}
       <section id="distillery" className="grid grid-cols-1 border-black border-b-4 lg:grid-cols-4">
         <div className="flex flex-col justify-center border-black border-r-4 bg-neutral-50 p-8 md:p-16 lg:col-span-2">
-          <span className="mb-6 block font-bold text-accent tracking-[0.3em]">
-            {'// PROCESS_REPORT_04'}
-          </span>
-          <h2 className="mb-10 text-7xl md:text-9xl">The Art of Distillation</h2>
+          <span className="mb-6 block font-bold text-accent tracking-[0.3em]">{processEyebrow}</span>
+          <h2 className="mb-10 text-7xl md:text-9xl">{processTitle}</h2>
           <p className="border-accent border-l-8 pl-8 font-mono text-lg leading-relaxed lowercase opacity-80 md:text-xl">
-            Crafted with passion and precision, our proprietary process ensures the smoothest finish
-            in every bottle. We don't just make spirits; we engineer experiences.
+            {processLead}
           </p>
           <Link
             href="/our-story"
@@ -90,34 +143,21 @@ export default async function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:col-span-2">
-          <div className="group border-black border-r-2 border-b-2 bg-white p-10 transition-colors hover:bg-accent hover:text-white">
-            <Sprout className="mb-8 h-12 w-12 text-accent group-hover:text-white" />
-            <h3 className="mb-4 text-4xl">Premium Grains</h3>
-            <p className="font-mono text-sm lowercase opacity-70 group-hover:opacity-100">
-              Sourced from the finest local fields, our winter wheat provides a silky texture and a
-              naturally sweet finish.
-            </p>
-          </div>
-          <div className="group border-black border-b-2 bg-neutral-50 p-10 transition-colors hover:bg-accent hover:text-white">
-            <Droplets className="mb-8 h-12 w-12 text-accent group-hover:text-white" />
-            <h3 className="mb-4 text-4xl">10X Distilled</h3>
-            <p className="font-mono text-sm lowercase opacity-70 group-hover:opacity-100">
-              Refined exactly ten times for exceptional clarity, then charcoal filtered to remove
-              impurities while keeping character.
-            </p>
-          </div>
-          <div className="group border-black border-r-2 bg-neutral-100 p-10 transition-colors hover:bg-accent hover:text-white sm:col-span-2">
-            <Waves className="mb-8 h-12 w-12 text-accent group-hover:text-white" />
-            <h3 className="mb-4 text-4xl">Pure Spring Water</h3>
-            <p className="max-w-md font-mono text-sm lowercase opacity-70 group-hover:opacity-100">
-              Blended with pristine, mineral-rich water from natural protected springs for a crisp,
-              clean taste that defines our signature profile.
-            </p>
-          </div>
+          {PROCESS_CARDS.map((preset, i) => {
+            const cms = cmsCards[i];
+            const Icon = (cms?.icon ? PROCESS_ICONS[cms.icon] : undefined) ?? preset.Icon;
+            return (
+              <div key={preset.title} className={preset.wrapper}>
+                <Icon className="mb-8 h-12 w-12 text-accent group-hover:text-white" />
+                <h3 className="mb-4 text-4xl">{cms?.title ?? preset.title}</h3>
+                <p className={preset.bodyClass}>{cms?.body ?? preset.body}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooterData />
     </div>
   );
 }

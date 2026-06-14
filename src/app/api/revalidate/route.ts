@@ -18,10 +18,14 @@ import { type NextRequest, NextResponse } from 'next/server';
 const MODEL_PATHS: Record<string, string[]> = {
   product: ['/products'],
   cocktail: ['/cocktails'],
+  'cocktail-recipe': ['/cocktails'],
   article: ['/blog'],
   'blog-post': ['/blog'],
-  siteconfig: ['/'], // global config affects the whole layout
 };
+
+// Global config (footer/socials/site-config) renders on EVERY page → bust the
+// whole root layout, not a single path. Handle both webhook model spellings.
+const GLOBAL_CONFIG_MODELS = new Set(['siteconfig', 'site-config']);
 
 export async function POST(req: NextRequest) {
   const secret = process.env.REVALIDATION_SECRET;
@@ -48,16 +52,27 @@ export async function POST(req: NextRequest) {
   const model = body.model;
   const slug = body.entry?.slug;
 
-  const listings = (model && MODEL_PATHS[model]) || ['/'];
-  for (const path of listings) {
+  if (model && GLOBAL_CONFIG_MODELS.has(model)) {
+    // Layout-level: refresh every route under the root layout (footer is global).
+    revalidatePath('/', 'layout');
+    revalidated.push('/ (layout)');
+  } else if (model === 'page') {
+    // Marketing-copy page → a top-level route equal to its slug (home → /).
+    const path = !slug || slug === 'home' ? '/' : `/${slug}`;
     revalidatePath(path);
     revalidated.push(path);
-  }
-  // Also revalidate the specific entry detail page when we can derive it.
-  if (slug && model && MODEL_PATHS[model]?.[0] && MODEL_PATHS[model][0] !== '/') {
-    const detail = `${MODEL_PATHS[model][0]}/${slug}`;
-    revalidatePath(detail);
-    revalidated.push(detail);
+  } else {
+    const listings = (model && MODEL_PATHS[model]) || ['/'];
+    for (const path of listings) {
+      revalidatePath(path);
+      revalidated.push(path);
+    }
+    // Also revalidate the specific entry detail page when we can derive it.
+    if (slug && model && MODEL_PATHS[model]?.[0] && MODEL_PATHS[model][0] !== '/') {
+      const detail = `${MODEL_PATHS[model][0]}/${slug}`;
+      revalidatePath(detail);
+      revalidated.push(detail);
+    }
   }
 
   return NextResponse.json({ revalidated: true, paths: revalidated, now: Date.now() });
