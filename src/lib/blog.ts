@@ -3,9 +3,11 @@
  * server only). The body is rendered as Markdown by the page (react-markdown +
  * remark-gfm); we deliberately avoid a heavy MDX runtime for a content-only blog.
  *
- * MIGRATION NOTE (S6): these posts are the seed for the shared Strapi `Article`
- * content type (site = touch-vodka). Once migrated, swap this fs reader for a
- * `strapiFetch('articles', …)` call — the `BlogPost` shape is the seam.
+ * CMS WIRING (S6, 2026-06-13): each loader now tries the shared Strapi `Article`
+ * type first (via the tenant-scoped `getArticles`) and falls back to these MDX
+ * files when the CMS is unwired/empty — so a brand renders from Strapi the moment
+ * its content lands, with zero consumer changes (the `BlogPost` shape is the seam)
+ * and no risk to the build pre-migration. Strapi is the source of truth once live.
  *
  * Tiny dependency-free frontmatter parser (no gray-matter): the files use simple
  * `key: "value"` / `key: ["a","b"]` YAML, which is all we emit.
@@ -13,6 +15,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { mediaUrl } from '@/lib/media';
+import { type StrapiArticle, getArticles } from '@/lib/strapi';
 
 const BLOG_DIR = join(process.cwd(), 'src/content/blog');
 
@@ -68,13 +71,70 @@ async function readPost(file: string): Promise<BlogPost> {
   };
 }
 
-export async function getAllPosts(): Promise<BlogPost[]> {
+// ── Strapi `Article` → BlogPost mapping (tolerant of v5/v4 + field-name variants) ──
+
+function str(v: unknown, fallback = ''): string {
+  if (typeof v === 'string') return v;
+  return v == null ? fallback : String(v);
+}
+
+/** A Strapi media field → URL, tolerant of v5 object / v4 `{data:{attributes}}` / plain string. */
+function mediaField(v: unknown): string {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return mediaField(v[0]);
+  if (typeof v === 'object') {
+    const o = v as Record<string, unknown>;
+    if (typeof o.url === 'string') return o.url; // v5 populated media
+    if (o.data && typeof o.data === 'object') {
+      const a = (o.data as Record<string, unknown>).attributes as
+        | Record<string, unknown>
+        | undefined;
+      if (a && typeof a.url === 'string') return a.url; // v4 nested
+    }
+  }
+  return '';
+}
+
+function mapArticle(rec: StrapiArticle): BlogPost {
+  const r = rec as Record<string, unknown>;
+  const category = r.category;
+  const categoryName =
+    typeof category === 'string'
+      ? category
+      : str((category as Record<string, unknown> | undefined)?.name, 'General');
+  return {
+    slug: str(r.slug),
+    title: str(r.title),
+    date: str(r.date ?? r.publishedAt ?? r.published_at),
+    excerpt: str(r.excerpt),
+    author: str(r.author, 'admin'),
+    category: categoryName || 'General',
+    tags: Array.isArray(r.tags) ? (r.tags as unknown[]).map((t) => str(t)).filter(Boolean) : [],
+    image: mediaUrl(mediaField(r.image ?? r.featured_image ?? r.cover)),
+    body: str(r.body ?? r.content),
+  };
+}
+
+const byDateDesc = (a: BlogPost, b: BlogPost): number => (a.date < b.date ? 1 : -1);
+
+async function readMdxPosts(): Promise<BlogPost[]> {
   const files = (await readdir(BLOG_DIR)).filter((f) => f.endsWith('.mdx') || f.endsWith('.md'));
   const posts = await Promise.all(files.map(readPost));
-  return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
+  return posts.sort(byDateDesc);
+}
+
+export async function getAllPosts(): Promise<BlogPost[]> {
+  const cms = await getArticles();
+  if (cms) return cms.map(mapArticle).sort(byDateDesc);
+  return readMdxPosts();
 }
 
 export async function getPostSlugs(): Promise<string[]> {
+  const cms = await getArticles();
+  if (cms) {
+    return cms.map((r) => str((r as Record<string, unknown>).slug)).filter(Boolean);
+  }
   const files = await readdir(BLOG_DIR);
   return files
     .filter((f) => f.endsWith('.mdx') || f.endsWith('.md'))
@@ -82,6 +142,8 @@ export async function getPostSlugs(): Promise<string[]> {
 }
 
 export async function getPost(slug: string): Promise<BlogPost | null> {
+  const cms = await getArticles();
+  if (cms) return cms.map(mapArticle).find((p) => p.slug === slug) ?? null;
   try {
     return await readPost(`${slug}.mdx`);
   } catch {

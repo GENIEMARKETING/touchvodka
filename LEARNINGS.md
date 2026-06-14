@@ -231,3 +231,24 @@ Format: **Symptom · Cause · Fix · Promote?**
   manual provider). Browser proof requires the Amplify redeploy (build-time inlining) AND
   the deployed origin (shop-api `STORE_CORS` allowlists touchvodka.com, **not** localhost —
   so a local browser e2e can't validate against live Medusa).
+
+## Wire the rest of the content to Strapi via the tenant-scoped data-provider (not ad-hoc fetches)
+- **Symptom:** blog (`src/content/blog/*.mdx`), homepage/our-story copy (hardcoded JSX), and
+  the footer (hardcoded) were the only content NOT editable from the CMS — only `products`/
+  `stockists` read from Strapi. Editing in Strapi changed nothing for them.
+- **Cause:** no reader existed for the `article`/`page`/`site-config` types; the copy lived in code.
+- **Fix:** added `getArticles`/`getPage`/`getSiteConfig` to `lib/strapi.ts` (the ONE tenant-scoped
+  access path — `filters[client][$eq]` + seed fallback, per the design-lane rule), then wired
+  `lib/blog.ts` (Strapi-first, MDX fallback, **same function signatures** so the pages don't move),
+  `app/our-story` + `app/page.tsx` (Strapi `page` by slug, hardcoded fallback; interactive hero
+  stays in code), and `SiteFooter` (now prop-driven, fed by a server `SiteFooterData` wrapper from
+  `site-config`). Every reader returns the in-repo source when the CMS is unwired/empty → the build
+  is never gated on the CMS. Also extended `/api/revalidate` to handle the `page` model (slug→route,
+  home→`/`) and `site-config` (layout-level bust, both `siteconfig`/`site-config` spellings).
+- **Gotchas:** (1) Strapi media fields are shape-variable (v5 `{url}` / v4 `{data:{attributes:{url}}}`
+  / string) — map tolerantly (`mediaField` in `lib/blog.ts`); `lib/media.ts` already passes absolute
+  URLs through. (2) `noUncheckedIndexedAccess` makes tuple indexing `T|undefined` — iterate the
+  presets array and zip the CMS card by index, don't index a fallback tuple. (3) field names for
+  `article`/`site-config` aren't pinned in a committed schema → readers tolerate camel/snake variants.
+- **Promote?:** yes → registry `strapi-wire-via-tenant-data-provider-with-fallback` (every site's
+  CMS cutover follows this shape).

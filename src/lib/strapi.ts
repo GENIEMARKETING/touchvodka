@@ -73,3 +73,59 @@ export async function getStockists(client = SITE_KEY): Promise<Stockist[]> {
   });
   return data && data.length > 0 ? data : STOCKISTS;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Editable content types (S6 CMS wiring, 2026-06-13). Same single tenant-scoped
+// access path as products/stockists above: filter by `client`, `populate=*` for
+// media, and return null when the CMS isn't wired/empty so each caller falls back
+// to its existing in-repo source (MDX / hardcoded copy) — the build is never
+// gated on the CMS. Strapi stays READ-ONLY here (design-lane content-ownership
+// rule: blogs/pages/config are edited only in Strapi; nothing writes back).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** A blog article as returned by Strapi (shape-tolerant; mapped in lib/blog). */
+export type StrapiArticle = Record<string, unknown>;
+
+/** Articles (blog) for this brand. null → CMS not wired/empty (caller falls back to MDX). */
+export async function getArticles(client = SITE_KEY): Promise<StrapiArticle[] | null> {
+  const data = await strapiFetch<StrapiArticle[]>('articles', {
+    'filters[client][$eq]': client,
+    populate: '*',
+    'pagination[pageSize]': '100',
+  });
+  return data && data.length > 0 ? data : null;
+}
+
+/** Editable marketing-copy page (slug-keyed). Mirrors the `page` content type. */
+export type StrapiPage = {
+  slug?: string;
+  title?: string;
+  eyebrow?: string;
+  lead?: string;
+  body?: string;
+  sections?: Record<string, unknown> | null;
+  seoTitle?: string;
+  seoDescription?: string;
+};
+
+/** One page by slug for this brand. null → not in CMS (caller falls back to hardcoded copy). */
+export async function getPage(slug: string, client = SITE_KEY): Promise<StrapiPage | null> {
+  const data = await strapiFetch<StrapiPage[]>('pages', {
+    'filters[client][$eq]': client,
+    'filters[slug][$eq]': slug,
+    populate: '*',
+  });
+  return data && data.length > 0 ? (data[0] ?? null) : null;
+}
+
+/** Per-brand site config (logo / socials / footer). Mirrors the `site-config` type. */
+export type StrapiSiteConfig = Record<string, unknown>;
+
+/** Site config for this brand. null → not in CMS (caller falls back to hardcoded defaults). */
+export async function getSiteConfig(client = SITE_KEY): Promise<StrapiSiteConfig | null> {
+  const data = await strapiFetch<StrapiSiteConfig[]>('site-configs', {
+    'filters[client][$eq]': client,
+    populate: '*',
+  });
+  return data && data.length > 0 ? (data[0] ?? null) : null;
+}

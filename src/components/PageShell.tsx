@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 import Header from './Header';
-import SiteFooter from './SiteFooter';
+import SiteFooterData from './SiteFooterData';
 
-/** Standard inner-page chrome: brutalist header + content + footer. */
+/** Standard inner-page chrome: brutalist header + content + footer (footer copy from Strapi site-config). */
 export default function PageShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-white text-black">
       <Header />
       <main>{children}</main>
-      <SiteFooter />
+      <SiteFooterData />
     </div>
   );
 }

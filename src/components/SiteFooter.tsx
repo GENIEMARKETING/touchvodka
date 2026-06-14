@@ -42,15 +42,33 @@ const COLS: Array<{ heading: string; links: Array<{ label: string; href: string 
   },
 ];
 
-export default function SiteFooter() {
+/** Hardcoded defaults = today's footer; overridden per-brand by Strapi site-config (via SiteFooterData). */
+const DEFAULTS = {
+  siteName: 'Touch Vodka',
+  tagline:
+    'Elevating spirits since 2012. Crafted for those who appreciate the finer details. Industrial precision meets artisanal soul.',
+  instagram: 'https://instagram.com',
+  twitter: 'https://twitter.com',
+};
+
+export default function SiteFooter({
+  siteName = DEFAULTS.siteName,
+  tagline = DEFAULTS.tagline,
+  instagram = DEFAULTS.instagram,
+  twitter = DEFAULTS.twitter,
+}: {
+  siteName?: string;
+  tagline?: string;
+  instagram?: string;
+  twitter?: string;
+} = {}) {
   return (
     <footer className="border-black border-t-4 bg-black p-8 text-white md:p-16">
       <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
         <div className="flex flex-col gap-12 md:col-span-5">
-          <span className="font-display text-4xl uppercase tracking-tight">Touch Vodka</span>
+          <span className="font-display text-4xl uppercase tracking-tight">{siteName}</span>
           <p className="max-w-xs border-accent border-l-2 pl-6 font-mono text-sm leading-relaxed opacity-60">
-            Elevating spirits since 2012. Crafted for those who appreciate the finer details.
-            Industrial precision meets artisanal soul.
+            {tagline}
           </p>
         </div>
 
@@ -94,14 +112,14 @@ export default function SiteFooter() {
         </p>
         <div className="flex gap-6">
           <a
-            href="https://instagram.com"
+            href={instagram}
             aria-label="Instagram"
             className="group border-2 border-white p-3 transition-all hover:border-accent hover:bg-accent"
           >
             <Instagram className="h-6 w-6" />
           </a>
           <a
-            href="https://twitter.com"
+            href={twitter}
             aria-label="Twitter / X"
             className="group border-2 border-white p-3 transition-all hover:border-accent hover:bg-accent"
           >
