@@ -2,8 +2,10 @@ import Header from '@/components/Header';
 import SiteFooterData from '@/components/SiteFooterData';
 import HomeFaq from '@/components/home/HomeFaq';
 import HomeHero from '@/components/home/HomeHero';
+import { TestimonialWall } from '@/components/vinny/testimonial-wall/testimonial-wall';
 import { mediaUrl } from '@/lib/media';
 import { getPage, getSiteProducts } from '@/lib/strapi';
+import { getTestimonials } from '@/lib/testimonials';
 import { Droplets, type LucideIcon, Sprout, Waves } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -62,7 +64,11 @@ const PROCESS_CARDS = [
 type CmsCard = { icon?: string; title?: string; body?: string };
 
 export default async function Home() {
-  const [products, home] = await Promise.all([getSiteProducts(), getPage('home')]);
+  const [products, home, testimonials] = await Promise.all([
+    getSiteProducts(),
+    getPage('home'),
+    getTestimonials(),
+  ]);
   const s = (home?.sections ?? {}) as Record<string, unknown>;
 
   const collectionEyebrow = (s.collectionEyebrow as string) || FALLBACK.collectionEyebrow;
@@ -157,6 +163,15 @@ export default async function Home() {
           })}
         </div>
       </section>
+
+      {/* T47: social proof — testimonial wall (marquee; reduced-motion → static grid). */}
+      {testimonials.length > 0 ? (
+        <TestimonialWall
+          heading="What people are pouring"
+          testimonials={testimonials}
+          className="border-black border-b-4 bg-neutral-50 py-16 [--border:#000]"
+        />
+      ) : null}
 
       {/* T46 (AEO): answer-shaped FAQ — visible Q&A + matching FAQPage JSON-LD. */}
       <HomeFaq />
