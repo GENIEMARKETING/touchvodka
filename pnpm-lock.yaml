@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@geniemarketing/commerce':
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.2.0
+        version: 0.2.0
       '@geniemarketing/foundation':
         specifier: ^0.2.2
         version: 0.2.2(react@19.2.7)
@@ -317,8 +317,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@geniemarketing/commerce@0.1.1':
-    resolution: {integrity: sha512-zceOaX0PTny7E0jtbD8gfuXqvlLfsDOLSnDrqyiFiLqJNmm6B9fOKj8dpmDMsZn6Et6RVJ0SiNPY3kbKGE5nSQ==, tarball: https://npm.pkg.github.com/download/@geniemarketing/commerce/0.1.1/bdd07a679d1671912e4a7321f6b9d5c2563f6abf}
+  '@geniemarketing/commerce@0.2.0':
+    resolution: {integrity: sha512-YnaVHpmsTyfhzxDkWHJZ2upyhP54GJJLiAxu2bxqZnL2pKG1If5F+Xtt671ywTu/TtQUIcb71S6uTNPad6XFkQ==, tarball: https://npm.pkg.github.com/download/@geniemarketing/commerce/0.2.0/c55277683033842c96e611e3a82f62c602b91160}
 
   '@geniemarketing/foundation@0.2.2':
     resolution: {integrity: sha512-xBSdcULaSoDsspwWIPxWgFtOvXuTJHK7PLFWXKBcZdrLET4xlD+y5LYRbOA4EVzGuYQ10SlinTF0VkO+aom9Rw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.2.2/097d04a8cfceb8ca228d09f2e5755014f371389b}
@@ -1554,7 +1554,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.0':
     optional: true
 
-  '@geniemarketing/commerce@0.1.1': {}
+  '@geniemarketing/commerce@0.2.0': {}
 
   '@geniemarketing/foundation@0.2.2(react@19.2.7)':
     optionalDependencies:
