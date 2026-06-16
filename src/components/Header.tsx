@@ -1,5 +1,6 @@
 'use client';
 
+import { AccountButton } from '@/components/AccountButton';
 import { CartButton } from '@/components/vinny/commerce/cart-button';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
@@ -57,6 +58,9 @@ export default function Header() {
         >
           Find_Us
         </Link>
+
+        {/* T48: customer account — renders only when a Medusa channel is wired. */}
+        <AccountButton className="border-black border-l-4" />
 
         {/* S10: DTC cart — renders only when a Medusa channel is wired. */}
         <CartButton className="border-black border-l-4" />
