@@ -19,7 +19,7 @@
     "test:update": "playwright test --update-snapshots"
   },
   "dependencies": {
-    "@geniemarketing/commerce": "^0.1.1",
+    "@geniemarketing/commerce": "^0.2.0",
     "@geniemarketing/foundation": "^0.2.2",
     "@geniemarketing/seo": "^0.2.0",
     "@geniemarketing/ui": "^0.2.0",

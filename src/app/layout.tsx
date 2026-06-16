@@ -1,5 +1,6 @@
 import Analytics from '@/components/Analytics';
 import { AgeGate } from '@/components/vinny/age-gate/age-gate';
+import { AuthProvider } from '@/components/vinny/commerce/auth-context';
 import { CartProvider } from '@/components/vinny/commerce/cart-context';
 import { CartDrawer } from '@/components/vinny/commerce/cart-drawer';
 import { ConsentBanner } from '@/components/vinny/consent-banner/consent-banner';
@@ -74,11 +75,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         {/* S10: age-gate (21+) for the regulated spirits category. */}
         <AgeGate brand="Touch Vodka" minAge={21} />
-        {/* S10: DTC cart state + slide-over (inert until Medusa is wired). */}
-        <CartProvider>
-          {children}
-          <CartDrawer />
-        </CartProvider>
+        {/* S10/T48: DTC cart + customer session (both inert until Medusa is wired). */}
+        <AuthProvider>
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
+        </AuthProvider>
         {/* S7: consent banner — the keystone the trackers are gated on. */}
         <ConsentBanner
           brand="Touch Vodka"
