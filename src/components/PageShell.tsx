@@ -35,7 +35,7 @@ export function PageHero({
       {watermark ? (
         <span
           aria-hidden
-          className="pointer-events-none absolute right-4 bottom-0 select-none font-display text-[clamp(5rem,18vw,15rem)] text-fg/[0.05] uppercase leading-[0.8] tracking-tight"
+          className="pointer-events-none absolute right-0 bottom-0 select-none font-display text-[clamp(3.5rem,13vw,11rem)] text-black/[0.04] uppercase leading-[0.8] tracking-tight"
         >
           {watermark}
         </span>

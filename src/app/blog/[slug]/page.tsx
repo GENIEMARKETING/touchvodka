@@ -1,8 +1,8 @@
+import BlogImage from '@/components/BlogImage';
 import PageShell from '@/components/PageShell';
 import { getPost, getPostSlugs } from '@/lib/blog';
 import { articleJsonLd, breadcrumbJsonLd, jsonLdScript, pageMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
@@ -77,22 +77,14 @@ export default async function BlogDetailPage({ params }: Params) {
 
         {/* Article hero image (Figma 55:84). */}
         <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-3xl bg-warm">
-          {post.image?.trim() ? (
-            <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              priority
-              sizes="(max-width:768px) 100vw, 768px"
-              className="object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <span className="font-mono text-neutral-400 text-xs uppercase tracking-widest">
-                {post.category}
-              </span>
-            </div>
-          )}
+          <BlogImage
+            src={post.image}
+            alt={post.title}
+            label={post.category}
+            priority
+            sizes="(max-width:768px) 100vw, 768px"
+            className="object-cover"
+          />
         </div>
 
         <div className="max-w-none font-sans text-neutral-700 leading-relaxed [&_a]:text-accent [&_h2]:mt-10 [&_h2]:font-display [&_h2]:text-3xl [&_h2]:text-fg [&_h2]:uppercase [&_h3]:mt-8 [&_h3]:font-display [&_h3]:text-2xl [&_h3]:text-fg [&_h3]:uppercase [&_li]:my-1 [&_p]:my-4 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6">

@@ -1,8 +1,8 @@
+import BlogImage from '@/components/BlogImage';
 import PageShell, { PageHero } from '@/components/PageShell';
-import { type BlogPost, getAllPosts } from '@/lib/blog';
+import { getAllPosts } from '@/lib/blog';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -10,28 +10,6 @@ export const metadata: Metadata = {
   description:
     'Stories on craft spirits, cocktails, and sustainability from the Touch Vodka journal.',
 };
-
-/** Warm image tile with a graceful placeholder when a post has no cover image. */
-function PostImage({ post, className }: { post: BlogPost; className?: string }) {
-  if (post.image?.trim()) {
-    return (
-      <Image
-        src={post.image}
-        alt={post.title}
-        fill
-        sizes="(max-width:768px) 100vw, 50vw"
-        className={className}
-      />
-    );
-  }
-  return (
-    <div className="flex h-full w-full items-center justify-center bg-warm">
-      <span className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest">
-        {post.category}
-      </span>
-    </div>
-  );
-}
 
 export default async function BlogPage() {
   const posts = await getAllPosts();
@@ -54,8 +32,11 @@ export default async function BlogPage() {
             className="group mb-14 grid items-center gap-8 overflow-hidden rounded-3xl border border-concrete/60 bg-white shadow-soft transition-all duration-300 ease-brand hover:-translate-y-1 hover:shadow-soft-lg md:grid-cols-2"
           >
             <div className="relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-full md:min-h-[340px]">
-              <PostImage
-                post={featured}
+              <BlogImage
+                src={featured.image}
+                alt={featured.title}
+                label={featured.category}
+                sizes="(max-width:768px) 100vw, 50vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
@@ -86,8 +67,11 @@ export default async function BlogPage() {
               className="group flex flex-col overflow-hidden rounded-2xl border border-concrete/60 bg-white shadow-soft transition-all duration-300 ease-brand hover:-translate-y-1 hover:shadow-soft-lg"
             >
               <div className="relative aspect-[4/3] overflow-hidden">
-                <PostImage
-                  post={post}
+                <BlogImage
+                  src={post.image}
+                  alt={post.title}
+                  label={post.category}
+                  sizes="(max-width:768px) 100vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
