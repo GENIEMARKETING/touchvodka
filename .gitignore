@@ -27,5 +27,5 @@ tsconfig.tsbuildinfo
 graphify-out/cache/
 
 # heavy raster media — placeholders live locally; finals go to S3/CDN (asset pipeline)
-public/hero/
+# (the 66KB optimized hero IS committed so the deploy has it; products resolve via the CDN)
 public/products/
