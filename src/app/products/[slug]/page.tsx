@@ -168,16 +168,8 @@ export default async function ProductDetailPage({ params }: Params) {
                 </p>
                 <p className="font-display text-accent text-xl">In stock</p>
               </div>
-              {price ? (
-                <div>
-                  <p className="font-mono text-neutral-400 text-xs uppercase tracking-[0.2em]">
-                    Price
-                  </p>
-                  <p className="font-display text-fg text-xl">
-                    ${(price.amount / 100).toFixed(2)}
-                  </p>
-                </div>
-              ) : null}
+              {/* Price intentionally omitted here — the buy box below shows the
+                  canonical Medusa price (formatted, in the right currency). */}
             </div>
 
             <div className="mt-8">
