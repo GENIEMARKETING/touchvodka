@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import Header from './Header';
 import SiteFooterData from './SiteFooterData';
 
-/** Standard inner-page chrome: brutalist header + content + footer (footer copy from Strapi site-config). */
+/** Standard inner-page chrome: header + content + footer (footer copy from Strapi site-config). */
 export default function PageShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-fg">
       <Header />
       <main>{children}</main>
       <SiteFooterData />
@@ -13,7 +13,10 @@ export default function PageShell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Reusable brutalist page hero (eyebrow + title + lead). */
+/**
+ * PageHero — Refined-Bold inner-page header (eyebrow + title + optional lead) on
+ * a warm band that echoes the home hero. Replaces the brutalist bordered hero.
+ */
 export function PageHero({
   eyebrow,
   title,
@@ -24,16 +27,12 @@ export function PageHero({
   lead?: string;
 }) {
   return (
-    <section className="border-black border-b-4 bg-neutral-50 p-8 md:p-12 lg:p-16">
-      <div className="mx-auto max-w-6xl">
-        <span className="mb-4 block font-bold text-accent text-sm tracking-[0.3em]">{eyebrow}</span>
-        <h1 className="mb-8 font-display text-6xl uppercase leading-[0.85] md:text-8xl lg:text-9xl">
-          {title}
-        </h1>
+    <section className="bg-warm py-20 md:py-28 lg:py-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
+        <p className="mb-3 font-mono text-accent text-xs uppercase tracking-[0.25em]">{eyebrow}</p>
+        <h1 className="mb-6 font-display text-5xl text-fg uppercase md:text-7xl lg:text-8xl">{title}</h1>
         {lead ? (
-          <p className="max-w-3xl border-accent border-l-4 pl-8 font-mono text-lg leading-relaxed lowercase opacity-80 md:text-xl">
-            {lead}
-          </p>
+          <p className="max-w-3xl text-lg text-neutral-600 leading-relaxed md:text-xl">{lead}</p>
         ) : null}
       </div>
     </section>

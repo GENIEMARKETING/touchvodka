@@ -17,44 +17,44 @@ export default async function FindUsPage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="// CONTACT"
+        eyebrow="Get in Touch"
         title="Find Us"
         lead="Find Touch Vodka at a store near you — or reach out about stocking, wholesale, or collaboration."
       />
 
-      {/* Contact strip (ported from the Vite FindUs page) */}
-      <section className="border-black border-b-4 bg-white p-8 md:p-12">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
-          <div className="border-4 border-black p-8">
+      {/* Contact strip */}
+      <section className="bg-white py-20 md:py-28">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 md:grid-cols-3 md:px-10">
+          <div className="rounded-2xl bg-neutral-50 p-8 shadow-soft">
             <div className="mb-6 flex items-center gap-4">
-              <Mail className="h-8 w-8 text-accent" />
-              <h3 className="font-display text-2xl uppercase">Email</h3>
+              <Mail className="h-7 w-7 text-accent" />
+              <h3 className="font-display text-xl text-fg uppercase">Email</h3>
             </div>
             <a
               href="mailto:info@touchvodka.com"
-              className="font-mono text-sm lowercase opacity-80 hover:text-accent"
+              className="text-neutral-600 transition-colors hover:text-accent"
             >
               info@touchvodka.com
             </a>
           </div>
-          <div className="border-4 border-black bg-neutral-50 p-8">
+          <div className="rounded-2xl bg-neutral-50 p-8 shadow-soft">
             <div className="mb-6 flex items-center gap-4">
-              <Phone className="h-8 w-8 text-accent" />
-              <h3 className="font-display text-2xl uppercase">Phone</h3>
+              <Phone className="h-7 w-7 text-accent" />
+              <h3 className="font-display text-xl text-fg uppercase">Phone</h3>
             </div>
             <a
               href="tel:813-242-4459"
-              className="font-mono text-sm lowercase opacity-80 hover:text-accent"
+              className="text-neutral-600 transition-colors hover:text-accent"
             >
               813-242-4459
             </a>
           </div>
-          <div className="border-4 border-black p-8">
+          <div className="rounded-2xl bg-neutral-50 p-8 shadow-soft">
             <div className="mb-6 flex items-center gap-4">
-              <MapPin className="h-8 w-8 text-accent" />
-              <h3 className="font-display text-2xl uppercase">Location</h3>
+              <MapPin className="h-7 w-7 text-accent" />
+              <h3 className="font-display text-xl text-fg uppercase">Location</h3>
             </div>
-            <p className="font-mono text-sm lowercase opacity-80">
+            <p className="text-neutral-600 leading-relaxed">
               Fat Dog Spirits
               <br />
               3212 N 40th St, Ste 701

@@ -5,9 +5,10 @@
 /* Brand theme contract — @geniemarketing/ui elements read these variables. Re-skin this
    site by changing only these four values. preflight verifies they exist.
 
-   Touch Vodka = neo-brutalist: electric-blue accent on a high-contrast
-   black/white grid. Fonts come from next/font (Anton + Space Mono), exposed as
-   --font-display / --font-mono by layout.tsx.
+   Touch Vodka = Refined Bold (redesign 2026-06): electric-blue accent on a warm,
+   high-contrast white canvas — confident bold-display headlines + readable body.
+   Fonts come from next/font (Bricolage Grotesque + Hanken Grotesk + Space Mono),
+   exposed as --font-display / --font-sans / --font-mono by layout.tsx.
 
    NOTE (token gotcha, see LEARNINGS): the shared Footer block uses --brand-fg as
    a *background*, while @geniemarketing/ui Button uses it as on-brand *text*. Those are
@@ -24,6 +25,7 @@
   --accent: var(--brand);
   --industrial: #f5f5f5;
   --concrete: #e5e5e5;
+  --warm: #f7f1e6; /* warm pale cream — echoes the hero's background on brand-moment sections */
 }
 
 html {
@@ -32,8 +34,8 @@ html {
 }
 
 body {
-  font-family: var(--font-mono), monospace;
-  text-transform: uppercase;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -41,8 +43,8 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display), sans-serif;
-  letter-spacing: -0.02em;
-  line-height: 0.9;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
 }
 
 ::selection {
@@ -61,16 +63,17 @@ h4 {
   }
 }
 
-/* Neo-brutalist scrollbar (ported from the Vite build) */
+/* Refined-Bold scrollbar — subtle, rounded (replaces the brutalist black bar). */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #fff;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #000;
-  border: 3px solid #fff;
+  background: #d4d4d4;
+  border: 2px solid #fff;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brand);

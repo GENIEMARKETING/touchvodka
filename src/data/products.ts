@@ -30,6 +30,15 @@ export interface Product {
   beaconPosition?: { top: string; left: string };
 }
 
+/**
+ * Redesign-only CDN path for the new warm-scene collection product shots
+ * (Vinny-approved 2026-06-15). Deliberately NOT the live `/touch-vodka/products/`
+ * path the live `next-rebuild` site serves — those stay the old real-bottle cutouts
+ * so the live site is untouched. Absolute URLs pass through `mediaUrl` unchanged.
+ * Source/recipe: Outputs/designs/touchvodka-redesign/ASSET-PASS-HANDOFF.md.
+ */
+const REDESIGN_PRODUCTS = 'https://img.fatdogspirits.com/touch-vodka/redesign/products';
+
 export const PRODUCTS: Product[] = [
   {
     id: 'TO-001',
@@ -39,11 +48,11 @@ export const PRODUCTS: Product[] = [
     description:
       'Our artisanal blend, carefully crafted using traditional distillation methods. A smooth, elegant vodka that honors time-tested techniques.',
     color: '#D4A574',
-    image: '/products/artisan.png',
+    image: `${REDESIGN_PRODUCTS}/artisan.webp`,
     proof: '80 PROOF',
     category: '10X Premium Distilled Spirit',
     distillationProcess: '10x Distilled',
-    relatedCocktailIds: ['CK-001'],
+    relatedCocktailIds: ['CK-001', 'CK-006', 'CK-007', 'CK-008', 'CK-009'],
     beaconPosition: { top: '52%', left: '52%' },
     tastingNotes: {
       nose: 'Subtle grain notes with hints of vanilla and white flowers',
@@ -60,11 +69,11 @@ export const PRODUCTS: Product[] = [
     description:
       'Vibrant key lime essence perfectly balanced with our signature smooth vodka base. A refreshing tropical escape in every sip.',
     color: '#7FDB00',
-    image: '/products/keylime.png',
+    image: `${REDESIGN_PRODUCTS}/keylime.webp`,
     proof: '80 PROOF',
     category: '10X Citrus Infused Spirit',
     distillationProcess: '10x Distilled',
-    relatedCocktailIds: ['CK-002'],
+    relatedCocktailIds: ['CK-002', 'CK-010', 'CK-011', 'CK-012', 'CK-013'],
     beaconPosition: { top: '50%', left: '54%' },
     tastingNotes: {
       nose: 'Bright key lime zest with tropical fruit undertones',
@@ -81,11 +90,11 @@ export const PRODUCTS: Product[] = [
     description:
       'A sophisticated blend of ruby-red berries, offering depth, complexity, and natural sweetness that elevates any cocktail.',
     color: '#E63946',
-    image: '/products/ruby.png',
+    image: `${REDESIGN_PRODUCTS}/ruby.webp`,
     proof: '80 PROOF',
     category: '10X Berry Infused Spirit',
     distillationProcess: '10x Distilled',
-    relatedCocktailIds: ['CK-003'],
+    relatedCocktailIds: ['CK-003', 'CK-014', 'CK-015', 'CK-016', 'CK-017'],
     beaconPosition: { top: '48%', left: '52%' },
     tastingNotes: {
       nose: 'Complex blend of blackberries, raspberries, and dark cherry',
@@ -102,11 +111,11 @@ export const PRODUCTS: Product[] = [
     description:
       'The flagship of our collection. A premium vodka crafted for those who appreciate excellence, clarity, and uncompromising quality.',
     color: '#0055FF',
-    image: '/products/one.png',
+    image: `${REDESIGN_PRODUCTS}/one.webp`,
     proof: '80 PROOF',
     category: '10X Premium Distilled Spirit',
     distillationProcess: '10x Distilled + Charcoal Filtered',
-    relatedCocktailIds: ['CK-004'],
+    relatedCocktailIds: ['CK-004', 'CK-018', 'CK-019', 'CK-020', 'CK-021'],
     beaconPosition: { top: '52%', left: '51%' },
     tastingNotes: {
       nose: 'Pure and pristine with subtle grain and mineral notes',
@@ -123,11 +132,11 @@ export const PRODUCTS: Product[] = [
     description:
       'Bright orange notes with a vibrant kick. A bold infusion that brings energy and sophistication to the classic vodka profile.',
     color: '#FF8C00',
-    image: '/products/orange.png',
+    image: `${REDESIGN_PRODUCTS}/orange.webp`,
     proof: '80 PROOF',
     category: '10X Citrus Infused Spirit',
     distillationProcess: '10x Distilled',
-    relatedCocktailIds: ['CK-005'],
+    relatedCocktailIds: ['CK-005', 'CK-022', 'CK-023', 'CK-024', 'CK-025'],
     beaconPosition: { top: '50%', left: '52%' },
     tastingNotes: {
       nose: 'Bold orange peel with hints of blood orange and citrus blossom',
@@ -140,6 +149,16 @@ export const PRODUCTS: Product[] = [
 
 export function getProductBySlug(slug: string): Product | undefined {
   return PRODUCTS.find((p) => p.slug === slug);
+}
+
+export function getProductById(id: string): Product | undefined {
+  return PRODUCTS.find((p) => p.id === id);
+}
+
+/** Map a cocktail's base spirit ("Touch Key Lime") to its product, for "Shop …" CTAs. */
+export function getProductByName(name: string): Product | undefined {
+  const n = name.trim().toLowerCase();
+  return PRODUCTS.find((p) => p.name.toLowerCase() === n);
 }
 
 /** Map a Product to the shared TastingNotes block's `notes` shape. */

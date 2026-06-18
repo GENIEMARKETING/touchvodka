@@ -2,18 +2,20 @@
 
 import { CartButton } from '@/components/vinny/commerce/cart-button';
 import { Menu, X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
- * Header — Touch Vodka's bespoke neo-brutalist nav.
+ * Header — Refined-Bold redesign (2026-06). Modern, minimal nav.
  *
- * REUSE DECISION (S4): the shared @geniemarketing `navbar` block is transparent-over-a-
- * dark-hero with white text — it suits image-led heroes, not Touch Vodka's
- * light, high-contrast brutalist grid. So the brand *chrome* stays bespoke while
- * the *functional* blocks (consent, leads, locator, tasting-notes) are reused.
- * Ported from the Vite build, swapping the hash router for next/link routes and
- * framer-motion for CSS transitions (one fewer dependency).
+ * Transparent and merged into the hero at the top of the page (the hero image
+ * shows through); on scroll it goes sticky with a solid black bar + white links.
+ * The wordmark is Vinny's brand vector recolored two ways: electric-blue ink
+ * (#0055FF) over the hero at the top, white ink on the black bar once scrolled —
+ * the two crossfade with the bar so the texture stays legible in both states.
+ * It is `sticky` (reserves its row) and the home hero pulls up under it with
+ * `-mt-20`, so on pages without a hero the content never hides behind the bar.
  */
 const NAV_ITEMS: Array<{ label: string; href: string }> = [
   { label: 'Our Story', href: '/our-story' },
@@ -25,47 +27,96 @@ const NAV_ITEMS: Array<{ label: string; href: string }> = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-[100] border-black border-b-4 bg-white">
-      <div className="flex h-20 items-stretch md:h-24">
+    <header
+      className={`sticky top-0 z-[100] w-full transition-colors duration-300 ease-brand ${
+        scrolled ? 'bg-fg text-white shadow-soft' : 'bg-transparent text-fg'
+      }`}
+    >
+      <div className="mx-auto flex h-20 max-w-7xl items-center gap-6 px-6 md:px-10">
         <Link
           href="/"
-          className="flex flex-shrink-0 items-center justify-center border-black border-r-4 px-4 font-display text-2xl uppercase tracking-tight transition-opacity hover:opacity-70 md:px-6 md:text-3xl"
+          aria-label="Touch Vodka home"
+          className="relative block h-8 w-24 flex-shrink-0 md:h-9 md:w-28"
         >
-          Touch
+          {/* Brand wordmark (Vinny's vector, recolored). Blue ink over the hero,
+              white ink on the scrolled black bar — crossfaded with the bar. */}
+          <Image
+            src="/brand/touch-logo-blue.svg"
+            alt="Touch Vodka"
+            fill
+            priority
+            unoptimized
+            sizes="112px"
+            className={`object-contain object-left transition-opacity duration-300 ease-brand ${
+              scrolled ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+          <Image
+            src="/brand/touch-logo-white.svg"
+            alt=""
+            aria-hidden
+            fill
+            priority
+            unoptimized
+            sizes="112px"
+            className={`object-contain object-left transition-opacity duration-300 ease-brand ${
+              scrolled ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
         </Link>
 
-        <nav className="hidden flex-grow items-center gap-10 px-8 font-bold text-xs uppercase tracking-widest lg:flex">
+        <nav className="hidden flex-grow items-center justify-center gap-9 font-medium text-sm uppercase tracking-wide lg:flex">
           {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group relative transition-colors hover:text-accent"
-            >
+            <Link key={item.href} href={item.href} className="transition-opacity hover:opacity-60">
               {item.label}
-              <span className="-bottom-1 absolute left-0 h-0.5 w-0 bg-accent transition-all group-hover:w-full" />
             </Link>
           ))}
         </nav>
-
         <div className="flex-grow lg:hidden" />
 
         <Link
-          href="/find-us"
-          className="hidden items-center gap-2 bg-white p-6 font-display text-black text-xl uppercase transition-colors hover:bg-accent hover:text-white lg:flex"
+          href="/login"
+          className="hidden font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60 lg:inline-flex"
         >
-          Find_Us
+          Log In
+        </Link>
+        <Link
+          href="/signup"
+          className={`hidden items-center rounded-full px-5 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
+            scrolled ? 'bg-white text-fg hover:bg-accent hover:text-white' : 'bg-fg text-white hover:bg-accent'
+          }`}
+        >
+          Sign Up
+        </Link>
+        <Link
+          href="/find-us"
+          className={`hidden items-center rounded-full px-6 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
+            scrolled
+              ? 'bg-accent text-white hover:bg-white hover:text-fg'
+              : 'bg-accent text-white hover:bg-fg'
+          }`}
+        >
+          Find Us
         </Link>
 
         {/* S10: DTC cart — renders only when a Medusa channel is wired. */}
-        <CartButton className="border-black border-l-4" />
+        <CartButton className="ml-1" />
 
         <button
           type="button"
           aria-label="Open menu"
           aria-expanded={open}
-          className="flex items-center gap-2 bg-white p-6 text-black transition-colors hover:bg-accent hover:text-white lg:hidden"
+          className="lg:hidden"
           onClick={() => setOpen(true)}
         >
           <Menu className="h-6 w-6" />
@@ -73,30 +124,57 @@ export default function Header() {
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-[200] flex flex-col bg-accent p-8 text-white">
+        <div className="fixed inset-0 z-[200] flex flex-col bg-fg p-8 text-white">
           <div className="mb-16 flex items-center justify-between">
-            <h2 className="font-display text-4xl uppercase">Menu</h2>
+            <Image
+              src="/brand/touch-logo-white.svg"
+              alt="Touch Vodka"
+              width={500}
+              height={167}
+              priority
+              unoptimized
+              className="h-9 w-auto"
+            />
             <button
               type="button"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
-              className="border-4 border-white p-2"
+              className="rounded-full border border-white/30 p-2 transition-colors hover:bg-white/10"
             >
-              <X className="h-8 w-8" />
+              <X className="h-7 w-7" />
             </button>
           </div>
-          <nav className="flex flex-col gap-8 font-display text-5xl uppercase">
+          <nav className="flex flex-col gap-7 font-display text-4xl uppercase">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="transition-transform hover:translate-x-4"
+                className="transition-transform hover:translate-x-3 hover:text-accent"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
+          <div className="mt-auto flex flex-col gap-4 border-white/10 border-t pt-8">
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="font-display text-lg uppercase tracking-wide text-white/80 transition-colors hover:text-white"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              onClick={() => setOpen(false)}
+              className="inline-flex w-fit items-center rounded-full bg-accent px-6 py-3 font-display text-base uppercase tracking-wide text-white"
+            >
+              Sign Up
+            </Link>
+            <p className="mt-2 font-mono text-white/40 text-xs uppercase tracking-widest">
+              21+ · Crafted in Tampa, Florida
+            </p>
+          </div>
         </div>
       ) : null}
     </header>

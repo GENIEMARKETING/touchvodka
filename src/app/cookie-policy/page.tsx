@@ -6,13 +6,13 @@ export const metadata: Metadata = { title: 'Cookie Policy' };
 export default function CookiePolicyPage() {
   return (
     <PageShell>
-      <PageHero eyebrow="// LEGAL" title="Cookies" />
-      <section className="mx-auto max-w-3xl space-y-6 px-6 py-16 font-mono text-sm leading-relaxed lowercase opacity-80">
+      <PageHero eyebrow="Legal" title="Cookies" />
+      <section className="mx-auto max-w-3xl space-y-6 px-6 py-20 text-neutral-700 leading-relaxed md:py-28">
         <p>
           We use a small set of necessary cookies to run the site, and — only with your consent —
           analytics and marketing cookies.
         </p>
-        <h2 className="font-display text-2xl uppercase opacity-100">Categories</h2>
+        <h2 className="mt-10 font-display text-2xl text-fg uppercase">Categories</h2>
         <ul className="list-disc space-y-2 pl-6">
           <li>
             <strong>necessary</strong> — always on; session and security only.

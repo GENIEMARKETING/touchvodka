@@ -15,25 +15,25 @@ export default async function BlogPage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="// 03_JOURNAL"
+        eyebrow="The Journal"
         title="Journal"
         lead="Notes on craft, cocktails, and the pursuit of the perfect pour."
       />
-      <div className="grid grid-cols-1 md:grid-cols-2">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 py-20 md:grid-cols-2 md:px-10 md:py-28">
         {posts.map((post) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
-            className="group flex flex-col border-black border-r-2 border-b-2 p-8 transition-colors hover:bg-neutral-50"
+            className="group flex flex-col rounded-3xl bg-neutral-50 p-8 shadow-soft transition-all duration-300 ease-brand hover:-translate-y-1 hover:shadow-soft-lg md:p-10"
           >
-            <span className="mb-3 font-bold text-accent text-xs tracking-widest">
-              [ {post.category} ]
+            <span className="mb-3 font-mono text-accent text-xs uppercase tracking-widest">
+              {post.category}
             </span>
-            <h2 className="mb-3 font-display text-3xl uppercase transition-colors group-hover:text-accent">
+            <h2 className="mb-3 font-display text-2xl text-fg uppercase transition-colors group-hover:text-accent md:text-3xl">
               {post.title}
             </h2>
-            <p className="mb-6 font-mono text-sm lowercase opacity-70">{post.excerpt}</p>
-            <span className="mt-auto font-mono text-xs lowercase opacity-50">{post.date}</span>
+            <p className="mb-6 line-clamp-3 text-neutral-600 leading-relaxed">{post.excerpt}</p>
+            <span className="mt-auto text-neutral-400 text-sm">{post.date}</span>
           </Link>
         ))}
       </div>

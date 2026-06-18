@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
  * source of truth once content lands; this copy is the seed + offline safety net.
  */
 const FALLBACK = {
-  eyebrow: '// 00_ORIGIN',
+  eyebrow: 'Est. 2012',
   title: 'Our Story',
   lead: 'Industrial precision meets artisanal soul. Elevating spirits since 2012 for those who appreciate the finer details.',
   body: [
@@ -43,9 +43,18 @@ export default async function OurStoryPage() {
   return (
     <PageShell>
       <PageHero eyebrow={eyebrow} title={title} lead={lead} />
-      <section className="mx-auto max-w-3xl space-y-8 px-6 py-16 font-mono text-base leading-relaxed lowercase opacity-80">
-        {paragraphs.map((p) => (
-          <p key={p.slice(0, 48)}>{p}</p>
+      <section className="mx-auto max-w-3xl space-y-6 px-6 py-20 md:py-28">
+        {paragraphs.map((p, i) => (
+          <p
+            key={p.slice(0, 48)}
+            className={
+              i === 0
+                ? 'text-neutral-800 text-xl leading-relaxed md:text-2xl'
+                : 'text-lg text-neutral-600 leading-relaxed'
+            }
+          >
+            {p}
+          </p>
         ))}
       </section>
     </PageShell>

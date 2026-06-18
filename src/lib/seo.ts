@@ -119,6 +119,47 @@ export function productJsonLd(input: ProductJsonLdInput): JsonLd {
   };
 }
 
+export type RecipeJsonLdInput = {
+  name: string;
+  description?: string;
+  image: string[];
+  path: string;
+  ingredients: string[];
+  /** Ordered method steps (each becomes a HowToStep). */
+  instructions: string[];
+  category?: string;
+  yield?: string;
+  keywords?: string[];
+};
+
+/**
+ * schema.org `Recipe` JSON-LD for a cocktail recipe page. `@geniemarketing/seo`
+ * ships Article/Product/Breadcrumb only, so this is hand-rolled here (the same
+ * pattern as the brand-only Product fallback above). Drives the Recipe rich
+ * result + AEO/AI-crawler answers.
+ */
+export function recipeJsonLd(input: RecipeJsonLdInput): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Recipe',
+    name: input.name,
+    ...(input.description ? { description: input.description } : {}),
+    image: input.image,
+    url: `${SITE_ORIGIN}${input.path}`,
+    author: { '@type': 'Organization', name: BRAND },
+    recipeCategory: input.category ?? 'Cocktail',
+    recipeCuisine: 'Cocktail',
+    ...(input.yield ? { recipeYield: input.yield } : {}),
+    ...(input.keywords?.length ? { keywords: input.keywords.join(', ') } : {}),
+    recipeIngredient: input.ingredients,
+    recipeInstructions: input.instructions.map((step, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      text: step,
+    })),
+  };
+}
+
 /** BreadcrumbList for a deep page. Pass site-relative paths; origin is prefixed. */
 export function breadcrumbJsonLd(crumbs: Array<{ name: string; path: string }>): JsonLd {
   return breadcrumbSchema(

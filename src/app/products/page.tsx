@@ -28,39 +28,38 @@ export default async function ProductsPage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="// 01_CATALOGUE"
+        eyebrow="The Collection"
         title="The Collection"
         lead="Five expressions, one obsession with the smoothest finish. Each bottle is 10x distilled and charcoal filtered."
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 py-20 sm:grid-cols-2 md:px-10 md:py-28 lg:grid-cols-3">
         {products.map((product) => {
           const mp = byHandle.get(product.slug);
           return (
             <div
               key={product.id}
-              className="group flex flex-col border-black border-r-2 border-b-2 p-8 transition-colors hover:bg-neutral-50"
+              className="group flex flex-col rounded-3xl bg-neutral-50 p-6 shadow-soft transition-all duration-300 ease-brand hover:-translate-y-1 hover:shadow-soft-lg"
             >
               <Link href={`/products/${product.slug}`} className="flex flex-1 flex-col">
-                <div className="relative mb-6 aspect-[3/4] overflow-hidden border border-neutral-200 bg-neutral-100">
+                <div className="relative mb-6 aspect-square overflow-hidden rounded-2xl bg-warm">
                   <Image
                     alt={product.name}
                     src={mediaUrl(product.image)}
                     fill
                     sizes="(max-width:1024px) 50vw, 33vw"
-                    className="scale-90 object-contain p-6 grayscale transition-all duration-500 group-hover:scale-100 group-hover:grayscale-0"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute top-0 right-0 bg-black p-1.5 font-bold text-[10px] text-white">
+                  <div className="absolute top-3 right-3 rounded-full bg-white/90 px-3 py-1 font-mono text-accent text-xs uppercase tracking-wider shadow-sm">
                     {product.proof}
                   </div>
                 </div>
-                <h2 className="mb-1 text-3xl transition-colors group-hover:text-accent">
+                {/* Reserve 2 lines so 1- and 2-line names keep the rows below aligned across cards. */}
+                <h2 className="mb-1 flex min-h-16 items-start font-display text-2xl text-fg uppercase transition-colors group-hover:text-accent md:text-3xl">
                   {product.name}
                 </h2>
-                <p className="mb-4 font-mono text-[10px] text-neutral-500 lowercase tracking-wider">
-                  {product.category}
-                </p>
-                <p className="font-mono text-sm lowercase opacity-70">{product.tagline}</p>
-                <span className="mt-auto pt-6 font-display text-accent text-xl group-hover:underline">
+                <p className="mb-3 text-neutral-500 text-sm">{product.category}</p>
+                <p className="text-neutral-600 leading-relaxed">{product.tagline}</p>
+                <span className="mt-auto inline-flex items-center gap-1.5 pt-6 font-display text-accent text-sm uppercase tracking-wide">
                   Explore →
                 </span>
               </Link>

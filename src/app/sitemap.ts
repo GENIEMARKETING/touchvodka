@@ -1,3 +1,5 @@
+import { COCKTAILS } from '@/data/cocktails';
+import { CITIES, OCCASIONS, SEASONS } from '@/data/explore';
 import { PRODUCTS } from '@/data/products';
 import { getPostSlugs } from '@/lib/blog';
 import { siteI18n } from '@/lib/seo';
@@ -14,6 +16,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/', changeFrequency: 'weekly', priority: 1 },
     { path: '/products', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/cocktails', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/cocktails/cities', changeFrequency: 'monthly', priority: 0.5 },
+    { path: '/cocktails/seasons', changeFrequency: 'monthly', priority: 0.5 },
+    { path: '/cocktails/occasions', changeFrequency: 'monthly', priority: 0.5 },
     { path: '/our-story', changeFrequency: 'yearly', priority: 0.6 },
     { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
     { path: '/find-us', changeFrequency: 'monthly', priority: 0.6 },
@@ -31,8 +36,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'monthly',
     priority: 0.5,
   }));
+  const recipes: SitemapRoute[] = COCKTAILS.map((c) => ({
+    path: `/cocktails/${c.slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+  const explore: SitemapRoute[] = [
+    ...CITIES.map((c) => ({ path: `/cocktails/cities/${c.slug}` })),
+    ...SEASONS.map((s) => ({ path: `/cocktails/seasons/${s.slug}` })),
+    ...OCCASIONS.map((o) => ({ path: `/cocktails/occasions/${o.slug}` })),
+  ].map((r) => ({ ...r, changeFrequency: 'monthly' as const, priority: 0.4 }));
 
-  return buildSitemap(siteI18n, [...staticRoutes, ...products, ...posts]).map((e) => ({
+  return buildSitemap(siteI18n, [
+    ...staticRoutes,
+    ...products,
+    ...posts,
+    ...recipes,
+    ...explore,
+  ]).map((e) => ({
     ...e,
     lastModified: e.lastModified ?? LAST_MODIFIED,
   }));

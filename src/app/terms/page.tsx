@@ -6,8 +6,8 @@ export const metadata: Metadata = { title: 'Terms of Service' };
 export default function TermsPage() {
   return (
     <PageShell>
-      <PageHero eyebrow="// LEGAL" title="Terms" />
-      <section className="mx-auto max-w-3xl space-y-6 px-6 py-16 font-mono text-sm leading-relaxed lowercase opacity-80">
+      <PageHero eyebrow="Legal" title="Terms" />
+      <section className="mx-auto max-w-3xl space-y-6 px-6 py-20 text-neutral-700 leading-relaxed md:py-28">
         <p>
           By using this site you confirm you are of legal drinking age (21+ in the United States)
           and agree to enjoy our products responsibly.
