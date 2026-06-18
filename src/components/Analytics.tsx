@@ -15,17 +15,22 @@
  *     The per-brand write key is `WRITE_KEY_TOUCH` (RudderStack source
  *     `touch-vodka`, in SOPS), surfaced to the browser as
  *     NEXT_PUBLIC_RUDDERSTACK_WRITE_KEY; data plane = events.fatdogspirits.com.
- *   • PostHog (analytics category) — kept as an OPTIONAL future self-host path
- *     (the dedicated box was never deployed; see the PostHog-vs-CDP DECISION in
- *     sessions/HANDOFFS.md). initPostHog no-ops while NEXT_PUBLIC_POSTHOG_KEY is
- *     empty, so it costs nothing and lights up only if Vinny later stands the box
- *     up. The CDP stream above is the live path.
+ *   • PostHog Cloud (analytics category) — product analytics: funnels, session
+ *     REPLAYS, person profiles, and EXACT IP + GeoIP. Vinny-authorized 2026-06-17
+ *     (reverses the 2026-06-09 PostHog-vs-CDP DECISION-A; see sessions/HANDOFFS.md).
+ *     Uses the site-local `initPostHogFull` (src/lib/posthog-full.ts), NOT the
+ *     foundation default — the foundation `initPostHog` is privacy-hardened (strips
+ *     $ip, no recording) and can't express this posture. Still consent-gated via
+ *     the same tagLoader; no-ops while NEXT_PUBLIC_POSTHOG_KEY is empty. The CDP
+ *     stream above stays the IP-ANONYMIZED warehouse/BI path; PostHog is the
+ *     visitor-level layer.
  *   • Google gtag (marketing category) — pixels.google() via tagLoader; nothing
  *     loads until the visitor accepts marketing in the consent banner.
  */
 import { tagLoader } from '@geniemarketing/foundation/tracking';
-import { initPostHog, initRudderStack, pixels } from '@geniemarketing/foundation/tracking';
+import { initRudderStack, pixels } from '@geniemarketing/foundation/tracking';
 import { useEffect } from 'react';
+import { initPostHogFull } from '@/lib/posthog-full';
 
 export default function Analytics() {
   useEffect(() => {
@@ -36,11 +41,12 @@ export default function Analytics() {
       initRudderStack({ writeKey: cdpKey, dataPlaneUrl: cdpPlane });
     }
 
-    // Optional future self-host: no-ops while the PostHog key is empty.
+    // PostHog Cloud — full capture (replays + IP/GeoIP). No-ops while the key is
+    // empty; consent-gated under `analytics`. See src/lib/posthog-full.ts.
     const phKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
     const phHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
     if (phKey && phHost) {
-      initPostHog({ apiKey: phKey, apiHost: phHost });
+      initPostHogFull(phKey, phHost);
     }
 
     const gaId = process.env.NEXT_PUBLIC_GA_ID;

@@ -18,7 +18,9 @@ export default function CookiePolicyPage() {
             <strong>necessary</strong> — always on; session and security only.
           </li>
           <li>
-            <strong>analytics</strong> — self-hosted PostHog, IP anonymized; opt-in.
+            <strong>analytics</strong> — PostHog Cloud (PostHog, Inc., USA): product analytics, your
+            IP / approximate location, and session recordings (form inputs masked); plus our own
+            IP-anonymized data warehouse. opt-in.
           </li>
           <li>
             <strong>marketing</strong> — advertising pixels (e.g. Google); opt-in.

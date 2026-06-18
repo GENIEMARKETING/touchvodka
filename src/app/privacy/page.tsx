@@ -14,10 +14,14 @@ export default function PrivacyPage() {
         </p>
         <h2 className="font-display text-2xl uppercase opacity-100">What we collect</h2>
         <p>
-          With your consent, we use self-hosted analytics (PostHog, IP-anonymized) and, if you opt
-          in, marketing pixels. Nothing non-essential is loaded before you choose in the cookie
-          banner. If you submit a form, we store your contact details and your marketing-consent
-          state in our CRM to respond to you.
+          With your consent, we use product analytics from PostHog Cloud (provided by PostHog, Inc.
+          in the United States), which includes your IP address (used for approximate, city-level
+          location) and session recordings — replays of your visit — with form fields such as email
+          and address masked so they are never captured. We also keep aggregate, IP-anonymized
+          analytics in our own data warehouse. If you opt in, we additionally load marketing pixels.
+          Nothing non-essential is loaded before you choose in the cookie banner. If you submit a
+          form, we store your contact details and your marketing-consent state in our CRM to respond
+          to you.
         </p>
         <h2 className="font-display text-2xl uppercase opacity-100">Your rights</h2>
         <p>
