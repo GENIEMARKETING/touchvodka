@@ -1,6 +1,8 @@
 import PageShell from '@/components/PageShell';
 import { getPost, getPostSlugs } from '@/lib/blog';
+import { articleJsonLd, breadcrumbJsonLd, jsonLdScript, pageMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
@@ -17,11 +19,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return { title: 'Not found' };
-  return {
+  return pageMetadata({
     title: post.title,
     description: post.excerpt,
-    openGraph: { title: post.title, description: post.excerpt, type: 'article' },
-  };
+    path: `/blog/${slug}`,
+    ogType: 'article',
+    ...(post.image?.trim() ? { images: [{ url: post.image, alt: post.title }] } : {}),
+  });
 }
 
 export default async function BlogDetailPage({ params }: Params) {
@@ -29,9 +33,32 @@ export default async function BlogDetailPage({ params }: Params) {
   const post = await getPost(slug);
   if (!post) notFound();
 
+  const path = `/blog/${slug}`;
+
   return (
     <PageShell>
-      <article className="mx-auto max-w-3xl px-6 py-20 md:py-28">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD; jsonLdScript escapes "<".
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript([
+            articleJsonLd({
+              title: post.title,
+              description: post.excerpt,
+              image: post.image?.trim() || undefined,
+              path,
+              datePublished: post.date || undefined,
+              author: post.author || undefined,
+            }),
+            breadcrumbJsonLd([
+              { name: 'Journal', path: '/blog' },
+              { name: post.title, path },
+            ]),
+          ]),
+        }}
+      />
+
+      <article className="mx-auto max-w-3xl px-6 py-16 md:py-24">
         <Link
           href="/blog"
           className="mb-8 inline-block font-display text-accent text-sm transition-transform duration-300 ease-brand hover:-translate-x-0.5"
@@ -41,12 +68,33 @@ export default async function BlogDetailPage({ params }: Params) {
         <p className="mb-3 font-mono text-accent text-xs uppercase tracking-[0.25em]">
           {post.category}
         </p>
-        <h1 className="mb-4 font-display text-5xl text-fg uppercase leading-[0.9] md:text-6xl">
+        <h1 className="mb-4 font-display text-4xl text-fg uppercase leading-[0.95] md:text-6xl">
           {post.title}
         </h1>
-        <p className="mb-12 font-mono text-neutral-500 text-sm uppercase tracking-widest">
+        <p className="mb-8 font-mono text-neutral-500 text-sm uppercase tracking-widest">
           {post.date} · {post.author}
         </p>
+
+        {/* Article hero image (Figma 55:84). */}
+        <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-3xl bg-warm">
+          {post.image?.trim() ? (
+            <Image
+              src={post.image}
+              alt={post.title}
+              fill
+              priority
+              sizes="(max-width:768px) 100vw, 768px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="font-mono text-neutral-400 text-xs uppercase tracking-widest">
+                {post.category}
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="max-w-none font-sans text-neutral-700 leading-relaxed [&_a]:text-accent [&_h2]:mt-10 [&_h2]:font-display [&_h2]:text-3xl [&_h2]:text-fg [&_h2]:uppercase [&_h3]:mt-8 [&_h3]:font-display [&_h3]:text-2xl [&_h3]:text-fg [&_h3]:uppercase [&_li]:my-1 [&_p]:my-4 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
         </div>

@@ -1,26 +1,42 @@
-import PageShell, { PageHero } from '@/components/PageShell';
+import PageShell from '@/components/PageShell';
 import { getPage } from '@/lib/strapi';
 import type { Metadata } from 'next';
 
 /**
- * Our Story — editable marketing copy. Reads the shared Strapi `page`
- * (slug=our-story, tenant=touch-vodka) via the tenant-scoped data-provider and
- * falls back to this hardcoded copy when the CMS is unwired/empty. Strapi is the
- * source of truth once content lands; this copy is the seed + offline safety net.
+ * Our Story (Figma 51:62) — split hero → "Meet Fat Dog Spirits" → timeline →
+ * dark Mission & Vision. Editable copy reads the shared Strapi `page`
+ * (slug=our-story, tenant=touch-vodka) and falls back to this seed. Distillery
+ * photography is placeholder until the asset pass.
+ *
+ * ⚠ FLAG (DEV-HANDOFF): founding-year conflict — Touch lists Est. 2012; Fat Dog
+ * Spirits founded 2016. Both shown in the timeline; confirm with Vinny.
  */
 const FALLBACK = {
-  eyebrow: 'Est. 2012',
-  title: 'Our Story',
-  lead: 'Industrial precision meets artisanal soul. Elevating spirits since 2012 for those who appreciate the finer details.',
+  eyebrow: 'Our Story',
+  title: 'Made in Tampa since 2012',
+  lead: 'Touch was born in Tampa, Florida with a single obsession: the smoothest finish. Ten times distilled and charcoal filtered in small batches, every expression is built on craft, patience, and good company — never shortcuts.',
   body: [
-    'Touch Vodka began with a simple obsession: the smoothest finish, every time. We engineer our spirits the way an industrial designer engineers an object — relentless iteration, no wasted material, every detail deliberate.',
-    'Our winter wheat is sourced from local fields and distilled ten times, then charcoal-filtered to strip impurities while keeping character. Blended with mineral-rich spring water, the result is a vodka that is clean, crisp, and unmistakably ours.',
-    'Touch Vodka is a Fat Dog Spirits brand, crafted in Tampa, Florida. Please enjoy responsibly.',
+    'Touch is a Fat Dog Spirits brand — an independent, family-owned distillery in Tampa, Florida, named after the distillery’s first four-legged quality inspector.',
+    'Small by design: fewer than 100 batches a year, each one hand-finished, tasted, and signed by our distillers. 98% of our waste is diverted — spent grain goes to local farms and bakeries.',
   ].join('\n\n'),
   seoTitle: 'Our Story',
   seoDescription:
-    'The Touch Vodka story — industrial precision meets artisanal soul. Crafting premium spirits since 2012.',
+    'The Touch Vodka story — made in Tampa, Florida since 2012. A Fat Dog Spirits brand: small-batch, 10× distilled, craft first.',
 };
+
+const TIMELINE = [
+  { year: '2012', label: 'Touch Vodka established' },
+  { year: '2016', label: 'Fat Dog Spirits founded' },
+  { year: '2024', label: 'Awarded for flavor innovation' },
+  { year: 'Today', label: '5 expressions · 10× distilled' },
+];
+
+const VALUES = [
+  'Independent & family-owned',
+  'Fewer than 100 batches a year',
+  '98% waste diverted',
+  'Hand-finished & signed',
+];
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage('our-story');
@@ -33,8 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function OurStoryPage() {
   const page = await getPage('our-story');
   const eyebrow = page?.eyebrow || FALLBACK.eyebrow;
-  const title = page?.title || FALLBACK.title;
   const lead = page?.lead || FALLBACK.lead;
+  const title = page?.title && page.title !== 'Our Story' ? page.title : FALLBACK.title;
   const paragraphs = (page?.body || FALLBACK.body)
     .split(/\n{2,}/)
     .map((p) => p.trim())
@@ -42,20 +58,99 @@ export default async function OurStoryPage() {
 
   return (
     <PageShell>
-      <PageHero eyebrow={eyebrow} title={title} lead={lead} />
-      <section className="mx-auto max-w-3xl space-y-6 px-6 py-20 md:py-28">
-        {paragraphs.map((p, i) => (
-          <p
-            key={p.slice(0, 48)}
-            className={
-              i === 0
-                ? 'text-neutral-800 text-xl leading-relaxed md:text-2xl'
-                : 'text-lg text-neutral-600 leading-relaxed'
-            }
-          >
-            {p}
+      {/* Hero split */}
+      <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+        <div className="grid items-center gap-10 md:grid-cols-2 lg:gap-16">
+          <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-300 via-neutral-200 to-accent/10 shadow-soft">
+            <span className="font-mono text-neutral-500 text-xs uppercase tracking-[0.25em]">
+              Distillery · asset pass
+            </span>
+          </div>
+          <div>
+            <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">{eyebrow}</p>
+            <h1 className="mt-3 font-display text-4xl text-fg uppercase md:text-6xl">{title}</h1>
+            <p className="mt-5 text-lg text-neutral-600 leading-relaxed">{lead}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Meet Fat Dog Spirits */}
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
+        <div className="grid items-center gap-10 md:grid-cols-2 lg:gap-16">
+          <div>
+            <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">
+              The distillery
+            </p>
+            <h2 className="mt-3 font-display text-4xl text-fg uppercase md:text-5xl">
+              Meet Fat Dog Spirits
+            </h2>
+            <div className="mt-5 space-y-4">
+              {paragraphs.map((p) => (
+                <p key={p.slice(0, 40)} className="text-neutral-600 leading-relaxed">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
+          <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-amber-100 via-neutral-100 to-accent/10 shadow-soft md:order-last">
+            <span className="font-mono text-neutral-500 text-xs uppercase tracking-[0.25em]">
+              Stills · asset pass
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline */}
+      <section className="bg-warm py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-6 md:px-10">
+          <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">Timeline</p>
+          <h2 className="mt-3 font-display text-4xl text-fg uppercase md:text-5xl">
+            How we got here
+          </h2>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {TIMELINE.map((t) => (
+              <div key={t.year} className="rounded-2xl bg-white p-7 shadow-soft">
+                <p className="font-display text-4xl text-accent">{t.year}</p>
+                <p className="mt-2 text-neutral-600 text-sm">{t.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & vision — dark */}
+      <section className="bg-fg py-16 text-white md:py-24">
+        <div className="mx-auto max-w-7xl px-6 md:px-10">
+          <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">
+            What we stand for
           </p>
-        ))}
+          <h2 className="mt-3 font-display text-4xl uppercase md:text-5xl">Mission &amp; vision</h2>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
+              <p className="font-mono text-accent text-xs uppercase tracking-[0.2em]">Our mission</p>
+              <h3 className="mt-3 font-display text-2xl">Flavor first. Every drop matters.</h3>
+              <p className="mt-3 text-white/70 leading-relaxed">
+                Great spirits should be unpretentious, meticulously crafted, and shared with the
+                people — and dogs — you love.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
+              <p className="font-mono text-accent text-xs uppercase tracking-[0.2em]">Our vision</p>
+              <h3 className="mt-3 font-display text-2xl">Out-pour the giants.</h3>
+              <p className="mt-3 text-white/70 leading-relaxed">
+                To prove that independent, small-batch craft can out-pour the giants — one honest
+                bottle at a time.
+              </p>
+            </div>
+          </div>
+          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-4">
+            {VALUES.map((v) => (
+              <div key={v} className="border-accent border-t pt-4 text-sm text-white/80">
+                {v}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     </PageShell>
   );

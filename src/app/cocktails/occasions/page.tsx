@@ -12,6 +12,7 @@ export default function OccasionsPage() {
     <ExploreLanding
       eyebrow="Explore"
       title="Serves by Occasion"
+      watermark="Occasions"
       lead="Whatever the moment, there's a Touch serve for it. Find yours."
       entries={OCCASIONS.map((o) => ({
         entry: o,

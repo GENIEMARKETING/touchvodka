@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'marketing.fatdogspirits.com' }, // shared Strapi media (S6)
       { protocol: 'https', hostname: 'vinny-agency-media.s3.amazonaws.com' }, // S3 media bucket / CDN origin (S5)
       { protocol: 'https', hostname: '**.touchvodka.com' }, // brand CDN subdomain
+      { protocol: 'https', hostname: 'images.unsplash.com' }, // blog seed imagery (MDX placeholders; real posts use the CDN)
     ],
   },
   // Registry trap `amplify-nextconfig-env`: NEXT_PUBLIC_* is inlined at build

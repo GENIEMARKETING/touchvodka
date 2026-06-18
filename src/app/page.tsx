@@ -10,7 +10,6 @@ import Signup from '@/components/home/Signup';
 import Stats from '@/components/home/Stats';
 import PromoDialog from '@/components/PromoDialog';
 import { getPage, getSiteProducts } from '@/lib/strapi';
-import { Droplets, type LucideIcon, Sprout, Waves } from 'lucide-react';
 
 /**
  * Home — composed server component (Refined-Bold redesign). Products come from
@@ -33,29 +32,23 @@ const FALLBACK = {
     "Crafted with passion and precision, our proprietary process ensures the smoothest finish in every bottle. We don't just make spirits; we engineer experiences.",
 } as const;
 
-/** CMS may send an icon by name; resolve it to the component, else use the per-card default. */
-const PROCESS_ICONS: Record<string, LucideIcon> = { Sprout, Droplets, Waves };
-
-/** Default process content stays in code; CMS can override icon name + title + body per card. */
+/** Default process content stays in code (numbered cards, Figma 151:576); CMS can override title + body per card. */
 const PROCESS_CARDS = [
   {
-    Icon: Sprout,
     title: 'Premium Grains',
     body: 'Sourced from the finest local fields, our winter wheat provides a silky texture and a naturally sweet finish.',
   },
   {
-    Icon: Droplets,
     title: '10X Distilled',
     body: 'Refined exactly ten times for exceptional clarity, then charcoal filtered to remove impurities while keeping character.',
   },
   {
-    Icon: Waves,
     title: 'Pure Spring Water',
     body: 'Blended with pristine, mineral-rich water from natural protected springs for a crisp, clean taste that defines our signature profile.',
   },
 ] as const;
 
-type CmsCard = { icon?: string; title?: string; body?: string };
+type CmsCard = { title?: string; body?: string };
 
 export default async function Home() {
   const [products, home] = await Promise.all([getSiteProducts(), getPage('home')]);
@@ -69,8 +62,7 @@ export default async function Home() {
   const cmsCards: CmsCard[] = Array.isArray(s.processCards) ? (s.processCards as CmsCard[]) : [];
   const processCards = PROCESS_CARDS.map((preset, i) => {
     const cms = cmsCards[i];
-    const Icon = (cms?.icon ? PROCESS_ICONS[cms.icon] : undefined) ?? preset.Icon;
-    return { Icon, title: cms?.title ?? preset.title, body: cms?.body ?? preset.body };
+    return { title: cms?.title ?? preset.title, body: cms?.body ?? preset.body };
   });
 
   return (

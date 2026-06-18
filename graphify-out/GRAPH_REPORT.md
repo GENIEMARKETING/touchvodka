@@ -1,16 +1,16 @@
 # Graph Report - touchvodka-next-redesign  (2026-06-18)
 
 ## Corpus Check
-- 135 files · ~62,464 words
+- 136 files · ~64,298 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1048 nodes · 1470 edges · 76 communities (60 shown, 16 thin omitted)
+- 1057 nodes · 1494 edges · 74 communities (58 shown, 16 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 3 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8817919e`
+- Built from commit: `205702e2`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -81,10 +81,8 @@
 - [[_COMMUNITY_Community 69|Community 69]]
 - [[_COMMUNITY_Community 70|Community 70]]
 - [[_COMMUNITY_Community 71|Community 71]]
-- [[_COMMUNITY_Community 72|Community 72]]
 - [[_COMMUNITY_Community 73|Community 73]]
 - [[_COMMUNITY_Community 74|Community 74]]
-- [[_COMMUNITY_Community 75|Community 75]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `mediaUrl()` - 28 edges
@@ -93,24 +91,24 @@
 4. `compilerOptions` - 18 edges
 5. `Learnings — Touch Vodka rebuild (T25 onboarding pilot)` - 18 edges
 6. `useCart()` - 16 edges
-7. `pageMetadata()` - 14 edges
+7. `pageMetadata()` - 15 edges
 8. `attributes` - 13 edges
 9. `Cheap Vodka: Finding Quality Budget-Friendly Spirits Without Sacrificing Taste` - 13 edges
 10. `test` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `CocktailCard()` --calls--> `mediaUrl()`  [EXTRACTED]
+  src/components/CocktailCard.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
+- `ExploreCard()` --calls--> `mediaUrl()`  [EXTRACTED]
+  src/components/ExploreCard.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
 - `generateMetadata()` --calls--> `mediaUrl()`  [INFERRED]
-  src/app/cocktails/[slug]/page.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
-- `ProductDetailPage()` --calls--> `mediaUrl()`  [EXTRACTED]
-  src/app/products/[slug]/page.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
-- `RecipePage()` --calls--> `mediaUrl()`  [EXTRACTED]
   src/app/cocktails/[slug]/page.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
 - `PromoDialog()` --calls--> `mediaUrl()`  [EXTRACTED]
   src/components/PromoDialog.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
-- `CocktailCard()` --calls--> `mediaUrl()`  [EXTRACTED]
-  src/components/CocktailCard.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
+- `ExploreDetail()` --calls--> `mediaUrl()`  [EXTRACTED]
+  src/components/ExploreDetail.tsx → /Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next/src/lib/media.ts
 
-## Communities (76 total, 16 thin omitted)
+## Communities (74 total, 16 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -121,8 +119,8 @@ Cohesion: 0.05
 Nodes (44): required, type, attributes, address, city, country, lat, lng (+36 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.09
-Nodes (34): robots(), LAST_MODIFIED, sitemap(), ExploreDetail(), titleCase(), getProductByName(), getProductBySlug(), Product (+26 more)
+Cohesion: 0.07
+Nodes (49): robots(), sitemap(), AddToCart(), AddToCartProps, inStock(), variantPrice(), PromoDialog(), getProductByName() (+41 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.14
@@ -130,7 +128,7 @@ Nodes (14): devDependencies, autoprefixer, @axe-core/playwright, @biomejs/biome,
 
 ### Community 4 - "Community 4"
 Cohesion: 0.06
-Nodes (32): CmsCard, FALLBACK, Home(), PROCESS_CARDS, PROCESS_ICONS, CocktailCard(), ExploreCard(), PromoDialog() (+24 more)
+Nodes (31): CmsCard, FALLBACK, Home(), PROCESS_CARDS, PROCESS_ICONS, COLS, DEFAULTS, SiteFooterData() (+23 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.10
@@ -141,11 +139,11 @@ Cohesion: 0.09
 Nodes (22): Artisan Old Fashioned, Best Vodka Cocktails: 10 Recipes Every Bar Should Know, Bloody Mary, Cosmopolitan, Espresso Martini, Frequently Asked Questions, Key Lime Paradise, Mix Your Best With Touch Vodka (+14 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.07
-Nodes (38): CartPage(), metadata, CheckoutPage(), metadata, AddToCart(), AddToCartProps, inStock(), variantPrice() (+30 more)
+Cohesion: 0.06
+Nodes (41): AgeGate(), AgeGateProps, display, metadata, mono, RootLayout(), sans, CartPage() (+33 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.22
+Cohesion: 0.15
 Nodes (12): FindUsPage(), metadata, DEFAULT_FIELDS, KNOWN_FIELDS, LeadCapture(), LeadCaptureProps, LeadField, track() (+4 more)
 
 ### Community 9 - "Community 9"
@@ -266,7 +264,7 @@ Nodes (9): scripts, build, dev, lint, preflight, start, test, test:update (+1 mo
 
 ### Community 55 - "Community 55"
 Cohesion: 0.06
-Nodes (42): metadata, CityDetailPage(), generateMetadata(), CocktailsPage(), metadata, Group, Cocktail, COCKTAILS (+34 more)
+Nodes (47): LAST_MODIFIED, metadata, CityDetailPage(), generateMetadata(), CocktailsPage(), metadata, CocktailCard(), Group (+39 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.29
@@ -316,37 +314,29 @@ Nodes (14): Can people with celiac disease drink vodka?, Does flavored vodka con
 Cohesion: 0.14
 Nodes (13): A note on mixers and "empty calories", Calories in Vodka by Serving Size, Does proof change the calorie count?, Does vodka have sugar or carbs?, Does Vodka Make You Gain Weight?, Frequently Asked Questions, How many calories are in a shot of vodka?, How Many Calories Are in Vodka? A Clear Breakdown (+5 more)
 
-### Community 72 - "Community 72"
-Cohesion: 0.09
-Nodes (16): AgeGate(), AgeGateProps, display, metadata, mono, RootLayout(), sans, Analytics() (+8 more)
-
 ### Community 73 - "Community 73"
-Cohesion: 0.11
-Nodes (19): BlogPage(), metadata, PageHero(), CookiePolicyPage(), metadata, BLOG_DIR, BlogPost, getAllPosts() (+11 more)
-
-### Community 75 - "Community 75"
-Cohesion: 0.22
-Nodes (3): Q, QUESTIONS, metadata
+Cohesion: 0.07
+Nodes (21): BlogPage(), metadata, PageHero(), Q, QUESTIONS, CookiePolicyPage(), metadata, BLOG_DIR (+13 more)
 
 ## Knowledge Gaps
-- **453 isolated node(s):** `config`, `name`, `version`, `private`, `type` (+448 more)
+- **457 isolated node(s):** `config`, `name`, `version`, `private`, `type` (+452 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `PageHero()` connect `Community 73` to `Community 8`, `Community 4`, `Community 55`, `Community 7`?**
+- **Why does `PageHero()` connect `Community 73` to `Community 2`, `Community 4`, `Community 7`, `Community 8`, `Community 55`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `mediaUrl()` connect `Community 2` to `Community 73`, `Community 4`, `Community 55`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `mediaUrl()` connect `Community 4` to `Community 73`, `Community 2`, `Community 55`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
-- **Why does `pageMetadata()` connect `Community 55` to `Community 2`, `Community 4`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `pageMetadata()` connect `Community 2` to `Community 55`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **What connects `config`, `name`, `version` to the rest of the system?**
-  _453 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _457 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05405405405405406 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.04734299516908213 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.09125188536953242 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06903622693096377 - nodes in this community are weakly interconnected._

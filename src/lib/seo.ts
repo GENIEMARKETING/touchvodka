@@ -119,6 +119,30 @@ export function productJsonLd(input: ProductJsonLdInput): JsonLd {
   };
 }
 
+export type ArticleJsonLdInput = {
+  title: string;
+  description?: string;
+  image?: string;
+  path: string;
+  datePublished?: string;
+  author?: string;
+};
+
+/** schema.org `Article` JSON-LD for a blog post (AEO + rich result). */
+export function articleJsonLd(input: ArticleJsonLdInput): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: input.title,
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.image ? { image: [input.image] } : {}),
+    ...(input.datePublished ? { datePublished: input.datePublished } : {}),
+    author: { '@type': 'Organization', name: input.author || BRAND },
+    publisher: { '@type': 'Organization', name: BRAND },
+    url: `${SITE_ORIGIN}${input.path}`,
+  };
+}
+
 export type RecipeJsonLdInput = {
   name: string;
   description?: string;

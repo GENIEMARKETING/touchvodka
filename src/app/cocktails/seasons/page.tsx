@@ -12,6 +12,7 @@ export default function SeasonsPage() {
     <ExploreLanding
       eyebrow="Explore"
       title="Serves by Season"
+      watermark="Seasons"
       lead="A serve for every season — find the right Touch cocktail for the weather."
       entries={SEASONS.map((s) => ({
         entry: s,

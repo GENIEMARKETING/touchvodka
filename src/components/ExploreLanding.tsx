@@ -14,16 +14,18 @@ export default function ExploreLanding({
   eyebrow,
   title,
   lead,
+  watermark,
   entries,
 }: {
   eyebrow: string;
   title: string;
   lead: string;
+  watermark?: string;
   entries: Array<{ entry: ExploreEntry; href: string; serve?: Cocktail }>;
 }) {
   return (
     <PageShell>
-      <PageHero eyebrow={eyebrow} title={title} lead={lead} />
+      <PageHero eyebrow={eyebrow} title={title} lead={lead} watermark={watermark} />
       <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-20">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {entries.map(({ entry, href, serve }) => (

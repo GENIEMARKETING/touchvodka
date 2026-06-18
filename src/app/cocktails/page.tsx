@@ -24,6 +24,7 @@ export default function CocktailsPage() {
       <PageHero
         eyebrow="Signature Serves"
         title="Cocktails"
+        watermark="Cocktails"
         lead="Fifty signature serves engineered for the smoothest finish. Filter by expression, season, occasion, or your city."
       />
 

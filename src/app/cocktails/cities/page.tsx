@@ -12,6 +12,7 @@ export default function CitiesPage() {
     <ExploreLanding
       eyebrow="Explore"
       title="Touch, City by City"
+      watermark="Cities"
       lead="Every city drinks a little differently. Find the signature Touch serve where you are."
       entries={CITIES.map((city) => ({
         entry: city,

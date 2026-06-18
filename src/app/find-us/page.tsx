@@ -1,14 +1,14 @@
+import AreaInterest from '@/components/AreaInterest';
 import PageShell, { PageHero } from '@/components/PageShell';
 import { LeadCapture } from '@/components/vinny/lead-capture/lead-capture';
 import { StockistLocator } from '@/components/vinny/stockist-locator/stockist-locator';
 import { getStockists } from '@/lib/strapi';
-import { Mail, MapPin, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Find Us',
   description:
-    'Find Touch Vodka at a store near you, or get in touch about stocking and wholesale.',
+    'Find Touch Vodka at a store near you, or get notified the moment it lands in your area.',
 };
 
 export default async function FindUsPage() {
@@ -17,58 +17,19 @@ export default async function FindUsPage() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="Get in Touch"
-        title="Find Us"
-        lead="Find Touch Vodka at a store near you — or reach out about stocking, wholesale, or collaboration."
+        eyebrow="Find Us"
+        title="Find Touch near you"
+        watermark="Find Us"
+        lead="Search your ZIP for the nearest stockist — or get notified the moment Touch lands in your area."
       />
 
-      {/* Contact strip */}
-      <section className="bg-white py-20 md:py-28">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 md:grid-cols-3 md:px-10">
-          <div className="rounded-2xl bg-neutral-50 p-8 shadow-soft">
-            <div className="mb-6 flex items-center gap-4">
-              <Mail className="h-7 w-7 text-accent" />
-              <h3 className="font-display text-xl text-fg uppercase">Email</h3>
-            </div>
-            <a
-              href="mailto:info@touchvodka.com"
-              className="text-neutral-600 transition-colors hover:text-accent"
-            >
-              info@touchvodka.com
-            </a>
-          </div>
-          <div className="rounded-2xl bg-neutral-50 p-8 shadow-soft">
-            <div className="mb-6 flex items-center gap-4">
-              <Phone className="h-7 w-7 text-accent" />
-              <h3 className="font-display text-xl text-fg uppercase">Phone</h3>
-            </div>
-            <a
-              href="tel:813-242-4459"
-              className="text-neutral-600 transition-colors hover:text-accent"
-            >
-              813-242-4459
-            </a>
-          </div>
-          <div className="rounded-2xl bg-neutral-50 p-8 shadow-soft">
-            <div className="mb-6 flex items-center gap-4">
-              <MapPin className="h-7 w-7 text-accent" />
-              <h3 className="font-display text-xl text-fg uppercase">Location</h3>
-            </div>
-            <p className="text-neutral-600 leading-relaxed">
-              Fat Dog Spirits
-              <br />
-              3212 N 40th St, Ste 701
-              <br />
-              Tampa, FL
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* S10: stockist locator (BOFU "find a store") — ZIP search + nearest list. */}
+      <StockistLocator heading="Stockists near you" stockists={stockists} />
 
-      {/* S10: stockist locator (BOFU "find a store") */}
-      <StockistLocator heading="Find Touch Vodka near you" stockists={stockists} />
+      {/* Area-Interest geo capture (Figma "Want Touch in your area"). */}
+      <AreaInterest variant="module" />
 
-      {/* S8: lead capture → /api/lead → Twenty + Mautic (consent-stamped) */}
+      {/* S8: wholesale / trade inquiry → /api/lead → Twenty + Mautic (consent-stamped). */}
       <LeadCapture
         brand="touch-vodka"
         heading="Stock Touch Vodka"

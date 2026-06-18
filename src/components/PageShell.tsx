@@ -14,21 +14,33 @@ export default function PageShell({ children }: { children: ReactNode }) {
 }
 
 /**
- * PageHero — Refined-Bold inner-page header (eyebrow + title + optional lead) on
- * a warm band that echoes the home hero. Replaces the brutalist bordered hero.
+ * PageHero — Refined-Bold inner-page banner (eyebrow + title + optional lead) on
+ * a warm band that echoes the home hero (Figma banner pattern, PLP/Cocktails/
+ * Blog/Find Us). An optional oversized `watermark` word sits faint behind the
+ * copy, matching the Figma `Display/Watermark` treatment.
  */
 export function PageHero({
   eyebrow,
   title,
   lead,
+  watermark,
 }: {
   eyebrow: string;
   title: string;
   lead?: string;
+  watermark?: string;
 }) {
   return (
-    <section className="bg-warm py-20 md:py-28 lg:py-32">
-      <div className="mx-auto max-w-7xl px-6 md:px-10">
+    <section className="relative overflow-hidden bg-warm py-20 md:py-28 lg:py-32">
+      {watermark ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute right-4 bottom-0 select-none font-display text-[clamp(5rem,18vw,15rem)] text-fg/[0.05] uppercase leading-[0.8] tracking-tight"
+        >
+          {watermark}
+        </span>
+      ) : null}
+      <div className="relative mx-auto max-w-7xl px-6 md:px-10">
         <p className="mb-3 font-mono text-accent text-xs uppercase tracking-[0.25em]">{eyebrow}</p>
         <h1 className="mb-6 font-display text-5xl text-fg uppercase md:text-7xl lg:text-8xl">{title}</h1>
         {lead ? (
