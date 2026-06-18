@@ -1,22 +1,44 @@
 'use client';
 
+import { useCustomer } from '@/components/auth/customer-context';
 import { type FormEvent, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 /**
  * AuthScreen — the split-screen Login / Sign Up shell (Figma Login 111:74 /
- * Sign Up 114:74). Dark brand panel (hidden ≤768) beside the form. There is no
- * accounts backend yet, so submit shows an honest "coming soon" note rather than
- * faking a session — the layout + fields match the design for the redesign review.
+ * Sign Up 114:74). Dark brand panel (hidden ≤768) beside the form. Submitting
+ * runs real Medusa v2 customer auth via the CustomerProvider (→ /api/auth/*),
+ * then redirects to `?next=` (or home). Failures surface the server's honest
+ * message (bad credentials, email already taken, etc.).
  */
 export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
   const isSignup = mode === 'signup';
-  const [submitted, setSubmitted] = useState(false);
+  const { login, register } = useCustomer();
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
+    if (submitting) return;
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get('email') ?? '').trim();
+    const password = String(form.get('password') ?? '');
+    const name = String(form.get('name') ?? '').trim();
+    setSubmitting(true);
+    setError(null);
+    try {
+      if (isSignup) await register(name, email, password);
+      else await login(email, password);
+      const next = new URLSearchParams(window.location.search).get('next');
+      router.push(next?.startsWith('/') ? next : '/');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -88,15 +110,24 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-accent px-8 py-4 font-display text-lg text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5"
+              disabled={submitting}
+              className="w-full rounded-full bg-accent px-8 py-4 font-display text-lg text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSignup ? 'Create account' : 'Sign in'}
+              {submitting
+                ? isSignup
+                  ? 'Creating account…'
+                  : 'Signing in…'
+                : isSignup
+                  ? 'Create account'
+                  : 'Sign in'}
             </button>
 
-            {submitted ? (
-              <p aria-live="polite" className="rounded-xl bg-warm px-4 py-3 text-neutral-700 text-sm">
-                Accounts are coming soon — we've noted your interest. In the meantime, you can shop
-                as a guest.
+            {error ? (
+              <p
+                aria-live="polite"
+                className="rounded-xl bg-red-50 px-4 py-3 text-red-700 text-sm"
+              >
+                {error}
               </p>
             ) : null}
           </form>

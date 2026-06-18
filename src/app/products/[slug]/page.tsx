@@ -39,18 +39,49 @@ const REVIEWS = [
     quote: 'Smoothest vodka I’ve had in this price range. The finish is unbelievably clean.',
     name: 'Jordan M.',
     meta: 'Verified buyer',
+    stars: 5,
   },
   {
     quote: 'Became our house pour the day it arrived. The bottle looks incredible on the bar too.',
     name: 'Priya S.',
     meta: 'Verified buyer',
+    stars: 5,
   },
   {
     quote: 'Bought it for the label, stayed for the taste. Perfect in a martini.',
     name: 'Alex R.',
     meta: 'Verified buyer',
+    stars: 4,
   },
 ];
+
+/** Aggregate of the on-page reviews — the fallback when Medusa has no rating yet. */
+const REVIEW_FALLBACK = {
+  average: REVIEWS.reduce((sum, r) => sum + r.stars, 0) / REVIEWS.length,
+  count: REVIEWS.length,
+};
+
+/**
+ * Small read-only star row. `value` may be fractional — the last star is clipped
+ * to the remainder so 4.7 shows ~⁷⁄₁₀ of the 5th star filled.
+ */
+function StarRating({ value, className = 'h-4 w-4' }: { value: number; className?: string }) {
+  return (
+    <span className="inline-flex text-accent" aria-hidden>
+      {[0, 1, 2, 3, 4].map((i) => {
+        const fill = Math.max(0, Math.min(1, value - i));
+        return (
+          <span key={i} className="relative">
+            <Star className={`${className} text-concrete`} />
+            <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
+              <Star className={`${className} fill-current`} />
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
 
 export default async function ProductDetailPage({ params }: Params) {
   const { slug } = await params;
@@ -63,6 +94,15 @@ export default async function ProductDetailPage({ params }: Params) {
   const commerce = await getCommerceProduct(slug);
   const price = commerce ? priceOf(commerce) : null;
 
+  // Single source of truth for the rating shown beside Availability, in the
+  // Reviews section, AND emitted in the Product JSON-LD — so the visible stars
+  // and the structured aggregateRating can never drift. Prefer the real Medusa
+  // aggregate (hydrated from the reviews service once it exists); fall back to the
+  // aggregate of the reviews actually rendered on this page (REVIEW_FALLBACK), so
+  // the structured data always matches what the visitor sees.
+  const reviewSummary =
+    commerce?.rating && commerce.rating.count > 0 ? commerce.rating : REVIEW_FALLBACK;
+
   const productLd = productJsonLd({
     name: product.name,
     description: product.description,
@@ -71,9 +111,7 @@ export default async function ProductDetailPage({ params }: Params) {
     ...(price
       ? { price: price.amount, currency: price.currency_code, availability: 'InStock' as const }
       : {}),
-    ...(commerce?.rating && commerce.rating.count > 0
-      ? { rating: { value: commerce.rating.average, count: commerce.rating.count } }
-      : {}),
+    rating: { value: Number(reviewSummary.average.toFixed(1)), count: reviewSummary.count },
   });
   const breadcrumbLd = breadcrumbJsonLd([
     { name: 'Home', path: '/' },
@@ -167,6 +205,18 @@ export default async function ProductDetailPage({ params }: Params) {
                   Availability
                 </p>
                 <p className="font-display text-accent text-xl">In stock</p>
+              </div>
+              <div>
+                <p className="font-mono text-neutral-400 text-xs uppercase tracking-[0.2em]">
+                  Rating
+                </p>
+                <a href="#reviews" className="mt-1 flex items-center gap-2">
+                  <StarRating value={reviewSummary.average} className="h-4 w-4" />
+                  <span className="font-display text-fg text-xl">
+                    {reviewSummary.average.toFixed(1)}
+                  </span>
+                  <span className="text-neutral-500 text-sm">({reviewSummary.count})</span>
+                </a>
               </div>
               {/* Price intentionally omitted here — the buy box below shows the
                   canonical Medusa price (formatted, in the right currency). */}
@@ -287,19 +337,24 @@ export default async function ProductDetailPage({ params }: Params) {
       </section>
 
       {/* What people are saying — reviews. */}
-      <section className="bg-warm py-16 md:py-24">
+      <section id="reviews" className="scroll-mt-24 bg-warm py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">Reviews</p>
           <h2 className="mt-3 font-display text-4xl text-fg uppercase md:text-5xl">
             What people are saying
           </h2>
+          <div className="mt-3 flex items-center gap-3">
+            <StarRating value={reviewSummary.average} className="h-5 w-5" />
+            <span className="font-display text-fg text-lg">{reviewSummary.average.toFixed(1)}</span>
+            <span className="text-neutral-500 text-sm">
+              from {reviewSummary.count} review{reviewSummary.count === 1 ? '' : 's'}
+            </span>
+          </div>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {REVIEWS.map((r) => (
               <figure key={r.name} className="flex flex-col rounded-2xl bg-white p-7 shadow-soft">
-                <div className="mb-4 flex gap-1 text-accent">
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                <div className="mb-4">
+                  <StarRating value={r.stars} className="h-4 w-4" />
                 </div>
                 <blockquote className="flex-1 text-neutral-700 leading-relaxed">
                   “{r.quote}”

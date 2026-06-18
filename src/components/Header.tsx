@@ -1,5 +1,6 @@
 'use client';
 
+import { useCustomer } from '@/components/auth/customer-context';
 import { CartButton } from '@/components/vinny/commerce/cart-button';
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
@@ -28,6 +29,7 @@ const NAV_ITEMS: Array<{ label: string; href: string }> = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { customer, logout } = useCustomer();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -84,20 +86,37 @@ export default function Header() {
         </nav>
         <div className="flex-grow lg:hidden" />
 
-        <Link
-          href="/login"
-          className="hidden font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60 lg:inline-flex"
-        >
-          Log In
-        </Link>
-        <Link
-          href="/signup"
-          className={`hidden items-center rounded-full px-5 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
-            scrolled ? 'bg-white text-fg hover:bg-accent hover:text-white' : 'bg-fg text-white hover:bg-accent'
-          }`}
-        >
-          Sign Up
-        </Link>
+        {customer ? (
+          <div className="hidden items-center gap-4 lg:flex">
+            <span className="font-medium text-sm uppercase tracking-wide">
+              Hi, {customer.first_name || 'there'}
+            </span>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60"
+            >
+              Log Out
+            </button>
+          </div>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className="hidden font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60 lg:inline-flex"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className={`hidden items-center rounded-full px-5 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
+                scrolled ? 'bg-white text-fg hover:bg-accent hover:text-white' : 'bg-fg text-white hover:bg-accent'
+              }`}
+            >
+              Sign Up
+            </Link>
+          </>
+        )}
         <Link
           href="/find-us"
           className={`hidden items-center rounded-full px-6 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
@@ -157,20 +176,40 @@ export default function Header() {
             ))}
           </nav>
           <div className="mt-auto flex flex-col gap-4 border-white/10 border-t pt-8">
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="font-display text-lg uppercase tracking-wide text-white/80 transition-colors hover:text-white"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className="inline-flex w-fit items-center rounded-full bg-accent px-6 py-3 font-display text-base uppercase tracking-wide text-white"
-            >
-              Sign Up
-            </Link>
+            {customer ? (
+              <>
+                <span className="font-display text-lg uppercase tracking-wide text-white/80">
+                  Hi, {customer.first_name || 'there'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    logout();
+                  }}
+                  className="inline-flex w-fit items-center rounded-full bg-accent px-6 py-3 font-display text-base uppercase tracking-wide text-white"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="font-display text-lg uppercase tracking-wide text-white/80 transition-colors hover:text-white"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex w-fit items-center rounded-full bg-accent px-6 py-3 font-display text-base uppercase tracking-wide text-white"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
             <p className="mt-2 font-mono text-white/40 text-xs uppercase tracking-widest">
               21+ · Crafted in Tampa, Florida
             </p>
