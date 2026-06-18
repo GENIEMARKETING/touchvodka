@@ -23,5 +23,8 @@ frontend:
       - '**/*'
   cache:
     paths:
+      # NOTE: do NOT cache .next/cache — it persists Next's Data Cache (the Strapi
+      # fetch responses) + ISR/image cache across builds, so CMS edits never show
+      # until the cache is busted. Caching node_modules alone keeps installs fast
+      # without serving stale content (see DEV-HANDOFF: Amplify .next/cache trap).
       - node_modules/**/*
-      - .next/cache/**/*
