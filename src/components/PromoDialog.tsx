@@ -2,7 +2,6 @@
 
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
-import { mediaUrl } from '@/lib/media';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { type FormEvent, useEffect, useState } from 'react';
@@ -108,11 +107,11 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
       <div className="relative z-10 grid w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-soft-lg sm:grid-cols-2">
         <div className="relative hidden min-h-[280px] bg-warm sm:block">
           <Image
-            src={mediaUrl('/products/keylime.png')}
+            src="/cocktails/touch-key-lime-0.webp"
             alt="Touch Key Lime cocktail"
             fill
             sizes="320px"
-            className="object-contain p-8"
+            className="object-cover"
           />
         </div>
         <div className="relative p-8 md:p-10">

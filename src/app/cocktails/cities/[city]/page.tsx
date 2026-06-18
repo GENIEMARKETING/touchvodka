@@ -33,6 +33,7 @@ export default async function CityDetailPage({ params }: { params: Promise<{ cit
       title={c.name}
       blurb={c.blurb}
       serve={signatureServe(c)}
+      heroImage={c.image}
       features={c.whyHere}
       exploreHref="/cocktails/cities"
       exploreLabel="Explore more cities"

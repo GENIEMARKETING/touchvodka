@@ -11,6 +11,14 @@ export const metadata: Metadata = {
     'Stories on craft spirits, cocktails, and sustainability from the Touch Vodka journal.',
 };
 
+/** Scene fallbacks so the blog looks photographed while real article imagery is pending. */
+const BLOG_SCENES = [
+  '/scenes/blog_cocktails.webp',
+  '/scenes/blog_whatis.webp',
+  '/scenes/blog_store.webp',
+  '/scenes/banner_cocktails.webp',
+];
+
 export default async function BlogPage() {
   const posts = await getAllPosts();
   const [featured, ...rest] = posts;
@@ -34,6 +42,7 @@ export default async function BlogPage() {
             <div className="relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-full md:min-h-[340px]">
               <BlogImage
                 src={featured.image}
+                fallbackSrc="/scenes/blog_featured.webp"
                 alt={featured.title}
                 label={featured.category}
                 sizes="(max-width:768px) 100vw, 50vw"
@@ -60,7 +69,7 @@ export default async function BlogPage() {
 
         {/* Post grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {rest.map((post) => (
+          {rest.map((post, idx) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
@@ -69,6 +78,7 @@ export default async function BlogPage() {
               <div className="relative aspect-[4/3] overflow-hidden">
                 <BlogImage
                   src={post.image}
+                  fallbackSrc={BLOG_SCENES[idx % BLOG_SCENES.length]}
                   alt={post.title}
                   label={post.category}
                   sizes="(max-width:768px) 100vw, 33vw"

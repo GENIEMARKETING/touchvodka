@@ -1,5 +1,4 @@
 import type { Cocktail } from '@/data/cocktails';
-import { mediaUrl } from '@/lib/media';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,11 +20,11 @@ export default function CocktailCard({ cocktail }: { cocktail: Cocktail }) {
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-warm">
         <Image
-          src={mediaUrl(cocktail.image)}
+          src={cocktail.image}
           alt={cocktail.name}
           fill
           sizes="(max-width: 768px) 50vw, 320px"
-          className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       <div className="flex flex-1 flex-col p-5">

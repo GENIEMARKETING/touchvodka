@@ -39,6 +39,7 @@ export const CITIES: CityEntry[] = [
     name: 'Tampa',
     state: 'Florida',
     kicker: 'Florida',
+    image: '/scenes/city_tampa.webp',
     blurb:
       'The home of Touch. Distilled on the bay and built for golden-hour balconies, Touch is Tampa in a glass.',
     signatureSlug: 'key-lime-paradise',
@@ -53,6 +54,7 @@ export const CITIES: CityEntry[] = [
     name: 'Miami',
     state: 'Florida',
     kicker: 'Florida',
+    image: '/scenes/city_miami.webp',
     blurb: 'Neon nights and ocean air. Touch Ruby brings the color Miami was made for.',
     signatureSlug: 'ruby-berry-crush',
     whyHere: [
@@ -66,6 +68,7 @@ export const CITIES: CityEntry[] = [
     name: 'Orlando',
     state: 'Florida',
     kicker: 'Florida',
+    image: '/scenes/city_orlando.webp',
     blurb: 'Sunshine in a glass. Touch Orange is the brightest serve in Central Florida.',
     signatureSlug: 'orange-sunburst',
     whyHere: [
@@ -79,6 +82,7 @@ export const CITIES: CityEntry[] = [
     name: 'New York',
     state: 'New York',
     kicker: 'New York',
+    image: '/scenes/city_nyc.webp',
     blurb: 'Clean lines, no compromise. Touch One is the martini this city deserves.',
     signatureSlug: 'one-crystal-martini',
     whyHere: [
@@ -92,6 +96,7 @@ export const CITIES: CityEntry[] = [
     name: 'Los Angeles',
     state: 'California',
     kicker: 'California',
+    image: '/scenes/city_la.webp',
     blurb: 'Late nights and good company. The Artisan Espresso Martini is LA after dark.',
     signatureSlug: 'artisan-espresso-martini',
     whyHere: [
@@ -105,6 +110,7 @@ export const CITIES: CityEntry[] = [
     name: 'Nashville',
     state: 'Tennessee',
     kicker: 'Tennessee',
+    image: '/scenes/city_nashville.webp',
     blurb: 'Copper mugs and front-porch nights. The Artisan Moscow Mule plays well here.',
     signatureSlug: 'artisan-moscow-mule',
     whyHere: [

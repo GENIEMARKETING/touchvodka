@@ -1,8 +1,8 @@
 import PageShell from '@/components/PageShell';
 import { COCKTAILS, getCocktailBySlug, titleCase } from '@/data/cocktails';
 import { getProductByName } from '@/data/products';
-import { mediaUrl } from '@/lib/media';
 import {
+  SITE_ORIGIN,
   breadcrumbJsonLd,
   jsonLdScript,
   pageMetadata,
@@ -53,7 +53,7 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
   const display = titleCase(c.name);
   const steps = methodSteps(c.preparation, c.garnish);
   const path = `/cocktails/${c.slug}`;
-  const imageAbs = `${mediaUrl(c.image)}`;
+  const imageAbs = c.image.startsWith('http') ? c.image : `${SITE_ORIGIN}${c.image}`;
 
   return (
     <PageShell>
@@ -94,12 +94,12 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
         <div className="grid items-center gap-10 md:grid-cols-2 lg:gap-16">
           <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-warm">
             <Image
-              src={mediaUrl(c.image)}
+              src={c.image}
               alt={display}
               fill
               priority
               sizes="(max-width: 768px) 100vw, 560px"
-              className="object-contain p-8"
+              className="object-cover"
             />
           </div>
           <div>

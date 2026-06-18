@@ -591,10 +591,11 @@ export function cocktailSlug(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function enrich(c: RawCocktail, i: number): Cocktail {
+function enrich(c: RawCocktail, i: number, image: string): Cocktail {
   return {
     ...c,
     slug: cocktailSlug(c.name),
+    image,
     glass: glassFor(c),
     serves: '1',
     season: seasonFor(c, i),
@@ -602,7 +603,15 @@ function enrich(c: RawCocktail, i: number): Cocktail {
   };
 }
 
-export const COCKTAILS: Cocktail[] = RAW_COCKTAILS.map(enrich);
+// Assign each cocktail a distinct, SKU-matched photo from the optimized Figma set
+// (public/cocktails/<sku-slug>-<n>.webp, generated from the Higgsfield assets).
+const skuIndex: Record<string, number> = {};
+export const COCKTAILS: Cocktail[] = RAW_COCKTAILS.map((c, i) => {
+  const skuSlug = cocktailSlug(c.baseSpirit);
+  const n = skuIndex[skuSlug] ?? 0;
+  skuIndex[skuSlug] = n + 1;
+  return enrich(c, i, `/cocktails/${skuSlug}-${n}.webp`);
+});
 
 export const ALL_SEASONS: readonly Season[] = SEASONS;
 export const ALL_OCCASIONS: readonly Occasion[] = OCCASIONS;

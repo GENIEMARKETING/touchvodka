@@ -66,7 +66,7 @@ export default function HomeHero() {
             </Link>
             <Link
               href="/cocktails"
-              className="inline-flex items-center justify-center rounded-full border border-neutral-400/60 bg-white/70 px-8 py-4 font-display text-fg text-lg backdrop-blur transition-colors duration-300 hover:bg-fg hover:text-surface"
+              className="inline-flex items-center justify-center rounded-full border border-neutral-400/60 bg-white/85 px-8 py-4 font-display text-fg text-lg transition-colors duration-300 hover:bg-fg hover:text-surface"
             >
               Find Recipes
             </Link>

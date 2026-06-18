@@ -42,7 +42,7 @@ export default function CocktailsBrowser({
   return (
     <div>
       {/* Sticky filter bar */}
-      <div className="sticky top-20 z-40 border-concrete border-y bg-white/95 backdrop-blur">
+      <div className="sticky top-20 z-40 border-concrete border-y bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-4 md:px-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             {segments.map((s) => (

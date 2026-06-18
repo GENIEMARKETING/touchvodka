@@ -1,6 +1,7 @@
 import PageShell from '@/components/PageShell';
 import { getPage } from '@/lib/strapi';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 
 /**
  * Our Story (Figma 51:62) — split hero → "Meet Fat Dog Spirits" → timeline →
@@ -61,10 +62,15 @@ export default async function OurStoryPage() {
       {/* Hero split */}
       <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
         <div className="grid items-center gap-10 md:grid-cols-2 lg:gap-16">
-          <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-300 via-neutral-200 to-accent/10 shadow-soft">
-            <span className="font-mono text-neutral-500 text-xs uppercase tracking-[0.25em]">
-              Distillery · asset pass
-            </span>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-warm shadow-soft">
+            <Image
+              src="/scenes/ourstory_hero.webp"
+              alt="The Fat Dog Spirits distillery in Tampa, Florida"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 600px"
+              className="object-cover"
+            />
           </div>
           <div>
             <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">{eyebrow}</p>
@@ -92,10 +98,14 @@ export default async function OurStoryPage() {
               ))}
             </div>
           </div>
-          <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-amber-100 via-neutral-100 to-accent/10 shadow-soft md:order-last">
-            <span className="font-mono text-neutral-500 text-xs uppercase tracking-[0.25em]">
-              Stills · asset pass
-            </span>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-warm shadow-soft md:order-last">
+            <Image
+              src="/scenes/distillery.webp"
+              alt="Copper stills at the Touch distillery"
+              fill
+              sizes="(max-width: 768px) 100vw, 600px"
+              className="object-cover"
+            />
           </div>
         </div>
       </section>

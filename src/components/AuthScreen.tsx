@@ -23,7 +23,15 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
     <div className="grid min-h-screen md:grid-cols-2">
       {/* Brand panel — moody dark with a blue beam (mock). Hidden on small screens. */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-fg p-12 text-white md:flex">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-fg via-fg to-accent/40" />
+        <Image
+          src="/scenes/login_brand.webp"
+          alt=""
+          aria-hidden
+          fill
+          sizes="50vw"
+          className="object-cover"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-fg/90 via-fg/70 to-accent/30" />
         <Link href="/" className="relative z-10">
           <Image
             src="/brand/touch-logo-white.svg"

@@ -4,14 +4,15 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 /**
- * BlogImage — a fill image that gracefully falls back to a warm placeholder tile
- * when the source is missing OR fails to load (the blog seed references stale
- * unsplash IDs + CDN blog-images that aren't uploaded yet). Client component so it
- * can catch next/image `onError`. Replace the placeholder when real blog
- * photography lands via the asset pipeline.
+ * BlogImage — a fill image that walks a fallback chain: the post's own image →
+ * an optional scene fallback → a warm placeholder tile. The blog seed references
+ * stale unsplash IDs + CDN blog-images that aren't uploaded yet, so without a
+ * fallback the cards render broken; the scene fallback keeps the blog looking
+ * photographed until real article imagery lands. Client component (needs onError).
  */
 export default function BlogImage({
   src,
+  fallbackSrc,
   alt,
   label,
   sizes,
@@ -19,15 +20,18 @@ export default function BlogImage({
   priority,
 }: {
   src?: string;
+  fallbackSrc?: string;
   alt: string;
   label?: string;
   sizes?: string;
   className?: string;
   priority?: boolean;
 }) {
-  const [failed, setFailed] = useState(!src?.trim());
+  const chain = [src, fallbackSrc].filter((s): s is string => Boolean(s?.trim()));
+  const [i, setI] = useState(0);
+  const current = chain[i];
 
-  if (failed || !src?.trim()) {
+  if (!current) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-warm">
         <span className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest">
@@ -39,13 +43,14 @@ export default function BlogImage({
 
   return (
     <Image
-      src={src}
+      key={current}
+      src={current}
       alt={alt}
       fill
       sizes={sizes}
       priority={priority}
       className={className}
-      onError={() => setFailed(true)}
+      onError={() => setI((n) => n + 1)}
     />
   );
 }

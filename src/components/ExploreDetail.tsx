@@ -1,7 +1,6 @@
 import PageShell from '@/components/PageShell';
 import type { Cocktail } from '@/data/cocktails';
 import { titleCase } from '@/data/cocktails';
-import { mediaUrl } from '@/lib/media';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -43,12 +42,12 @@ export default function ExploreDetail({
         <div className="grid items-center gap-10 md:grid-cols-2 lg:gap-16">
           <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-warm">
             <Image
-              src={mediaUrl(heroArt)}
+              src={heroArt}
               alt={title}
               fill
               priority
               sizes="(max-width: 768px) 100vw, 560px"
-              className="object-contain p-8"
+              className="object-cover"
             />
           </div>
           <div>
@@ -99,11 +98,11 @@ export default function ExploreDetail({
             </div>
             <div className="relative order-first aspect-[4/3] overflow-hidden rounded-3xl bg-warm md:order-last">
               <Image
-                src={mediaUrl(serve.image)}
+                src={serve.image}
                 alt={serve.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 560px"
-                className="object-contain p-8"
+                className="object-cover"
               />
             </div>
           </div>

@@ -1,8 +1,10 @@
+import Image from 'next/image';
+
 /**
  * Stats — "Five expressions. One obsession." (Figma home Stats). Two columns:
  * a 2×2 grid of white stat cards beside a distillery image. FACTS ONLY, harvested
  * from the real brand (est. 2012, 10× distilled, 5 expressions, 80 proof) — no
- * invented awards. The distillery photo is a placeholder until the asset pass.
+ * invented awards.
  */
 const STATS: Array<{ value: string; label: string }> = [
   { value: '2012', label: 'Established' },
@@ -32,11 +34,14 @@ export default function Stats() {
           </div>
         </div>
 
-        {/* Distillery photography — placeholder until the asset pass. */}
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-200 via-neutral-100 to-accent/10 shadow-soft">
-          <span className="font-mono text-neutral-400 text-xs uppercase tracking-[0.25em]">
-            Distillery · asset pass
-          </span>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-warm shadow-soft">
+          <Image
+            src="/scenes/distillery.webp"
+            alt="The Touch distillery in Tampa, Florida"
+            fill
+            sizes="(max-width: 1024px) 100vw, 600px"
+            className="object-cover"
+          />
         </div>
       </div>
     </section>

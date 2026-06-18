@@ -79,6 +79,7 @@ export default async function BlogDetailPage({ params }: Params) {
         <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-3xl bg-warm">
           <BlogImage
             src={post.image}
+            fallbackSrc="/scenes/blog_featured.webp"
             alt={post.title}
             label={post.category}
             priority

@@ -1,6 +1,5 @@
 import type { Cocktail } from '@/data/cocktails';
 import type { ExploreEntry } from '@/data/explore';
-import { mediaUrl } from '@/lib/media';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,11 +27,11 @@ export default function ExploreCard({
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-warm">
         <Image
-          src={mediaUrl(art)}
+          src={art}
           alt={entry.name}
           fill
           sizes="(max-width: 768px) 100vw, 320px"
-          className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       <div className="flex flex-1 flex-col p-5">
