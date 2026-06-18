@@ -1,21 +1,24 @@
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 /**
- * Lifestyle — Refined-Bold brand-moment block (new section, inspired by the
- * "Anywhere with…" feature on the reference site). Copy is the real Touch brand
- * voice harvested from Our Story + the footer. The image panel is a designed
- * placeholder until the lifestyle photography lands in the asset pass.
+ * Lifestyle — Refined-Bold brand-moment block ("Anywhere with good company").
+ * Copy is the real Touch brand voice. The image is the golden-hour Tampa rooftop
+ * "good company" scene (Higgsfield, optimized → public/scenes/lifestyle.webp).
  */
 export default function Lifestyle() {
   return (
     <section className="bg-warm py-20 md:py-28">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 md:px-10 lg:grid-cols-2 lg:gap-16">
-        {/* Placeholder for lifestyle photography — replaced in the asset pass */}
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-100 via-neutral-50 to-accent/10 shadow-soft">
-          <span className="font-mono text-neutral-400 text-xs uppercase tracking-[0.25em]">
-            Lifestyle photography · asset pass
-          </span>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-warm shadow-soft">
+          <Image
+            src="/scenes/lifestyle.webp"
+            alt="Friends sharing Touch cocktails at golden hour on a Tampa rooftop"
+            fill
+            sizes="(max-width: 1024px) 100vw, 600px"
+            className="object-cover"
+          />
         </div>
 
         <div>

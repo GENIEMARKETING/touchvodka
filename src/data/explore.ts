@@ -156,14 +156,19 @@ const OCCASION_COPY: Record<Occasion, { kicker: string; blurb: string; signature
 export const SEASONS: ExploreEntry[] = ALL_SEASONS.map((s) => ({
   slug: cocktailSlug(s),
   name: s,
+  image: `/scenes/season_${s.toLowerCase()}.webp`,
   ...SEASON_COPY[s],
 }));
 
-export const OCCASIONS: ExploreEntry[] = ALL_OCCASIONS.map((o) => ({
-  slug: cocktailSlug(o),
-  name: o,
-  ...OCCASION_COPY[o],
-}));
+export const OCCASIONS: ExploreEntry[] = ALL_OCCASIONS.map((o) => {
+  const sl = cocktailSlug(o);
+  return {
+    slug: sl,
+    name: o,
+    image: `/scenes/event_${sl.replace(/-/g, '_')}.webp`,
+    ...OCCASION_COPY[o],
+  };
+});
 
 export function getCity(slug: string): CityEntry | undefined {
   return CITIES.find((c) => c.slug === slug);

@@ -40,6 +40,7 @@ export default async function SeasonDetailPage({
       title={s.name}
       blurb={s.blurb}
       serve={signatureServe(s)}
+      heroImage={s.image}
       exploreHref="/cocktails/seasons"
       exploreLabel="Explore more seasons"
       extra={

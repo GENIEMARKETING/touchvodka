@@ -40,6 +40,7 @@ export default async function OccasionDetailPage({
       title={o.name}
       blurb={o.blurb}
       serve={signatureServe(o)}
+      heroImage={o.image}
       exploreHref="/cocktails/occasions"
       exploreLabel="Explore more occasions"
       extra={
