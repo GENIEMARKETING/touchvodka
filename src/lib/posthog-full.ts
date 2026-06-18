@@ -2,56 +2,76 @@
  * Touch Vodka — PostHog Cloud product analytics with FULL CAPTURE.
  *
  * ⚠️ DELIBERATE PRIVACY-POSTURE OVERRIDE (Vinny-authorized 2026-06-17).
- * The fleet default `initPostHog` in @geniemarketing/foundation/tracking is
- * privacy-HARDENED: it strips `$ip` and disables session recording (see
- * infrastructure/services/posthog/privacy.md — "non-negotiable" guardrails).
- * Touch Vodka intentionally captures the EXACT visitor IP (+ GeoIP) and SESSION
- * REPLAYS, so this site-local initializer replaces the foundation one.
+ * The fleet default `initPostHog` in @geniemarketing/foundation is privacy-
+ * HARDENED (strips `$ip`, disables recording — see posthog/privacy.md). Touch
+ * Vodka intentionally captures EXACT IP (+ GeoIP) and SESSION REPLAYS, so this
+ * site-local initializer is used instead. Still reuses foundation `tagLoader` +
+ * `consentStore`, so the consent gate is identical to every other tracker.
  *
- * Why site-local and not a foundation change: touchvodka consumes foundation as
- * a PUBLISHED package (@geniemarketing/foundation@0.2.2 from GH Packages), and
- * its locked-down initPostHog can't express this posture. We still reuse the
- * foundation `tagLoader` + `consentStore` so the consent gate is identical to
- * every other tracker. Promote this into foundation (a `captureIp` /
- * `sessionRecording` option) once a 2nd brand wants it (the 3×-reuse rule).
+ * LOADING: PostHog's `array.js` is the full SDK and hydrates the `window.posthog._i`
+ * init queue when it loads — so the official loader STUB must exist *before* we
+ * call init. (Injecting array.js bare and calling init does NOT work: the SDK
+ * loads but never initializes — verified live, only the loader downloaded, no
+ * capture/recording fired.) `installStub()` is PostHog's official snippet,
+ * which also derives the regional ASSETS host (api_host `us.i.posthog.com` →
+ * `us-assets.i.posthog.com`).
  *
- * Consent + privacy still enforced at THREE layers:
- *   1. Client gate — registered via `tagLoader` under the `analytics` category,
- *      so array.js is never injected before opt-in; on withdrawal we
- *      `opt_out_capturing()`.
- *   2. PostHog project settings (operator) — IP retention is governed by
- *      "Discard client IP data" = OFF, replays by "Record user sessions" = ON.
- *      The code cooperates; the project settings are the real switch.
- *   3. Input masking — `maskAllInputs` so form fields (email, address) are never
- *      recorded in replays.
+ * Privacy still enforced at THREE layers: (1) consent gate via `tagLoader`
+ * (`analytics`) — nothing loads pre-opt-in, opt-out on withdrawal; (2) PostHog
+ * project settings ("Discard client IP"=OFF, "Record user sessions"=ON);
+ * (3) `maskAllInputs` so form fields are never recorded in replays.
  */
 import { consentStore } from '@geniemarketing/foundation/consent';
 import { tagLoader } from '@geniemarketing/foundation/tracking';
 
-type PostHogLike = {
-  init: (key: string, opts: Record<string, unknown>) => void;
-  capture: (event: string, props?: Record<string, unknown>) => void;
-  opt_in_capturing: () => void;
-  opt_out_capturing: () => void;
-  startSessionRecording?: () => void;
-};
+// biome-ignore lint/suspicious/noExplicitAny: PostHog's loader stub is dynamically shaped (array + injected methods).
+type Stub = any;
 
-function ph(): PostHogLike | undefined {
+function ph(): Stub | undefined {
   if (typeof window === 'undefined') return undefined;
-  return (window as unknown as { posthog?: PostHogLike }).posthog;
+  return (window as unknown as { posthog?: Stub }).posthog;
 }
 
 /**
- * PostHog Cloud serves the loader (array.js) from a regional ASSETS host, not the
- * ingestion host. Derive it so a single NEXT_PUBLIC_POSTHOG_HOST drives both:
- *   https://us.i.posthog.com → https://us-assets.i.posthog.com
- *   https://eu.i.posthog.com → https://eu-assets.i.posthog.com
- * Self-hosted instances (no `i.posthog.com`) serve array.js from the same host.
+ * PostHog's official loader stub: creates `window.posthog` as a queue, stubs the
+ * API so pre-load calls are buffered, injects `array.js` from the assets host,
+ * and pushes the init args onto `_i` for array.js to hydrate on load. Idempotent.
  */
-function assetHost(apiHost: string): string {
-  const clean = apiHost.replace(/\/$/, '');
-  const m = clean.match(/^https:\/\/(us|eu)\.i\.posthog\.com$/);
-  return m ? `https://${m[1]}-assets.i.posthog.com` : clean;
+function installStub(): void {
+  const w = window as unknown as { posthog?: Stub };
+  if (w.posthog && w.posthog.__SV) return;
+  const p: Stub = (w.posthog = w.posthog || []);
+  p._i = [];
+  p.init = (token: string, config: { api_host: string } & Record<string, unknown>, name?: string) => {
+    const queue = (obj: Stub, method: string) => {
+      let o = obj;
+      let m = method;
+      const [a, b] = method.split('.');
+      if (a && b) {
+        o = obj[a];
+        m = b;
+      }
+      o[m] = (...args: unknown[]) => o.push([m, ...args]);
+    };
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.crossOrigin = 'anonymous';
+    script.async = true;
+    script.src = `${config.api_host.replace('.i.posthog.com', '-assets.i.posthog.com')}/static/array.js`;
+    const first = document.getElementsByTagName('script')[0];
+    first?.parentNode?.insertBefore(script, first);
+    let target: Stub = p;
+    if (name !== undefined) target = p[name] = [];
+    else name = 'posthog';
+    target.people = target.people || [];
+    const methods =
+      'init capture identify alias people.set people.set_once set_config register register_once unregister opt_in_capturing opt_out_capturing has_opted_out_capturing reset group startSessionRecording stopSessionRecording get_session_replay_url isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags captureException'.split(
+        ' ',
+      );
+    for (const m of methods) queue(target, m);
+    p._i.push([token, config, name]);
+  };
+  p.__SV = 1;
 }
 
 let started = false;
@@ -71,39 +91,21 @@ export function initPostHogFull(apiKey: string, apiHost: string): void {
     id: 'posthog',
     category: 'analytics',
     load() {
-      // array.js exposes the `window.posthog` queue stub; init configures it.
-      const el = document.createElement('script');
-      el.id = 'posthog';
-      el.async = true;
-      el.src = `${assetHost(api)}/static/array.js`;
-      document.head.appendChild(el);
-
-      const start = () => {
-        const inst = ph();
-        if (!inst) {
-          setTimeout(start, 50); // array.js still loading — retry next tick.
-          return;
-        }
-        inst.init(apiKey, {
-          api_host: api,
-          autocapture: true,
-          capture_pageview: true,
-          // FULL CAPTURE override vs the foundation default:
-          //   • NO `property_blacklist: ['$ip']` and NO `ip: false`, so PostHog
-          //     keeps the server-observed IP and runs GeoIP (city/region/country).
-          //     Final IP retention is the project's "Discard client IP" = OFF.
-          //   • Session replay ON, with inputs masked for privacy.
-          persistence: 'localStorage+cookie',
-          disable_session_recording: false,
-          session_recording: {
-            maskAllInputs: true,
-            maskTextSelector: '[data-ph-mask]',
-          },
-        });
-        inst.opt_in_capturing();
-        inst.startSessionRecording?.();
-      };
-      start();
+      installStub();
+      const inst = ph();
+      if (!inst) return;
+      inst.init(apiKey, {
+        api_host: api,
+        autocapture: true,
+        capture_pageview: true,
+        persistence: 'localStorage+cookie',
+        // FULL CAPTURE: keep server-side IP + GeoIP (no $ip blacklist / ip:false),
+        // session replay on with inputs masked. Recording auto-starts when the
+        // project setting "Record user sessions" is ON.
+        disable_session_recording: false,
+        session_recording: { maskAllInputs: true },
+      });
+      inst.opt_in_capturing();
     },
   });
 
