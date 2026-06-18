@@ -1,5 +1,6 @@
 import PageShell from '@/components/PageShell';
 import { getPost, getPostSlugs } from '@/lib/blog';
+import { articleJsonLd, breadcrumbJsonLd, jsonLdScript } from '@/lib/seo';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -29,8 +30,29 @@ export default async function BlogDetailPage({ params }: Params) {
   const post = await getPost(slug);
   if (!post) notFound();
 
+  // AEO (#46): Article + breadcrumb JSON-LD so every post -- including the
+  // content-autopilot auto-blog drafts -- ships structured data on publish.
+  const articleLd = articleJsonLd({
+    title: post.title,
+    description: post.excerpt,
+    image: post.image,
+    slug: post.slug,
+    datePublished: post.date,
+    author: post.author,
+  });
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Journal', path: '/blog' },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ]);
+
   return (
     <PageShell>
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD; jsonLdScript escapes "<".
+        dangerouslySetInnerHTML={{ __html: jsonLdScript([articleLd, breadcrumbLd]) }}
+      />
       <article className="mx-auto max-w-3xl px-6 py-16">
         <Link
           href="/blog"

@@ -14,6 +14,7 @@ import {
   type PageMetaInput,
   type SiteI18n,
   brandSchema,
+  articleSchema,
   breadcrumbSchema,
   buildMetadata,
   defineI18n,
@@ -189,6 +190,39 @@ export function productJsonLd(input: ProductJsonLdInput): JsonLd {
 }
 
 /** BreadcrumbList for a deep page. Pass site-relative paths; origin is prefixed. */
+export type ArticleJsonLdInput = {
+  title: string;
+  description?: string;
+  /** Single hero image URL (BlogPost.image); relative paths get the origin prefixed. */
+  image?: string;
+  /** Blog slug -> /blog/<slug>. */
+  slug: string;
+  /** ISO date the post was published (Strapi publishedAt / frontmatter date). */
+  datePublished: string;
+  dateModified?: string;
+  author?: string;
+};
+
+/**
+ * Article JSON-LD for a blog post (AEO / #46). Every published post -- including
+ * the auto-blog drafts from the content-autopilot pipeline -- emits this so it can
+ * win Article rich results and feed answer engines. Brand is the publisher.
+ */
+export function articleJsonLd(input: ArticleJsonLdInput): JsonLd {
+  const abs = (u: string) => (u.startsWith('http') ? u : `${SITE_ORIGIN}${u.startsWith('/') ? '' : '/'}${u}`);
+  return articleSchema({
+    headline: input.title,
+    description: input.description,
+    image: input.image ? [abs(input.image)] : undefined,
+    url: `${SITE_ORIGIN}/blog/${input.slug}`,
+    datePublished: input.datePublished,
+    dateModified: input.dateModified ?? input.datePublished,
+    authorName: input.author || BRAND,
+    publisherName: BRAND,
+    publisherLogo: `${SITE_ORIGIN}/logo/touch-vodka.png`,
+  });
+}
+
 export function breadcrumbJsonLd(crumbs: Array<{ name: string; path: string }>): JsonLd {
   return breadcrumbSchema(
     crumbs.map<Crumb>((c) => ({ name: c.name, url: `${SITE_ORIGIN}${c.path}` })),
