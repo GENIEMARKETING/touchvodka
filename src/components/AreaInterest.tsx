@@ -1,9 +1,11 @@
 'use client';
 
 import NotifyModal from '@/components/NotifyModal';
+import TurnstileWidget from '@/components/TurnstileWidget';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
 
 /**
@@ -96,43 +98,24 @@ export default function AreaInterest({
   );
 
   if (variant === 'strip') {
+    // Site-wide slim band — a CTA to the Find Us page (which carries the full
+    // capture module), NOT a second inline form. This matches the Figma "Strip CTA
+    // → Find Us" intent and avoids a duplicate capture stacking under the module on
+    // the high-intent pages (PDP / Find Us / City Detail).
     return (
-      <>
-        <div className="bg-accent text-white">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-5 md:flex-row md:px-10">
-            <p className="text-center font-medium text-sm md:text-left">
-              Want Touch near you? Get notified the moment it lands in your area.
-            </p>
-            <form onSubmit={onSubmit} className="flex w-full max-w-md items-center gap-2 md:w-auto">
-              {honeypot}
-              <input
-                name="zipcode"
-                inputMode="numeric"
-                placeholder="ZIP"
-                aria-label="ZIP code"
-                required
-                className="w-20 rounded-full bg-white/15 px-4 py-2.5 text-sm text-white placeholder:text-white/60 focus:bg-white/25 focus:outline-none"
-              />
-              <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                aria-label="Email"
-                required
-                className="min-w-0 flex-1 rounded-full bg-white/15 px-4 py-2.5 text-sm text-white placeholder:text-white/60 focus:bg-white/25 focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={status === 'submitting'}
-                className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-5 py-2.5 font-display text-accent text-sm transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-60"
-              >
-                Show your interest <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
-          </div>
+      <div className="bg-accent text-white">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-5 md:flex-row md:px-10">
+          <p className="text-center font-medium text-sm md:text-left">
+            Want Touch near you? Get notified the moment it lands in your area.
+          </p>
+          <Link
+            href="/find-us"
+            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-5 py-2.5 font-display text-accent text-sm transition-transform duration-300 ease-brand hover:-translate-y-0.5"
+          >
+            Show your interest <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
-        <NotifyModal open={modalOpen} email={email} onClose={() => setModalOpen(false)} />
-      </>
+      </div>
     );
   }
 
@@ -168,6 +151,7 @@ export default function AreaInterest({
                 className="w-full flex-1 rounded-full bg-white/15 px-5 py-4 text-white placeholder:text-white/60 focus:bg-white/25 focus:outline-none"
               />
             </div>
+            <TurnstileWidget />
             <button
               type="submit"
               disabled={status === 'submitting'}

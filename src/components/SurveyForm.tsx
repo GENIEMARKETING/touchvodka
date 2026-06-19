@@ -1,5 +1,6 @@
 'use client';
 
+import TurnstileWidget from '@/components/TurnstileWidget';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { Check } from 'lucide-react';
@@ -165,6 +166,8 @@ export default function SurveyForm() {
           className="mt-4 w-full max-w-md rounded-full border border-concrete px-5 py-4 text-fg placeholder:text-neutral-400 focus:border-accent focus:outline-none"
         />
       </div>
+
+      <TurnstileWidget />
 
       <button
         type="submit"

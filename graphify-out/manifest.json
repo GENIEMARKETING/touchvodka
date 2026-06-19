@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/layout.tsx": {
-    "mtime": 1781456736.5925844,
-    "ast_hash": "0453e5a63c1c61164f44580bbed2ff38",
+    "mtime": 1781823677.3625462,
+    "ast_hash": "07df75cdf2a6d64eacd8275874e38fb0",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/page.tsx": {
@@ -600,8 +600,8 @@
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/products/[slug]/page.tsx": {
-    "mtime": 1781801294.6752079,
-    "ast_hash": "9684013c4f375ce7b217c6bbf3488269",
+    "mtime": 1781823290.2039347,
+    "ast_hash": "9947bb5620320b19a31a4024903b7020",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/privacy/page.tsx": {
@@ -680,13 +680,13 @@
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/Analytics.tsx": {
-    "mtime": 1781456589.8279014,
-    "ast_hash": "7c08cbd771e76e5c50f62accaa21d9ef",
+    "mtime": 1781823143.0564528,
+    "ast_hash": "af01bf2dc8db2a7bce0d9aaee0a2efcb",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/Header.tsx": {
-    "mtime": 1781797744.2489827,
-    "ast_hash": "a2865647a0e8cf349a2fb60f468a6dd5",
+    "mtime": 1781823767.179474,
+    "ast_hash": "f687aa66793d66722caec401d804d34c",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/home/HomeHero.tsx": {
@@ -775,8 +775,8 @@
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/lib/strapi.ts": {
-    "mtime": 1781456589.837364,
-    "ast_hash": "1935ac6a5b6b942ff3ac8937ec662743",
+    "mtime": 1781835669.4282548,
+    "ast_hash": "928f741195fcc6d51b6285b7856d1f84",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/lib/blog.ts": {
@@ -835,8 +835,8 @@
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/amplify.yml": {
-    "mtime": 1781456589.7772498,
-    "ast_hash": "b7e88d63b0b0493f22364762f03301d1",
+    "mtime": 1781819093.8929353,
+    "ast_hash": "ee8b8ba45e08ce083eae2f8da0d7e87c",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/S8-CUTOVER-CHECKLIST.md": {
@@ -1105,8 +1105,8 @@
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/AuthScreen.tsx": {
-    "mtime": 1781804702.9126077,
-    "ast_hash": "53b124b24935f7aaa442df71db35563a",
+    "mtime": 1781823722.6785402,
+    "ast_hash": "890fea95b2db8f6f945bd6884faf2128",
     "semantic_hash": ""
   },
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/NotifyModal.tsx": {
@@ -1167,6 +1167,51 @@
   "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/BlogImage.tsx": {
     "mtime": 1781804725.5638235,
     "ast_hash": "a3374e198424df52fcb062649bee9e08",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/playwright.preview.config.ts": {
+    "mtime": 1781835095.1990674,
+    "ast_hash": "1c13487a358a22ef47f5a7a22660999c",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/e2e/preview-backends.spec.ts": {
+    "mtime": 1781836441.0532577,
+    "ast_hash": "427db999dd01240a96da98b5acabf0a7",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/api/auth/logout/route.ts": {
+    "mtime": 1781823646.8208628,
+    "ast_hash": "fd877115a5f0081a6228525c4ac051f3",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/api/auth/register/route.ts": {
+    "mtime": 1781823631.6313171,
+    "ast_hash": "f3c4c82bd383a6fdf160be52c1cf7efc",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/api/auth/me/route.ts": {
+    "mtime": 1781823640.5450714,
+    "ast_hash": "f4cbb102535764a5ba81291feeec8564",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/app/api/auth/login/route.ts": {
+    "mtime": 1781823620.0531566,
+    "ast_hash": "997d4c3a231145f2975ab53fb3ba0b20",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/components/auth/customer-context.tsx": {
+    "mtime": 1781823663.6769426,
+    "ast_hash": "e723a0012bd7e0f4ce12c02c5b5c0229",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/lib/medusa-auth.ts": {
+    "mtime": 1781823596.4290109,
+    "ast_hash": "c99a3fa2cc91d888e98fad6fe511dc92",
+    "semantic_hash": ""
+  },
+  "/Users/vamsigangeskalanidhi/Vamsi office/WEBSITES/projects/touchvodka-next-redesign/src/lib/posthog-full.ts": {
+    "mtime": 1781823122.5348973,
+    "ast_hash": "3dace5f0b764df104e028095b776d748",
     "semantic_hash": ""
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import TurnstileWidget from '@/components/TurnstileWidget';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { X } from 'lucide-react';
@@ -166,6 +167,7 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
                 >
                   {status === 'submitting' ? 'Sending…' : 'Sign Me Up'}
                 </button>
+                <TurnstileWidget className="sm:basis-full" />
               </form>
               <p className="mt-3 text-neutral-400 text-xs">
                 {status === 'error'
