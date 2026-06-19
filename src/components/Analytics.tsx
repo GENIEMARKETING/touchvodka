@@ -26,11 +26,15 @@
  *     via the same tagLoader; no-ops while NEXT_PUBLIC_POSTHOG_KEY is empty. The
  *     CDP stream above stays the IP-ANONYMIZED warehouse/BI path; PostHog is the
  *     visitor-level layer.
- *   • Google gtag (marketing category) — pixels.google() via tagLoader; nothing
- *     loads until the visitor accepts marketing in the consent banner.
+ *   • Marketing pixels (marketing category) — Google/GA4, Meta Pixel, TikTok, and
+ *     GTM, registered in ONE consent-gated call via foundation's initTracking().
+ *     Each id is optional; an unset id is skipped (a dark sink, consent-safe), so
+ *     this stays inert until the brand's ad creds are set. Nothing loads until the
+ *     visitor accepts `marketing`. Canonical track() events (age_gate_passed,
+ *     where_to_buy_click, lead_captured, …) map onto each platform's standard
+ *     events via foundation's PIXEL_EVENT_MAP.
  */
-import { tagLoader } from '@geniemarketing/foundation/tracking';
-import { initRudderStack, pixels } from '@geniemarketing/foundation/tracking';
+import { initRudderStack, initTracking } from '@geniemarketing/foundation/tracking';
 import { useEffect } from 'react';
 import { initPostHogFull } from '@/lib/posthog-full';
 
@@ -51,11 +55,15 @@ export default function Analytics() {
       initPostHogFull(phKey, phHost);
     }
 
-    const gaId = process.env.NEXT_PUBLIC_GA_ID;
-    if (gaId) {
-      // Legacy gtag — now consent-gated under `marketing` (was ungated).
-      tagLoader.register(pixels.google(gaId));
-    }
+    // Marketing pixels (marketing category) — one consent-gated call. Each id is
+    // optional; unset ids are skipped. Was Google-only via pixels.google(); now
+    // also Meta/TikTok/GTM so the demand-sensing track() events reach every pixel.
+    initTracking({
+      googleId: process.env.NEXT_PUBLIC_GA_ID,
+      metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID,
+      tiktokPixelId: process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID,
+      gtmId: process.env.NEXT_PUBLIC_GTM_ID,
+    });
   }, []);
 
   return null;
