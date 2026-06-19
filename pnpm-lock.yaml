@@ -12,14 +12,14 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       '@geniemarketing/foundation':
-        specifier: ^0.3.0
-        version: 0.3.0(react@19.2.7)
+        specifier: ^0.3.1
+        version: 0.3.1(react@19.2.7)
       '@geniemarketing/seo':
         specifier: ^0.2.0
         version: 0.2.0
       '@geniemarketing/ui':
         specifier: ^0.2.0
-        version: 0.2.0(@geniemarketing/foundation@0.3.0(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 0.2.0(@geniemarketing/foundation@0.3.1(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@gsap/react':
         specifier: ^2.1.1
         version: 2.1.2(gsap@3.15.0)(react@19.2.7)
@@ -320,8 +320,8 @@ packages:
   '@geniemarketing/commerce@0.2.0':
     resolution: {integrity: sha512-YnaVHpmsTyfhzxDkWHJZ2upyhP54GJJLiAxu2bxqZnL2pKG1If5F+Xtt671ywTu/TtQUIcb71S6uTNPad6XFkQ==, tarball: https://npm.pkg.github.com/download/@geniemarketing/commerce/0.2.0/c55277683033842c96e611e3a82f62c602b91160}
 
-  '@geniemarketing/foundation@0.3.0':
-    resolution: {integrity: sha512-PAGiQi6wEuhKrB+YqBcL8NOSNM5g1WVjPrQXi5bCn9LSUROHIO8bsedWmSBRhpfB5iV7pAazt2vOY0aKmGfgCw==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.3.0/1359a895d28c7915ad59a1da1f5892a46cbfcfa5}
+  '@geniemarketing/foundation@0.3.1':
+    resolution: {integrity: sha512-tza4Mg1GDgZGu5P3wzat/Q5l3WaW+pTaflKVi3/OPEdhO9P3fNMz9zBHCmAMGf+oxHbmZ7TrpFrTfW6qNbh63A==, tarball: https://npm.pkg.github.com/download/@geniemarketing/foundation/0.3.1/638fb24742dbd98d6513d8c5853841d13420e646}
     peerDependencies:
       react: '>=18'
 
@@ -1553,15 +1553,15 @@ snapshots:
 
   '@geniemarketing/commerce@0.2.0': {}
 
-  '@geniemarketing/foundation@0.3.0(react@19.2.7)':
+  '@geniemarketing/foundation@0.3.1(react@19.2.7)':
     dependencies:
       react: 19.2.7
 
   '@geniemarketing/seo@0.2.0': {}
 
-  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.3.0(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@geniemarketing/ui@0.2.0(@geniemarketing/foundation@0.3.1(react@19.2.7))(@gsap/react@2.1.2(gsap@3.15.0)(react@19.2.7))(gsap@3.15.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@geniemarketing/foundation': 0.3.0(react@19.2.7)
+      '@geniemarketing/foundation': 0.3.1(react@19.2.7)
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.7)
       class-variance-authority: 0.7.1
       clsx: 2.1.1

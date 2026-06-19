@@ -42,6 +42,19 @@ export default async function FindUsPage() {
           { name: 'name', label: 'Name', type: 'text', required: true },
           { name: 'email', label: 'Email', type: 'email', required: true },
           { name: 'phone', label: 'Phone', type: 'tel' },
+          {
+            name: 'buyerType',
+            label: "I'm a…",
+            type: 'select',
+            required: true,
+            options: [
+              { value: 'trade', label: 'Bar / Restaurant / Retailer' },
+              { value: 'distributor', label: 'Distributor' },
+              { value: 'consumer', label: 'Consumer / Fan' },
+            ],
+          },
+          { name: 'businessName', label: 'Business name', type: 'text' },
+          { name: 'licenseType', label: 'Liquor license type (if trade/distributor)', type: 'text' },
           { name: 'message', label: 'Tell us about your account', type: 'text' },
         ]}
         turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
