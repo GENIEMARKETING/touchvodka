@@ -92,9 +92,14 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
 
   if (!open) return null;
 
+  // z-[90] sits BELOW the sticky header (z-[100]) on purpose: this promo
+  // auto-opens after 3s (unrequested), so it must NOT trap the user — the header
+  // logo / nav / account + cart icons stay clickable above the overlay (clicking
+  // anywhere else still dismisses via the scrim). Cart drawer + NotifyModal are
+  // user-initiated and correctly keep z-[300].
   return (
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-fg/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[90] flex items-center justify-center bg-fg/60 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="promo-title"
