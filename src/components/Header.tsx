@@ -1,5 +1,6 @@
 'use client';
 
+import { AccountButton } from '@/components/AccountButton';
 import { useAuth } from '@/components/vinny/commerce/auth-context';
 import { CartButton } from '@/components/vinny/commerce/cart-button';
 import { Menu, X } from 'lucide-react';
@@ -87,38 +88,22 @@ export default function Header() {
         <div className="flex-grow lg:hidden" />
 
         {customer ? (
-          <div className="hidden items-center gap-4 lg:flex">
-            <Link
-              href="/account"
-              className="font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60"
-            >
-              Hi, {customer.first_name || 'there'}
-            </Link>
-            <button
-              type="button"
-              onClick={() => logout()}
-              className="font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60"
-            >
-              Log Out
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="hidden font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60 lg:inline-flex"
+          >
+            Log Out
+          </button>
         ) : (
-          <>
-            <Link
-              href="/login"
-              className="hidden font-medium text-sm uppercase tracking-wide transition-opacity hover:opacity-60 lg:inline-flex"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className={`hidden items-center rounded-full px-5 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
-                scrolled ? 'bg-white text-fg hover:bg-accent hover:text-white' : 'bg-fg text-white hover:bg-accent'
-              }`}
-            >
-              Sign Up
-            </Link>
-          </>
+          <Link
+            href="/signup"
+            className={`hidden items-center rounded-full px-5 py-2.5 font-display text-sm uppercase tracking-wide transition-colors duration-300 lg:inline-flex ${
+              scrolled ? 'bg-white text-fg hover:bg-accent hover:text-white' : 'bg-fg text-white hover:bg-accent'
+            }`}
+          >
+            Sign Up
+          </Link>
         )}
         <Link
           href="/find-us"
@@ -131,8 +116,10 @@ export default function Header() {
           Find Us
         </Link>
 
-        {/* S10: DTC cart — renders only when a Medusa channel is wired. The account
-            link lives in the "Hi, {name}" greeting above (→ /account). */}
+        {/* Account + cart icons (T48). Both render only when a Medusa channel is
+            wired. The account icon → /account when signed in (accent dot), → /login
+            otherwise; the cart opens the live drawer. */}
+        <AccountButton className="ml-1" />
         <CartButton className="ml-1" />
 
         <button
