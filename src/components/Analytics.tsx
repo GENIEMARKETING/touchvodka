@@ -20,9 +20,11 @@
  *     (reverses the 2026-06-09 PostHog-vs-CDP DECISION-A; see sessions/HANDOFFS.md).
  *     Uses the site-local `initPostHogFull` (src/lib/posthog-full.ts), NOT the
  *     foundation default — the foundation `initPostHog` is privacy-hardened (strips
- *     $ip, no recording) and can't express this posture. Still consent-gated via
- *     the same tagLoader; no-ops while NEXT_PUBLIC_POSTHOG_KEY is empty. The CDP
- *     stream above stays the IP-ANONYMIZED warehouse/BI path; PostHog is the
+ *     $ip, no recording) AND injects array.js bare, so it throws
+ *     `[tagLoader] posthog failed TypeError: a.init is not a function`. The
+ *     site-local loader installs PostHog's official stub first. Still consent-gated
+ *     via the same tagLoader; no-ops while NEXT_PUBLIC_POSTHOG_KEY is empty. The
+ *     CDP stream above stays the IP-ANONYMIZED warehouse/BI path; PostHog is the
  *     visitor-level layer.
  *   • Google gtag (marketing category) — pixels.google() via tagLoader; nothing
  *     loads until the visitor accepts marketing in the consent banner.

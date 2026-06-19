@@ -11,10 +11,12 @@
  * LOADING: PostHog's `array.js` is the full SDK and hydrates the `window.posthog._i`
  * init queue when it loads — so the official loader STUB must exist *before* we
  * call init. (Injecting array.js bare and calling init does NOT work: the SDK
- * loads but never initializes — verified live, only the loader downloaded, no
- * capture/recording fired.) `installStub()` is PostHog's official snippet,
- * which also derives the regional ASSETS host (api_host `us.i.posthog.com` →
- * `us-assets.i.posthog.com`).
+ * loads but never initializes — and `window.posthog` is a bare `[]` array at that
+ * instant, so `inst.init` throws `a.init is not a function`. This is exactly the
+ * `[tagLoader] posthog failed` error the foundation default `initPostHog` hits;
+ * the official stub below defines a real `init` before array.js arrives, fixing
+ * it.) `installStub()` is PostHog's official snippet, which also derives the
+ * regional ASSETS host (api_host `us.i.posthog.com` → `us-assets.i.posthog.com`).
  *
  * Privacy still enforced at THREE layers: (1) consent gate via `tagLoader`
  * (`analytics`) — nothing loads pre-opt-in, opt-out on withdrawal; (2) PostHog

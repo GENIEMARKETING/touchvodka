@@ -6,16 +6,22 @@ import { CartDrawer } from '@/components/vinny/commerce/cart-drawer';
 import { ConsentBanner } from '@/components/vinny/consent-banner/consent-banner';
 import { brandJsonLd, jsonLdScript, organizationJsonLd } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { Anton, Space_Mono } from 'next/font/google';
+import { Bricolage_Grotesque, Hanken_Grotesk, Space_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 import './globals.css';
 
 // next/font (S5 perf): self-hosted, no layout-shift, no render-blocking CDN
 // @import (the Vite build pulled fonts from fonts.googleapis.com at runtime).
-const display = Anton({
-  weight: '400',
+// Refined Bold redesign: warm-but-confident display grotesque + readable body
+// sans. Space Mono is retained only for tiny technical labels (proof/category).
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
   variable: '--font-display',
+  display: 'swap',
+});
+const sans = Hanken_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-sans',
   display: 'swap',
 });
 const mono = Space_Mono({
@@ -64,7 +70,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body>
         {/* schema.org Organization + Brand entity nodes (@geniemarketing/seo, S4·I + T46) —
             site-wide knowledge-panel + AEO entity-resolution nodes (sameAs socials). */}

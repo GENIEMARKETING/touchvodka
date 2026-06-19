@@ -31,7 +31,7 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
 
   return (
     <PageShell>
-      <PageHero eyebrow="// ACCOUNT" title="My Account" />
+      <PageHero eyebrow="Your account" title="My Account" />
       <div className="mx-auto flex max-w-6xl flex-col gap-10 p-8 md:flex-row md:p-12">
         <AccountNav
           items={NAV}

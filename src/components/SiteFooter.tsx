@@ -1,20 +1,21 @@
 'use client';
 
+import AreaInterest from '@/components/AreaInterest';
 import { Instagram, Twitter } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { DoNotSellLink, openConsentPreferences } from './vinny/consent-banner/consent-banner';
 
 /**
- * SiteFooter — Touch Vodka's bespoke neo-brutalist footer.
+ * SiteFooter — Touch Vodka's Refined-Bold footer (de-brutalized 2026-06).
  *
- * REUSE DECISION (S4): the shared @geniemarketing `footer` block hardcodes its palette to
- * `--brand-fg` (background) + `--surface` (text), which only works when
- * `--brand-fg` is a DARK brand color. Touch Vodka's `--brand-fg` is WHITE (it's
- * the on-blue button text), so the shared footer would render white-on-white.
- * Rather than fight the token contract we keep the bespoke footer (it also
- * carries the brand's brutalist border language) and wire the "Cookie settings"
- * link to the shared consent block's `openConsentPreferences` (S7 right-to-
- * withdraw). See LEARNINGS: token-fg-dual-use.
+ * REUSE DECISION (S4): the shared @geniemarketing `footer` block hardcodes its
+ * palette to `--brand-fg` (background) + `--surface` (text), which only works
+ * when `--brand-fg` is a DARK brand color. Touch Vodka's `--brand-fg` is WHITE,
+ * so the shared footer would render white-on-white. We keep a bespoke footer and
+ * wire "Cookie settings" to the shared consent block's `openConsentPreferences`
+ * (S7 right-to-withdraw) + the CPRA "Do Not Sell or Share" link (T45). See
+ * LEARNINGS: token-fg-dual-use.
  */
 const COLS: Array<{ heading: string; links: Array<{ label: string; href: string }> }> = [
   {
@@ -63,70 +64,83 @@ export default function SiteFooter({
   twitter?: string;
 } = {}) {
   return (
-    <footer className="border-black border-t-4 bg-black p-8 text-white md:p-16">
-      <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
-        <div className="flex flex-col gap-12 md:col-span-5">
-          <span className="font-display text-4xl uppercase tracking-tight">{siteName}</span>
-          <p className="max-w-xs border-accent border-l-2 pl-6 font-mono text-sm leading-relaxed opacity-60">
-            {tagline}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-12 sm:grid-cols-3 md:col-span-7">
-          {COLS.map((col) => (
-            <div key={col.heading} className="space-y-6">
-              <h4 className="font-bold text-accent text-xl tracking-widest">[ {col.heading} ]</h4>
-              <nav className="flex flex-col gap-3 font-mono text-sm opacity-70">
-                {col.links.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="hover:text-accent hover:underline"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                {col.heading === 'Legal' ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={openConsentPreferences}
-                      className="mt-1 text-left hover:text-accent hover:underline"
-                    >
-                      Cookie settings
-                    </button>
-                    {/* CPRA "Do Not Sell or Share" — opts out of marketing (ad pixels),
-                        preserves analytics/preferences; surfaces a GPC-honored note. */}
-                    <DoNotSellLink className="mt-1 text-left hover:text-accent hover:underline" />
-                  </>
-                ) : null}
-              </nav>
+    <>
+      {/* Site-wide geo-interest strip (Figma footer Area Interest band) — a CTA to Find Us. */}
+      <AreaInterest variant="strip" />
+      <footer className="border-white/10 border-t bg-fg px-6 py-16 text-white md:px-10 md:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
+            <div className="flex flex-col gap-6 md:col-span-5">
+              <Image
+                src="/brand/touch-logo-white.svg"
+                alt={siteName}
+                width={500}
+                height={167}
+                unoptimized
+                className="h-9 w-auto"
+              />
+              <p className="max-w-xs text-neutral-400 text-sm leading-relaxed">{tagline}</p>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="mt-24 flex flex-col items-center justify-between gap-8 border-white/20 border-t-2 pt-10 sm:flex-row">
-        <p className="text-center font-mono text-[10px] tracking-widest opacity-40 sm:text-left">
-          {'© 2026 Touch Vodka // please enjoy responsibly // all rights reserved'}
-        </p>
-        <div className="flex gap-6">
-          <a
-            href={instagram}
-            aria-label="Instagram"
-            className="group border-2 border-white p-3 transition-all hover:border-accent hover:bg-accent"
-          >
-            <Instagram className="h-6 w-6" />
-          </a>
-          <a
-            href={twitter}
-            aria-label="Twitter / X"
-            className="group border-2 border-white p-3 transition-all hover:border-accent hover:bg-accent"
-          >
-            <Twitter className="h-6 w-6" />
-          </a>
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-7">
+              {COLS.map((col) => (
+                <div key={col.heading} className="space-y-4">
+                  <h4 className="font-display text-accent text-sm uppercase tracking-widest">
+                    {col.heading}
+                  </h4>
+                  <nav className="flex flex-col gap-3 text-neutral-400 text-sm">
+                    {col.links.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                    {col.heading === 'Legal' ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={openConsentPreferences}
+                          className="text-left transition-colors hover:text-white"
+                        >
+                          Cookie settings
+                        </button>
+                        {/* CPRA "Do Not Sell or Share" (T45) — opts out of marketing/ad
+                            pixels, keeps analytics/preferences; GPC-honored. */}
+                        <DoNotSellLink className="text-left transition-colors hover:text-white" />
+                      </>
+                    ) : null}
+                  </nav>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-16 flex flex-col items-center justify-between gap-6 border-white/10 border-t pt-8 sm:flex-row">
+            <p className="text-center text-neutral-500 text-xs sm:text-left">
+              © 2026 Touch Vodka · Please enjoy responsibly · 21+
+            </p>
+            <div className="flex gap-3">
+              <a
+                href={instagram}
+                aria-label="Instagram"
+                className="rounded-full border border-white/15 p-3 transition-colors hover:border-accent hover:text-accent"
+              >
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a
+                href={twitter}
+                aria-label="Twitter / X"
+                className="rounded-full border border-white/15 p-3 transition-colors hover:border-accent hover:text-accent"
+              >
+                <Twitter className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }

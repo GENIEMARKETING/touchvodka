@@ -27,11 +27,19 @@ import {
 import { formatPrice, medusa } from '@/lib/commerce';
 import type { Order } from '@geniemarketing/commerce';
 import { createPaymentsClient, describeProvider } from '@geniemarketing/commerce/payments';
-import { Button, Input } from '@geniemarketing/ui';
 import Link from 'next/link';
 import { type FormEvent, useCallback, useRef, useState } from 'react';
 
 type Step = 'details' | 'delivery' | 'payment' | 'done';
+
+// Refined-Bold form primitives (Figma checkout 59:62) — soft, rounded, no brutalist borders.
+const INPUT_CLS =
+  'w-full rounded-xl border border-concrete px-4 py-3 text-fg placeholder:text-neutral-400 focus:border-accent focus:outline-none';
+const PRIMARY_BTN =
+  'rounded-full bg-accent px-7 py-4 font-display text-white transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-60';
+const GHOST_BTN =
+  'rounded-full border border-concrete px-7 py-4 font-display text-fg transition-colors hover:border-fg disabled:opacity-50';
+const SECTION_LABEL = 'mb-3 font-mono text-accent text-xs uppercase tracking-[0.2em]';
 
 const STRIPE_PK = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 // Pass config explicitly (static NEXT_PUBLIC_* reads → Next inlines them). A bare
@@ -87,14 +95,16 @@ export function Checkout() {
 
   if (!configured) {
     return (
-      <div className="mx-auto max-w-xl px-6 py-16 text-center">
-        <p className="font-display text-3xl uppercase">Online ordering coming soon</p>
-        <p className="mt-4 font-mono opacity-70">
+      <div className="mx-auto max-w-xl px-6 py-24 text-center">
+        <h1 className="font-display text-4xl text-fg uppercase md:text-5xl">
+          Online ordering coming soon
+        </h1>
+        <p className="mt-4 text-neutral-600 leading-relaxed">
           In the meantime, find Touch Vodka at a store near you.
         </p>
         <Link
           href="/find-us"
-          className="mt-6 inline-block font-display text-accent text-xl underline"
+          className="mt-8 inline-flex items-center justify-center rounded-full bg-accent px-8 py-4 font-display text-lg text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5"
         >
           Find a stockist →
         </Link>
@@ -167,19 +177,19 @@ export function Checkout() {
 
   if (step === 'done' && order) {
     return (
-      <div className="mx-auto max-w-xl px-6 py-16 text-center">
-        <p className="mb-2 font-mono text-accent text-sm uppercase tracking-widest">Order placed</p>
-        <h1 className="mb-6 font-display text-5xl uppercase">Thank you</h1>
-        <p className="font-mono opacity-80">
-          Order <span className="font-bold">#{order.display_id}</span> — a confirmation is on its
-          way to {order.email}.
+      <div className="mx-auto max-w-xl px-6 py-24 text-center">
+        <p className="mb-2 font-mono text-accent text-sm uppercase tracking-[0.25em]">Order placed</p>
+        <h1 className="mb-6 font-display text-5xl text-fg uppercase">Thank you</h1>
+        <p className="text-neutral-600 leading-relaxed">
+          Order <span className="font-display text-fg">#{order.display_id}</span> — a confirmation is
+          on its way to {order.email}.
         </p>
-        <p className="mt-2 font-mono text-lg">
+        <p className="mt-2 font-display text-fg text-lg">
           Total {formatPrice({ amount: order.total, currency_code: order.currency_code })}
         </p>
         <Link
           href="/products"
-          className="mt-8 inline-block font-display text-accent text-xl underline"
+          className="mt-8 inline-flex items-center justify-center rounded-full bg-accent px-8 py-4 font-display text-lg text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5"
         >
           Back to the collection →
         </Link>
@@ -187,164 +197,229 @@ export function Checkout() {
     );
   }
 
+  const currency = cart?.currency_code ?? 'usd';
+  const money = (amount: number) => formatPrice({ amount, currency_code: currency });
+
   return (
-    <div className="mx-auto grid max-w-5xl gap-12 px-6 py-12 lg:grid-cols-[1.3fr_1fr]">
-      <div>
-        <ol className="mb-8 flex gap-2 font-mono text-xs uppercase tracking-widest">
-          {(['details', 'delivery', 'payment'] as const).map((s, i) => (
-            <li
-              key={s}
-              className={`flex items-center gap-2 ${step === s ? 'text-accent' : 'opacity-50'}`}
-            >
-              <span className="flex h-5 w-5 items-center justify-center border-2 border-current">
-                {i + 1}
-              </span>
-              {s}
-            </li>
-          ))}
-        </ol>
-
-        {error ? (
-          <p className="mb-4 border-2 border-accent p-3 font-mono text-accent text-sm">{error}</p>
-        ) : null}
-
-        {step === 'details' ? (
-          <form onSubmit={submitDetails} className="space-y-4">
-            <Input
-              type="email"
-              required
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmailValue(e.target.value)}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                required
-                placeholder="First name"
-                value={address.first_name}
-                onChange={(e) => setAddress((a) => ({ ...a, first_name: e.target.value }))}
-              />
-              <Input
-                required
-                placeholder="Last name"
-                value={address.last_name}
-                onChange={(e) => setAddress((a) => ({ ...a, last_name: e.target.value }))}
-              />
-            </div>
-            <Input
-              required
-              placeholder="Address"
-              value={address.address_1}
-              onChange={(e) => setAddress((a) => ({ ...a, address_1: e.target.value }))}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                required
-                placeholder="City"
-                value={address.city}
-                onChange={(e) => setAddress((a) => ({ ...a, city: e.target.value }))}
-              />
-              <Input
-                placeholder="State / Province"
-                value={address.province}
-                onChange={(e) => setAddress((a) => ({ ...a, province: e.target.value }))}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                required
-                placeholder="Postal code"
-                value={address.postal_code}
-                onChange={(e) => setAddress((a) => ({ ...a, postal_code: e.target.value }))}
-              />
-              <Input
-                required
-                placeholder="Country code (e.g. us)"
-                value={address.country_code}
-                onChange={(e) => setAddress((a) => ({ ...a, country_code: e.target.value }))}
-              />
-            </div>
-            <Button type="submit" disabled={busy} className="w-full">
-              {busy ? 'Saving…' : 'Continue to delivery'}
-            </Button>
-          </form>
-        ) : null}
-
-        {step === 'delivery' ? (
-          <form onSubmit={submitDelivery} className="space-y-4">
-            {options.length === 0 ? (
-              <p className="font-mono text-sm opacity-70">
-                No shipping options for this address — Touch Vodka may not ship to your region yet.
-              </p>
-            ) : (
-              options.map((o) => (
-                <label
-                  key={o.id}
-                  className={`flex cursor-pointer items-center justify-between border-2 p-4 ${
-                    chosenOption === o.id ? 'border-accent' : 'border-black'
+    <div className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+      <h1 className="mb-10 font-display text-4xl text-fg uppercase md:text-6xl">Checkout</h1>
+      <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+        <div>
+          <ol className="mb-8 flex gap-4 font-display text-sm uppercase tracking-wide">
+            {(['details', 'delivery', 'payment'] as const).map((s, i) => (
+              <li
+                key={s}
+                className={`flex items-center gap-2 ${step === s ? 'text-fg' : 'text-neutral-400'}`}
+              >
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                    step === s ? 'bg-accent text-white' : 'bg-neutral-200 text-neutral-500'
                   }`}
                 >
-                  <span className="flex items-center gap-3 font-mono text-sm">
+                  {i + 1}
+                </span>
+                {s}
+              </li>
+            ))}
+          </ol>
+
+          {error ? (
+            <p className="mb-4 rounded-xl bg-red-50 p-3 text-red-600 text-sm">{error}</p>
+          ) : null}
+
+          {step === 'details' ? (
+            <form onSubmit={submitDetails} className="space-y-6">
+              <div>
+                <p className={SECTION_LABEL}>Contact</p>
+                <input
+                  type="email"
+                  required
+                  placeholder="Email address"
+                  className={INPUT_CLS}
+                  value={email}
+                  onChange={(e) => setEmailValue(e.target.value)}
+                />
+              </div>
+              <div>
+                <p className={SECTION_LABEL}>Shipping</p>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <input
-                      type="radio"
-                      name="shipping"
-                      value={o.id}
-                      checked={chosenOption === o.id}
-                      onChange={() => setChosenOption(o.id)}
+                      required
+                      placeholder="First name"
+                      className={INPUT_CLS}
+                      value={address.first_name}
+                      onChange={(e) => setAddress((a) => ({ ...a, first_name: e.target.value }))}
                     />
-                    {o.name}
-                  </span>
-                  <span className="font-mono text-sm">
-                    {formatPrice({ amount: o.amount, currency_code: cart?.currency_code ?? 'usd' })}
-                  </span>
-                </label>
-              ))
-            )}
-            <div className="flex gap-3">
-              <Button type="button" variant="ghost" onClick={() => setStep('details')}>
-                Back
-              </Button>
-              <Button type="submit" disabled={busy || !chosenOption} className="flex-1">
-                {busy ? 'Saving…' : 'Continue to payment'}
-              </Button>
-            </div>
-          </form>
-        ) : null}
+                    <input
+                      required
+                      placeholder="Last name"
+                      className={INPUT_CLS}
+                      value={address.last_name}
+                      onChange={(e) => setAddress((a) => ({ ...a, last_name: e.target.value }))}
+                    />
+                  </div>
+                  <input
+                    required
+                    placeholder="Street address"
+                    className={INPUT_CLS}
+                    value={address.address_1}
+                    onChange={(e) => setAddress((a) => ({ ...a, address_1: e.target.value }))}
+                  />
+                  <input
+                    required
+                    placeholder="City"
+                    className={INPUT_CLS}
+                    value={address.city}
+                    onChange={(e) => setAddress((a) => ({ ...a, city: e.target.value }))}
+                  />
+                  <div className="grid grid-cols-3 gap-4">
+                    <input
+                      placeholder="State"
+                      className={INPUT_CLS}
+                      value={address.province}
+                      onChange={(e) => setAddress((a) => ({ ...a, province: e.target.value }))}
+                    />
+                    <input
+                      required
+                      placeholder="ZIP"
+                      className={INPUT_CLS}
+                      value={address.postal_code}
+                      onChange={(e) => setAddress((a) => ({ ...a, postal_code: e.target.value }))}
+                    />
+                    <input
+                      required
+                      placeholder="Country"
+                      className={INPUT_CLS}
+                      value={address.country_code}
+                      onChange={(e) => setAddress((a) => ({ ...a, country_code: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" disabled={busy} className={`${PRIMARY_BTN} w-full`}>
+                {busy ? 'Saving…' : 'Continue to delivery'}
+              </button>
+            </form>
+          ) : null}
 
-        {step === 'payment' ? (
-          <div className="space-y-4">
-            {session?.kind === 'stripe' && session.secret && STRIPE_PK ? (
-              <StripePayment
-                publishableKey={STRIPE_PK}
-                clientSecret={session.secret}
-                busy={busy}
-                onConfirm={(confirm) => {
-                  stripeConfirm.current = confirm;
-                }}
-                onError={setError}
-              />
-            ) : (
-              <p className="border-2 border-black p-4 font-mono text-sm opacity-80">
-                Test payment — no card required. Click “Place order” to complete a TEST order.
-              </p>
-            )}
-            <div className="flex gap-3">
-              <Button type="button" variant="ghost" onClick={() => setStep('delivery')}>
-                Back
-              </Button>
-              <Button type="button" onClick={placeOrder} disabled={busy} className="flex-1">
-                {busy ? 'Placing order…' : 'Place order'}
-              </Button>
+          {step === 'delivery' ? (
+            <form onSubmit={submitDelivery} className="space-y-4">
+              <p className={SECTION_LABEL}>Delivery</p>
+              {options.length === 0 ? (
+                <p className="text-neutral-500 text-sm">
+                  No shipping options for this address — Touch Vodka may not ship to your region yet.
+                </p>
+              ) : (
+                options.map((o) => (
+                  <label
+                    key={o.id}
+                    className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-colors ${
+                      chosenOption === o.id ? 'border-accent bg-accent/5' : 'border-concrete'
+                    }`}
+                  >
+                    <span className="flex items-center gap-3 text-sm">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        value={o.id}
+                        checked={chosenOption === o.id}
+                        onChange={() => setChosenOption(o.id)}
+                      />
+                      {o.name}
+                    </span>
+                    <span className="font-display text-sm">{money(o.amount)}</span>
+                  </label>
+                ))
+              )}
+              <div className="flex gap-3">
+                <button type="button" className={GHOST_BTN} onClick={() => setStep('details')}>
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={busy || !chosenOption}
+                  className={`${PRIMARY_BTN} flex-1`}
+                >
+                  {busy ? 'Saving…' : 'Continue to payment'}
+                </button>
+              </div>
+            </form>
+          ) : null}
+
+          {step === 'payment' ? (
+            <div className="space-y-4">
+              <p className={SECTION_LABEL}>Payment</p>
+              {session?.kind === 'stripe' && session.secret && STRIPE_PK ? (
+                <StripePayment
+                  publishableKey={STRIPE_PK}
+                  clientSecret={session.secret}
+                  busy={busy}
+                  onConfirm={(confirm) => {
+                    stripeConfirm.current = confirm;
+                  }}
+                  onError={setError}
+                />
+              ) : (
+                <p className="rounded-xl border border-concrete bg-neutral-50 p-4 text-neutral-600 text-sm">
+                  Test payment — no card required. Click “Place order” to complete a TEST order.
+                </p>
+              )}
+              <div className="flex gap-3">
+                <button type="button" className={GHOST_BTN} onClick={() => setStep('delivery')}>
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={placeOrder}
+                  disabled={busy}
+                  className={`${PRIMARY_BTN} flex-1`}
+                >
+                  {busy ? 'Placing order…' : 'Place order'}
+                </button>
+              </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
+
+        {/* Order summary recap */}
+        <aside className="h-fit rounded-2xl border border-concrete/60 bg-neutral-50 p-6 lg:sticky lg:top-28">
+          <h2 className="font-display text-2xl text-fg">Order Summary</h2>
+          {cart ? (
+            <>
+              <ul className="mt-5 space-y-3">
+                {cart.items.map((it) => (
+                  <li key={it.id} className="flex justify-between gap-3 text-sm">
+                    <span className="text-neutral-600">
+                      {it.title} × {it.quantity}
+                    </span>
+                    <span className="text-fg">{money(it.unit_price * it.quantity)}</span>
+                  </li>
+                ))}
+              </ul>
+              <dl className="mt-5 space-y-2 border-concrete border-t pt-4 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-neutral-500">Subtotal</dt>
+                  <dd className="text-fg">{money(cart.subtotal)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-neutral-500">Shipping</dt>
+                  <dd className="text-fg">
+                    {cart.shipping_total > 0 ? money(cart.shipping_total) : '$10.00'}
+                  </dd>
+                </div>
+                <div className="flex justify-between border-concrete border-t pt-3 font-display text-fg text-lg">
+                  <dt>Total</dt>
+                  <dd>{money(cart.total)}</dd>
+                </div>
+              </dl>
+            </>
+          ) : null}
+          <p className="mt-5 text-center text-neutral-400 text-xs">
+            Secure SSL checkout · 21+ · Adult signature
+          </p>
+        </aside>
       </div>
-
-      {/* Order summary rail */}
-      <aside className="h-fit border-4 border-black">
-        <h2 className="border-black border-b-4 p-4 font-display text-2xl uppercase">Order</h2>
-        <CartView />
-      </aside>
     </div>
   );
 }

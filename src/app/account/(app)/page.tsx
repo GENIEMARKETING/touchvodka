@@ -31,27 +31,29 @@ export default function AccountOverview() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-display text-2xl uppercase">
+        <h2 className="font-display text-2xl text-fg uppercase">
           Welcome back, {customer.first_name ?? 'friend'}
         </h2>
-        <p className="mt-1 font-mono text-sm opacity-70">{customer.email}</p>
+        <p className="mt-1 text-neutral-500 text-sm">{customer.email}</p>
       </div>
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-bold text-sm uppercase tracking-widest">Recent orders</h3>
-          <Link href="/account/orders" className="text-sm underline">
+          <h3 className="font-mono text-accent text-xs uppercase tracking-[0.25em]">
+            Recent orders
+          </h3>
+          <Link href="/account/orders" className="text-accent text-sm hover:text-fg">
             View all →
           </Link>
         </div>
         <OrderHistory orders={orders} />
       </section>
 
-      <div className="flex flex-wrap gap-6 font-mono text-sm">
-        <Link href="/account/addresses" className="underline">
+      <div className="flex flex-wrap gap-6 text-sm">
+        <Link href="/account/addresses" className="text-accent hover:text-fg">
           Manage addresses →
         </Link>
-        <Link href="/account/settings" className="underline">
+        <Link href="/account/settings" className="text-accent hover:text-fg">
           Account settings →
         </Link>
       </div>

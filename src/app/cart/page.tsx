@@ -1,4 +1,4 @@
-import PageShell, { PageHero } from '@/components/PageShell';
+import PageShell from '@/components/PageShell';
 import { CartView } from '@/components/vinny/commerce/cart-view';
 import type { Metadata } from 'next';
 
@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 export default function CartPage() {
   return (
     <PageShell>
-      <PageHero eyebrow="// CART" title="Your Cart" />
-      <div className="mx-auto min-h-[40vh] max-w-2xl border-black border-x-4 md:border-x-0">
-        <CartView />
-      </div>
+      <section className="mx-auto min-h-[50vh] max-w-7xl px-6 py-12 md:px-10 md:py-16">
+        <h1 className="mb-10 font-display text-4xl text-fg uppercase md:text-6xl">Your Cart</h1>
+        <CartView layout="page" />
+      </section>
     </PageShell>
   );
 }

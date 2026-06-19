@@ -1,27 +1,38 @@
 'use client';
 
 /**
- * CartButton — header trigger that opens the cart drawer and badges the live
- * item count. Renders nothing until commerce is wired for this brand, so the
- * bespoke brutalist nav stays unchanged on the brand-only build.
+ * CartButton — header cart control. Always visible (Refined-Bold redesign): when
+ * commerce is wired for this brand it opens the live cart drawer and badges the
+ * item count; until then it's a plain link to the cart page so the nav always
+ * shows a cart. Inherits the header's text colour (dark over the hero, white on
+ * the scrolled black bar) instead of a fixed background.
  */
 import { useCart } from '@/components/vinny/commerce/cart-context';
 import { ShoppingBag } from 'lucide-react';
+import Link from 'next/link';
 
 export function CartButton({ className = '' }: { className?: string }) {
   const { configured, count, openDrawer } = useCart();
-  if (!configured) return null;
+  const base = `relative flex items-center justify-center p-2 transition-colors hover:text-accent ${className}`;
+
+  if (!configured) {
+    return (
+      <Link href="/cart" aria-label="Cart" className={base}>
+        <ShoppingBag className="h-6 w-6" />
+      </Link>
+    );
+  }
 
   return (
     <button
       type="button"
       aria-label={`Open cart, ${count} item${count === 1 ? '' : 's'}`}
       onClick={openDrawer}
-      className={`relative flex items-center justify-center bg-white p-6 text-black transition-colors hover:bg-accent hover:text-white ${className}`}
+      className={base}
     >
       <ShoppingBag className="h-6 w-6" />
       {count > 0 ? (
-        <span className="-translate-y-1/3 absolute top-3 right-3 flex h-5 min-w-5 translate-x-1/3 items-center justify-center bg-accent px-1 font-bold text-[10px] text-white">
+        <span className="-top-1 -right-1 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 font-bold text-[10px] text-white">
           {count}
         </span>
       ) : null}

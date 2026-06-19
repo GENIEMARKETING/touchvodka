@@ -189,40 +189,72 @@ export function productJsonLd(input: ProductJsonLdInput): JsonLd {
   };
 }
 
-/** BreadcrumbList for a deep page. Pass site-relative paths; origin is prefixed. */
 export type ArticleJsonLdInput = {
   title: string;
   description?: string;
-  /** Single hero image URL (BlogPost.image); relative paths get the origin prefixed. */
   image?: string;
-  /** Blog slug -> /blog/<slug>. */
-  slug: string;
-  /** ISO date the post was published (Strapi publishedAt / frontmatter date). */
-  datePublished: string;
-  dateModified?: string;
+  path: string;
+  datePublished?: string;
   author?: string;
 };
 
-/**
- * Article JSON-LD for a blog post (AEO / #46). Every published post -- including
- * the auto-blog drafts from the content-autopilot pipeline -- emits this so it can
- * win Article rich results and feed answer engines. Brand is the publisher.
- */
+/** schema.org `Article` JSON-LD for a blog post (AEO + rich result). */
 export function articleJsonLd(input: ArticleJsonLdInput): JsonLd {
-  const abs = (u: string) => (u.startsWith('http') ? u : `${SITE_ORIGIN}${u.startsWith('/') ? '' : '/'}${u}`);
-  return articleSchema({
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
     headline: input.title,
-    description: input.description,
-    image: input.image ? [abs(input.image)] : undefined,
-    url: `${SITE_ORIGIN}/blog/${input.slug}`,
-    datePublished: input.datePublished,
-    dateModified: input.dateModified ?? input.datePublished,
-    authorName: input.author || BRAND,
-    publisherName: BRAND,
-    publisherLogo: `${SITE_ORIGIN}/logo/touch-vodka.png`,
-  });
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.image ? { image: [input.image] } : {}),
+    ...(input.datePublished ? { datePublished: input.datePublished } : {}),
+    author: { '@type': 'Organization', name: input.author || BRAND },
+    publisher: { '@type': 'Organization', name: BRAND },
+    url: `${SITE_ORIGIN}${input.path}`,
+  };
 }
 
+export type RecipeJsonLdInput = {
+  name: string;
+  description?: string;
+  image: string[];
+  path: string;
+  ingredients: string[];
+  /** Ordered method steps (each becomes a HowToStep). */
+  instructions: string[];
+  category?: string;
+  yield?: string;
+  keywords?: string[];
+};
+
+/**
+ * schema.org `Recipe` JSON-LD for a cocktail recipe page. `@geniemarketing/seo`
+ * ships Article/Product/Breadcrumb only, so this is hand-rolled here (the same
+ * pattern as the brand-only Product fallback above). Drives the Recipe rich
+ * result + AEO/AI-crawler answers.
+ */
+export function recipeJsonLd(input: RecipeJsonLdInput): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Recipe',
+    name: input.name,
+    ...(input.description ? { description: input.description } : {}),
+    image: input.image,
+    url: `${SITE_ORIGIN}${input.path}`,
+    author: { '@type': 'Organization', name: BRAND },
+    recipeCategory: input.category ?? 'Cocktail',
+    recipeCuisine: 'Cocktail',
+    ...(input.yield ? { recipeYield: input.yield } : {}),
+    ...(input.keywords?.length ? { keywords: input.keywords.join(', ') } : {}),
+    recipeIngredient: input.ingredients,
+    recipeInstructions: input.instructions.map((step, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      text: step,
+    })),
+  };
+}
+
+/** BreadcrumbList for a deep page. Pass site-relative paths; origin is prefixed. */
 export function breadcrumbJsonLd(crumbs: Array<{ name: string; path: string }>): JsonLd {
   return breadcrumbSchema(
     crumbs.map<Crumb>((c) => ({ name: c.name, url: `${SITE_ORIGIN}${c.path}` })),
