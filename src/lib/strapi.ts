@@ -15,6 +15,8 @@
  * the rebuild renders + the production build is never gated on the CMS being up.
  * Remove the fallbacks once content is migrated and verified.
  */
+import { COCKTAILS, type Cocktail } from '@/data/cocktails';
+import { CITIES, type CityEntry, type ExploreEntry, OCCASIONS, SEASONS } from '@/data/explore';
 import { PRODUCTS, type Product } from '@/data/products';
 import { STOCKISTS, type Stockist } from '@/data/stockists';
 
@@ -128,4 +130,129 @@ export async function getSiteConfig(client = SITE_KEY): Promise<StrapiSiteConfig
     populate: '*',
   });
   return data && data.length > 0 ? (data[0] ?? null) : null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cocktails + explore taxonomy (redesign migration). These NEW content types
+// (`cocktail` / `city` / `season` / `occasion`) are authored on the box (see
+// infrastructure/cms/cocktails/) — the four `api/cocktails|cities|seasons|
+// occasions` endpoints 404 until then, so every reader returns null and the data
+// layer falls back to the in-repo seed (src/data/cocktails.ts + explore.ts).
+// Strapi v5 returns FLAT attributes (no `.attributes` nesting); we map
+// defensively so a partially-populated entry still renders. Media is returned as
+// `{ url }` (absolute CDN/Strapi URL) — passed through unchanged.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type Raw = Record<string, unknown>;
+const str = (v: unknown): string => (typeof v === 'string' ? v : '');
+const arr = (v: unknown): string[] =>
+  Array.isArray(v) ? v.map((x) => str(x)).filter(Boolean) : [];
+/** Strapi media → URL string. Accepts `{url}`, `{data:{url}}`, or a bare string. */
+function mediaUrlOf(v: unknown): string {
+  if (typeof v === 'string') return v;
+  if (v && typeof v === 'object') {
+    const o = v as Raw;
+    if (typeof o.url === 'string') return o.url;
+    const d = o.data as Raw | undefined;
+    if (d && typeof d.url === 'string') return d.url;
+  }
+  return '';
+}
+
+/** Cocktails (≥50) for this brand. null → type not deployed/empty (caller falls back to the seed). */
+export async function getStrapiCocktails(client = SITE_KEY): Promise<Cocktail[] | null> {
+  const data = await strapiFetch<Raw[]>('cocktails', {
+    'filters[client][$eq]': client,
+    populate: '*',
+    'pagination[pageSize]': '100',
+    sort: 'name:asc',
+  });
+  if (!data || data.length === 0) return null;
+  return data.map((c, i) => ({
+    id: str(c.cocktailId) || str(c.id) || `CK-${i + 1}`,
+    slug: str(c.slug),
+    name: str(c.name),
+    tagline: str(c.tagline),
+    description: str(c.description),
+    image: mediaUrlOf(c.image) || str(c.imageUrl),
+    ingredients: arr(c.ingredients),
+    preparation: str(c.preparation) || str(c.method),
+    garnish: str(c.garnish),
+    glass: str(c.glass),
+    serves: str(c.serves),
+    color: str(c.color) || '#0055FF',
+    baseSpirit: str(c.baseSpirit),
+    productIds: arr(c.productIds),
+    season: (str(c.season) || 'Summer') as Cocktail['season'],
+    event: (str(c.event) || str(c.occasion) || 'Party') as Cocktail['event'],
+  }));
+}
+
+function mapExplore(c: Raw): ExploreEntry {
+  return {
+    slug: str(c.slug),
+    name: str(c.name),
+    kicker: str(c.kicker),
+    blurb: str(c.blurb),
+    signatureSlug: str(c.signatureSlug),
+    image: mediaUrlOf(c.image) || str(c.imageUrl) || undefined,
+  };
+}
+
+/** Cities (6) for this brand. null → type not deployed/empty (caller falls back to the seed). */
+export async function getStrapiCities(client = SITE_KEY): Promise<CityEntry[] | null> {
+  const data = await strapiFetch<Raw[]>('cities', {
+    'filters[client][$eq]': client,
+    populate: '*',
+    'pagination[pageSize]': '50',
+  });
+  if (!data || data.length === 0) return null;
+  return data.map((c) => ({
+    ...mapExplore(c),
+    state: str(c.state),
+    whyHere: Array.isArray(c.whyHere)
+      ? (c.whyHere as Raw[]).map((w) => ({ title: str(w.title), body: str(w.body) }))
+      : [],
+  }));
+}
+
+/** Seasons (4) for this brand. null → type not deployed/empty (caller falls back to the seed). */
+export async function getStrapiSeasons(client = SITE_KEY): Promise<ExploreEntry[] | null> {
+  const data = await strapiFetch<Raw[]>('seasons', {
+    'filters[client][$eq]': client,
+    populate: '*',
+    'pagination[pageSize]': '50',
+  });
+  return data && data.length > 0 ? data.map(mapExplore) : null;
+}
+
+/** Occasions (6) for this brand. null → type not deployed/empty (caller falls back to the seed). */
+export async function getStrapiOccasions(client = SITE_KEY): Promise<ExploreEntry[] | null> {
+  const data = await strapiFetch<Raw[]>('occasions', {
+    'filters[client][$eq]': client,
+    populate: '*',
+    'pagination[pageSize]': '50',
+  });
+  return data && data.length > 0 ? data.map(mapExplore) : null;
+}
+
+// ── Strapi-first loaders ─────────────────────────────────────────────────────
+// One-call accessors for server components: return live Strapi content when the
+// type is deployed, else the in-repo seed. Call these from server pages (NOT
+// client components — they read the server-only STRAPI_API_TOKEN). Until the four
+// content types are deployed + imported (infrastructure/cms/cocktails/), every
+// one of these returns the seed, so the preview is byte-identical to today and
+// the migration is a zero-code-change flip on the box.
+
+export async function loadCocktails(): Promise<Cocktail[]> {
+  return (await getStrapiCocktails()) ?? COCKTAILS;
+}
+export async function loadCities(): Promise<CityEntry[]> {
+  return (await getStrapiCities()) ?? CITIES;
+}
+export async function loadSeasons(): Promise<ExploreEntry[]> {
+  return (await getStrapiSeasons()) ?? SEASONS;
+}
+export async function loadOccasions(): Promise<ExploreEntry[]> {
+  return (await getStrapiOccasions()) ?? OCCASIONS;
 }
