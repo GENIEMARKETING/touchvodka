@@ -32,6 +32,12 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+    // Marketing-data stack (Phase 2): public ad-pixel ids, browser-inlined +
+    // registered through initTracking() (consent-gated under `marketing`). Each is
+    // optional — an unset id is a dark sink (consent-safe), inert until provided.
+    NEXT_PUBLIC_META_PIXEL_ID: process.env.NEXT_PUBLIC_META_PIXEL_ID,
+    NEXT_PUBLIC_TIKTOK_PIXEL_ID: process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID,
+    NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
     NEXT_PUBLIC_SITE_KEY: process.env.NEXT_PUBLIC_SITE_KEY,
     // S5 (#7) production-media tier: base URL for client-editable media (bottle/
@@ -67,6 +73,16 @@ const nextConfig: NextConfig = {
     // MUST be forwarded here or lib/commerce.ts#searchProducts can't scope to the
     // channel on the WEB_COMPUTE runtime (registry trap `amplify-nextconfig-env`).
     MEDUSA_SALES_CHANNEL_ID: process.env.MEDUSA_SALES_CHANNEL_ID,
+    // Marketing-data stack (Phase 2) — server-side conversions (app/api/events):
+    // Meta CAPI + GA4 Measurement Protocol. Server-only secrets; MUST be forwarded
+    // or the WEB_COMPUTE standalone server can't reach the platforms (trap
+    // `amplify-nextconfig-env`). The route no-ops until these are set.
+    META_PIXEL_ID: process.env.META_PIXEL_ID,
+    FACEBOOK_CONVERSIONS_API_TOKEN: process.env.FACEBOOK_CONVERSIONS_API_TOKEN,
+    META_TEST_EVENT_CODE: process.env.META_TEST_EVENT_CODE,
+    GA4_MEASUREMENT_ID: process.env.GA4_MEASUREMENT_ID,
+    GA4_API_SECRET: process.env.GA4_API_SECRET,
+    TIKTOK_ACCESS_TOKEN: process.env.TIKTOK_ACCESS_TOKEN,
   },
 };
 
