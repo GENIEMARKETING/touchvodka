@@ -1,7 +1,8 @@
 'use client';
 
+import { track } from '@geniemarketing/foundation/analytics';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
-import type { LeadBrand, LeadPayload } from '@geniemarketing/foundation/lead-contract';
+import type { LeadBrand, LeadBuyerType, LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { Button, Input, cn } from '@geniemarketing/ui';
 import { ScrollReveal } from '@geniemarketing/ui/motion';
 import { type FormEvent, useEffect, useId, useState } from 'react';
@@ -29,8 +30,10 @@ import { type FormEvent, useEffect, useId, useState } from 'react';
 export type LeadField = {
   name: string;
   label: string;
-  type?: 'text' | 'email' | 'tel';
+  type?: 'text' | 'email' | 'tel' | 'select';
   required?: boolean;
+  /** Options for a `select` field (e.g. buyerType). Ignored for text inputs. */
+  options?: { value: string; label: string }[];
 };
 
 export type LeadCaptureProps = {
@@ -56,15 +59,18 @@ const DEFAULT_FIELDS: LeadField[] = [
 ];
 
 // Field names that map to first-class LeadPayload keys; anything else → meta.
-const KNOWN_FIELDS = new Set(['name', 'email', 'phone', 'message']);
-
-/** Null-safe PostHog. `window.posthog` only exists after S7's consent-gated loader runs. */
-function track(event: string, props: Record<string, unknown>): void {
-  if (typeof window === 'undefined') return;
-  (
-    window as { posthog?: { capture: (e: string, p?: Record<string, unknown>) => void } }
-  ).posthog?.capture(event, props);
-}
+const KNOWN_FIELDS = new Set([
+  'name',
+  'email',
+  'phone',
+  'message',
+  'buyerType',
+  'businessName',
+  'licenseType',
+  'productInterest',
+  'city',
+  'postalCode',
+]);
 
 export function LeadCapture({
   brand,
@@ -123,6 +129,13 @@ export function LeadCapture({
       name: value('name') || undefined,
       phone: value('phone') || undefined,
       message: value('message') || undefined,
+      // Marketing-data stack (gap C): richer first-class fields → Twenty + warehouse.
+      buyerType: (value('buyerType') || undefined) as LeadBuyerType | undefined,
+      businessName: value('businessName') || undefined,
+      licenseType: value('licenseType') || undefined,
+      productInterest: value('productInterest') || undefined,
+      city: value('city') || undefined,
+      postalCode: value('postalCode') || undefined,
       formId: variant,
       // S8 T15: stamp the consent state. `marketing` is the explicit opt-in OR an
       // existing banner grant; the rest mirrors S7's record for the audit trail.
@@ -169,18 +182,40 @@ export function LeadCapture({
         {sublead ? <p className="mt-2 text-[var(--fg)]/70">{sublead}</p> : null}
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4" aria-describedby={`${formId}-status`}>
-          {fields.map((f) => (
-            <label key={f.name} htmlFor={`${formId}-${f.name}`} className="block">
-              <span className="mb-1 block text-sm">{f.label}</span>
-              <Input
-                id={`${formId}-${f.name}`}
-                name={f.name}
-                type={f.type ?? 'text'}
-                required={f.required}
-                autoComplete={f.type === 'email' ? 'email' : undefined}
-              />
-            </label>
-          ))}
+          {fields.map((f) =>
+            f.type === 'select' ? (
+              <label key={f.name} htmlFor={`${formId}-${f.name}`} className="block">
+                <span className="mb-1 block text-sm">{f.label}</span>
+                <select
+                  id={`${formId}-${f.name}`}
+                  name={f.name}
+                  required={f.required}
+                  defaultValue=""
+                  className="w-full rounded-md border border-[var(--fg)]/20 bg-[var(--surface)] px-3 py-2 text-sm"
+                >
+                  <option value="" disabled>
+                    Select…
+                  </option>
+                  {f.options?.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : (
+              <label key={f.name} htmlFor={`${formId}-${f.name}`} className="block">
+                <span className="mb-1 block text-sm">{f.label}</span>
+                <Input
+                  id={`${formId}-${f.name}`}
+                  name={f.name}
+                  type={f.type ?? 'text'}
+                  required={f.required}
+                  autoComplete={f.type === 'email' ? 'email' : undefined}
+                />
+              </label>
+            ),
+          )}
 
           {/* Honeypot — must stay empty. Hidden from humans + assistive tech. */}
           <input
