@@ -41,8 +41,8 @@ export default async function BlogPage() {
           >
             <div className="relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-full md:min-h-[340px]">
               <BlogImage
-                src={featured.image}
-                fallbackSrc="/scenes/blog_featured.webp"
+                src={featured.thumbnail}
+                fallbackSrc={featured.image || '/scenes/blog_featured.webp'}
                 alt={featured.title}
                 label={featured.category}
                 sizes="(max-width:768px) 100vw, 50vw"
@@ -77,8 +77,8 @@ export default async function BlogPage() {
             >
               <div className="relative aspect-[4/3] overflow-hidden">
                 <BlogImage
-                  src={post.image}
-                  fallbackSrc={BLOG_SCENES[idx % BLOG_SCENES.length]}
+                  src={post.thumbnail}
+                  fallbackSrc={post.image || BLOG_SCENES[idx % BLOG_SCENES.length]}
                   alt={post.title}
                   label={post.category}
                   sizes="(max-width:768px) 100vw, 33vw"

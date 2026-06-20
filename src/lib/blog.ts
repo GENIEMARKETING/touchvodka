@@ -28,6 +28,8 @@ export type BlogPost = {
   category: string;
   tags: string[];
   image: string;
+  /** Bold card thumbnail (auto-blog `<slug>-thumb.png`). Falls back to `image`. */
+  thumbnail: string;
   body: string;
 };
 
@@ -58,6 +60,7 @@ function parseFrontmatter(raw: string): { data: Record<string, unknown>; body: s
 async function readPost(file: string): Promise<BlogPost> {
   const raw = await readFile(join(BLOG_DIR, file), 'utf8');
   const { data, body } = parseFrontmatter(raw);
+  const image = mediaUrl(String(data.image ?? ''));
   return {
     slug: file.replace(/\.mdx?$/, ''),
     title: String(data.title ?? ''),
@@ -66,7 +69,8 @@ async function readPost(file: string): Promise<BlogPost> {
     author: String(data.author ?? ''),
     category: String(data.category ?? 'General'),
     tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
-    image: mediaUrl(String(data.image ?? '')),
+    image,
+    thumbnail: data.thumbnail ? mediaUrl(String(data.thumbnail)) : image,
     body,
   };
 }
@@ -103,6 +107,8 @@ function mapArticle(rec: StrapiArticle): BlogPost {
     typeof category === 'string'
       ? category
       : str((category as Record<string, unknown> | undefined)?.name, 'General');
+  const image = mediaUrl(mediaField(r.image ?? r.featured_image ?? r.cover));
+  const thumb = mediaField(r.thumbnail);
   return {
     slug: str(r.slug),
     title: str(r.title),
@@ -111,7 +117,8 @@ function mapArticle(rec: StrapiArticle): BlogPost {
     author: str(r.author, 'admin'),
     category: categoryName || 'General',
     tags: Array.isArray(r.tags) ? (r.tags as unknown[]).map((t) => str(t)).filter(Boolean) : [],
-    image: mediaUrl(mediaField(r.image ?? r.featured_image ?? r.cover)),
+    image,
+    thumbnail: thumb ? mediaUrl(thumb) : image,
     body: str(r.body ?? r.content),
   };
 }
