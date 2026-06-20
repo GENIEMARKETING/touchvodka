@@ -91,5 +91,39 @@ export function priceOf(product: StoreProduct): Money | null {
   return null;
 }
 
+/** Storefront stock state for a variant (Phase 6). `manage_inventory=false`
+ *  means always-available / made-to-order. `low_stock_threshold` (variant
+ *  metadata, default 6) is the point at which we say "Only N left". */
+export type Availability = {
+  state: 'in_stock' | 'low_stock' | 'out_of_stock' | 'backorder';
+  label: string;
+  quantity?: number;
+};
+
+type VariantLike = {
+  manage_inventory?: boolean;
+  inventory_quantity?: number | null;
+  allow_backorder?: boolean;
+  metadata?: Record<string, unknown> | null;
+};
+
+export function availabilityOf(variant?: VariantLike | null): Availability {
+  if (!variant || !variant.manage_inventory) return { state: 'in_stock', label: 'In stock' };
+  const threshold = Number(variant.metadata?.low_stock_threshold ?? 6);
+  const qty = variant.inventory_quantity ?? 0;
+  if (qty <= 0 && variant.allow_backorder) return { state: 'backorder', label: 'Available to order' };
+  if (qty <= 0) return { state: 'out_of_stock', label: 'Sold out' };
+  if (qty <= threshold) return { state: 'low_stock', label: `Only ${qty} left`, quantity: qty };
+  return { state: 'in_stock', label: 'In stock', quantity: qty };
+}
+
+/** Map our availability state to the seo package's Offer availability value
+ *  (it models backorder as PreOrder). */
+export function schemaAvailability(a: Availability): 'InStock' | 'OutOfStock' | 'PreOrder' {
+  if (a.state === 'out_of_stock') return 'OutOfStock';
+  if (a.state === 'backorder') return 'PreOrder';
+  return 'InStock';
+}
+
 export { formatPrice, medusa, search };
 export type { Money, SearchResult, StoreProduct };

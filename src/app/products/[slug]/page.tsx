@@ -5,7 +5,9 @@ import { AddToCart } from '@/components/vinny/commerce/add-to-cart';
 import { COCKTAILS } from '@/data/cocktails';
 import { PRODUCTS, getProductBySlug } from '@/data/products';
 import { STOCKISTS } from '@/data/stockists';
-import { getCommerceProduct, priceOf } from '@/lib/commerce';
+import { ProductReviews } from '@/components/reviews/product-reviews';
+import { availabilityOf, getCommerceProduct, priceOf, schemaAvailability } from '@/lib/commerce';
+import { getReviewSummary } from '@/lib/reviews';
 import { mediaUrl } from '@/lib/media';
 import { breadcrumbJsonLd, jsonLdScript, pageMetadata, productJsonLd } from '@/lib/seo';
 import { ArrowRight, Star } from 'lucide-react';
@@ -93,15 +95,13 @@ export default async function ProductDetailPage({ params }: Params) {
 
   const commerce = await getCommerceProduct(slug);
   const price = commerce ? priceOf(commerce) : null;
+  const availability = commerce ? availabilityOf(commerce.variants?.[0]) : null;
 
-  // Single source of truth for the rating shown beside Availability, in the
-  // Reviews section, AND emitted in the Product JSON-LD — so the visible stars
-  // and the structured aggregateRating can never drift. Prefer the real Medusa
-  // aggregate (hydrated from the reviews service once it exists); fall back to the
-  // aggregate of the reviews actually rendered on this page (REVIEW_FALLBACK), so
-  // the structured data always matches what the visitor sees.
-  const reviewSummary =
-    commerce?.rating && commerce.rating.count > 0 ? commerce.rating : REVIEW_FALLBACK;
+  // Real review aggregate from the shared Medusa product_review module (Phase 7)
+  // when this brand has a channel — honest even at 0. The brand-only page (no
+  // channel) keeps the curated testimonial fallback so the section isn't empty.
+  const realSummary = commerce ? await getReviewSummary(commerce.id) : null;
+  const reviewSummary = realSummary ?? REVIEW_FALLBACK;
 
   const productLd = productJsonLd({
     name: product.name,
@@ -109,9 +109,15 @@ export default async function ProductDetailPage({ params }: Params) {
     image: [mediaUrl(product.image)],
     path: `/products/${slug}`,
     ...(price
-      ? { price: price.amount, currency: price.currency_code, availability: 'InStock' as const }
+      ? {
+          price: price.amount,
+          currency: price.currency_code,
+          availability: availability ? schemaAvailability(availability) : ('InStock' as const),
+        }
       : {}),
-    rating: { value: Number(reviewSummary.average.toFixed(1)), count: reviewSummary.count },
+    ...(reviewSummary.count > 0
+      ? { rating: { value: Number(reviewSummary.average.toFixed(1)), count: reviewSummary.count } }
+      : {}),
   });
   const breadcrumbLd = breadcrumbJsonLd([
     { name: 'Home', path: '/' },
@@ -204,18 +210,30 @@ export default async function ProductDetailPage({ params }: Params) {
                 <p className="font-mono text-neutral-400 text-xs uppercase tracking-[0.2em]">
                   Availability
                 </p>
-                <p className="font-display text-accent text-xl">In stock</p>
+                <p
+                  className={`font-display text-xl ${
+                    availability?.state === 'out_of_stock' ? 'text-neutral-500' : 'text-accent'
+                  }`}
+                >
+                  {availability ? availability.label : 'In stock'}
+                </p>
               </div>
               <div>
                 <p className="font-mono text-neutral-400 text-xs uppercase tracking-[0.2em]">
                   Rating
                 </p>
                 <a href="#reviews" className="mt-1 flex items-center gap-2">
-                  <StarRating value={reviewSummary.average} className="h-4 w-4" />
-                  <span className="font-display text-fg text-xl">
-                    {reviewSummary.average.toFixed(1)}
-                  </span>
-                  <span className="text-neutral-500 text-sm">({reviewSummary.count})</span>
+                  {reviewSummary.count > 0 ? (
+                    <>
+                      <StarRating value={reviewSummary.average} className="h-4 w-4" />
+                      <span className="font-display text-fg text-xl">
+                        {reviewSummary.average.toFixed(1)}
+                      </span>
+                      <span className="text-neutral-500 text-sm">({reviewSummary.count})</span>
+                    </>
+                  ) : (
+                    <span className="font-display text-fg text-base">Be the first to review</span>
+                  )}
                 </a>
               </div>
               {/* Price intentionally omitted here — the buy box below shows the
@@ -343,29 +361,40 @@ export default async function ProductDetailPage({ params }: Params) {
           <h2 className="mt-3 font-display text-4xl text-fg uppercase md:text-5xl">
             What people are saying
           </h2>
-          <div className="mt-3 flex items-center gap-3">
-            <StarRating value={reviewSummary.average} className="h-5 w-5" />
-            <span className="font-display text-fg text-lg">{reviewSummary.average.toFixed(1)}</span>
-            <span className="text-neutral-500 text-sm">
-              from {reviewSummary.count} review{reviewSummary.count === 1 ? '' : 's'}
-            </span>
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {REVIEWS.map((r) => (
-              <figure key={r.name} className="flex flex-col rounded-2xl bg-white p-7 shadow-soft">
-                <div className="mb-4">
-                  <StarRating value={r.stars} className="h-4 w-4" />
-                </div>
-                <blockquote className="flex-1 text-neutral-700 leading-relaxed">
-                  “{r.quote}”
-                </blockquote>
-                <figcaption className="mt-5">
-                  <p className="font-display text-fg">{r.name}</p>
-                  <p className="text-neutral-500 text-sm">{r.meta}</p>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          {reviewSummary.count > 0 ? (
+            <div className="mt-3 flex items-center gap-3">
+              <StarRating value={reviewSummary.average} className="h-5 w-5" />
+              <span className="font-display text-fg text-lg">
+                {reviewSummary.average.toFixed(1)}
+              </span>
+              <span className="text-neutral-500 text-sm">
+                from {reviewSummary.count} review{reviewSummary.count === 1 ? '' : 's'}
+              </span>
+            </div>
+          ) : null}
+
+          {commerce ? (
+            // Real reviews + signed-in submit form (Phase 7 product_review module).
+            <ProductReviews productId={commerce.id} productName={product.name} />
+          ) : (
+            // Brand-only fallback (no Medusa channel): curated testimonials.
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {REVIEWS.map((r) => (
+                <figure key={r.name} className="flex flex-col rounded-2xl bg-white p-7 shadow-soft">
+                  <div className="mb-4">
+                    <StarRating value={r.stars} className="h-4 w-4" />
+                  </div>
+                  <blockquote className="flex-1 text-neutral-700 leading-relaxed">
+                    “{r.quote}”
+                  </blockquote>
+                  <figcaption className="mt-5">
+                    <p className="font-display text-fg">{r.name}</p>
+                    <p className="text-neutral-500 text-sm">{r.meta}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
