@@ -1,5 +1,6 @@
 'use client';
 
+import TurnstileWidget from '@/components/TurnstileWidget';
 import { useAuth } from '@/components/vinny/commerce/auth-context';
 import { type FormEvent, useState } from 'react';
 import Image from 'next/image';
@@ -12,13 +13,24 @@ import { useRouter } from 'next/navigation';
  * runs the Medusa v2 customer session via T48's `useAuth` (AuthProvider →
  * shared `medusa` client), then redirects to `?next=` (or home). Failures
  * surface an honest message (bad credentials, email already taken, etc.).
+ *
+ * Bot gate: T48 auth hits Medusa `/auth/*` straight from the browser, so a
+ * Cloudflare Turnstile token is verified server-side via `/api/verify-turnstile`
+ * BEFORE the Medusa call (blunts credential-stuffing + bot signups). Turnstile
+ * tokens are single-use, so the widget is remounted (`key={tsKey}`) after any
+ * failed attempt to mint a fresh one for the retry. Skipped when
+ * `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is unset (local dev).
  */
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
 export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
   const isSignup = mode === 'signup';
   const { login, register } = useAuth();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Bumped to remount <TurnstileWidget> for a fresh single-use token after a failure.
+  const [tsKey, setTsKey] = useState(0);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,8 +39,37 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
     const email = String(form.get('email') ?? '').trim();
     const password = String(form.get('password') ?? '');
     const name = String(form.get('name') ?? '').trim();
+    const turnstileToken = String(form.get('cf-turnstile-response') ?? '');
     setSubmitting(true);
     setError(null);
+
+    // Server-side Turnstile gate (only when a site key is configured).
+    if (TURNSTILE_SITE_KEY) {
+      if (!turnstileToken) {
+        setError('Please complete the verification and try again.');
+        setSubmitting(false);
+        return;
+      }
+      try {
+        const res = await fetch('/api/verify-turnstile', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ token: turnstileToken }),
+        });
+        if (!res.ok) {
+          setError('Verification failed. Please try again.');
+          setTsKey((k) => k + 1);
+          setSubmitting(false);
+          return;
+        }
+      } catch {
+        setError('Verification failed. Please try again.');
+        setTsKey((k) => k + 1);
+        setSubmitting(false);
+        return;
+      }
+    }
+
     try {
       if (isSignup) {
         const [firstName, ...rest] = name.split(/\s+/).filter(Boolean);
@@ -41,6 +82,7 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setTsKey((k) => k + 1); // single-use token consumed → fresh widget for the retry
       setSubmitting(false);
     }
   }
@@ -111,6 +153,10 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
               type="password"
               autoComplete={isSignup ? 'new-password' : 'current-password'}
             />
+
+            {/* Bot gate — injects cf-turnstile-response into this form; verified
+                server-side in onSubmit before the Medusa call. Remounts on retry. */}
+            <TurnstileWidget key={tsKey} />
 
             <button
               type="submit"
