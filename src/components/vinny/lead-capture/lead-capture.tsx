@@ -1,5 +1,6 @@
 'use client';
 
+import TurnstileWidget, { TURNSTILE_ENABLED } from '@/components/TurnstileWidget';
 import { track } from '@geniemarketing/foundation/analytics';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadBrand, LeadBuyerType, LeadPayload } from '@geniemarketing/foundation/lead-contract';
@@ -49,7 +50,11 @@ export type LeadCaptureProps = {
   source: string;
   /** A/B variant id — becomes the payload's `formId` + rides on PostHog events. */
   variant?: string;
-  /** Cloudflare Turnstile site key. Omit only in local dev (S8 requires the token in prod). */
+  /**
+   * @deprecated The Turnstile site key is now read from
+   * `NEXT_PUBLIC_TURNSTILE_SITE_KEY` by the shared `<TurnstileWidget>` (explicit
+   * render + readiness gating). Kept for caller compatibility; ignored.
+   */
   turnstileSiteKey?: string;
 };
 
@@ -81,29 +86,22 @@ export function LeadCapture({
   successMessage = "You're in. Check your inbox.",
   source,
   variant,
-  turnstileSiteKey,
 }: LeadCaptureProps) {
   const { hasConsent, record } = useConsent();
   const formId = useId();
   const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
   const [optIn, setOptIn] = useState(false);
+  // Turnstile readiness via the shared explicit widget (the real Managed token
+  // takes ~1s; submit waits for it). `tsKey` remounts the single-use widget for a
+  // fresh token after a failed attempt. (Replaces the old implicit api.js loader —
+  // find-us renders two lead forms, and one explicit script for both is cleaner.)
+  const [tsToken, setTsToken] = useState('');
+  const [tsKey, setTsKey] = useState(0);
 
   // Fire once the form is on screen — gated for free by `track`'s null-safety.
   useEffect(() => {
     track('lead_form_viewed', { source, variant });
   }, [source, variant]);
-
-  // Load Turnstile (renders any .cf-turnstile and injects cf-turnstile-response).
-  useEffect(() => {
-    if (!turnstileSiteKey || typeof document === 'undefined') return;
-    if (document.querySelector('script[data-vinny-turnstile]')) return;
-    const s = document.createElement('script');
-    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    s.async = true;
-    s.defer = true;
-    s.dataset.vinnyTurnstile = 'true';
-    document.head.appendChild(s);
-  }, [turnstileSiteKey]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -145,7 +143,7 @@ export function LeadCapture({
         policyVersion: String(CONSENT_VERSION),
         source: 'form-checkbox',
       },
-      turnstileToken: value('cf-turnstile-response'),
+      turnstileToken: tsToken || value('cf-turnstile-response'),
       honeypot: value('company_website'),
       ...(Object.keys(meta).length > 0 ? { meta } : {}),
     };
@@ -162,6 +160,9 @@ export function LeadCapture({
     } catch {
       track('lead_capture_failed', { source, variant });
       setStatus('error');
+      // Single-use token consumed → mint a fresh one for the retry.
+      setTsToken('');
+      setTsKey((k) => k + 1);
     }
   }
 
@@ -238,13 +239,20 @@ export function LeadCapture({
             <span>Email me occasional updates. Unsubscribe anytime.</span>
           </label>
 
-          {/* Cloudflare Turnstile — injects the hidden cf-turnstile-response input. */}
-          {turnstileSiteKey ? (
-            <div className="cf-turnstile" data-sitekey={turnstileSiteKey} />
-          ) : null}
+          {/* Cloudflare Turnstile (explicit) — reports the token via onToken so we
+              can wait for it before enabling submit. */}
+          <TurnstileWidget key={tsKey} onToken={setTsToken} />
 
-          <Button type="submit" className="w-full" disabled={status === 'submitting'}>
-            {status === 'submitting' ? 'Sending…' : submitLabel}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={status === 'submitting' || (TURNSTILE_ENABLED && !tsToken)}
+          >
+            {status === 'submitting'
+              ? 'Sending…'
+              : TURNSTILE_ENABLED && !tsToken
+                ? 'Verifying…'
+                : submitLabel}
           </Button>
 
           <p

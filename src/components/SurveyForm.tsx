@@ -1,6 +1,6 @@
 'use client';
 
-import TurnstileWidget from '@/components/TurnstileWidget';
+import TurnstileWidget, { TURNSTILE_ENABLED } from '@/components/TurnstileWidget';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { Check } from 'lucide-react';
@@ -60,6 +60,9 @@ export default function SurveyForm() {
   const { hasConsent, record } = useConsent();
   const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
   const [code, setCode] = useState('');
+  // Wait for the real Managed Turnstile token before enabling submit.
+  const [tsToken, setTsToken] = useState('');
+  const [tsKey, setTsKey] = useState(0);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -83,7 +86,7 @@ export default function SurveyForm() {
         policyVersion: String(CONSENT_VERSION),
         source: 'form-checkbox',
       },
-      turnstileToken: get('cf-turnstile-response'),
+      turnstileToken: tsToken || get('cf-turnstile-response'),
       honeypot: get('company_website'),
       meta: answers,
     };
@@ -99,6 +102,8 @@ export default function SurveyForm() {
       setStatus('done');
     } catch {
       setStatus('error');
+      setTsToken('');
+      setTsKey((k) => k + 1);
     }
   }
 
@@ -167,14 +172,18 @@ export default function SurveyForm() {
         />
       </div>
 
-      <TurnstileWidget />
+      <TurnstileWidget key={tsKey} onToken={setTsToken} />
 
       <button
         type="submit"
-        disabled={status === 'submitting'}
+        disabled={status === 'submitting' || (TURNSTILE_ENABLED && !tsToken)}
         className="inline-flex items-center justify-center rounded-full bg-accent px-10 py-4 font-display text-lg text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-60"
       >
-        {status === 'submitting' ? 'Sending…' : 'Get my $10 code'}
+        {status === 'submitting'
+          ? 'Sending…'
+          : TURNSTILE_ENABLED && !tsToken
+            ? 'Verifying…'
+            : 'Get my $10 code'}
       </button>
       {status === 'error' ? (
         <p className="text-red-500 text-sm">Something went wrong — please try again.</p>

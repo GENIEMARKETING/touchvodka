@@ -31,6 +31,15 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
   const [error, setError] = useState<string | null>(null);
   // Bumped to remount <TurnstileWidget> for a fresh single-use token after a failure.
   const [tsKey, setTsKey] = useState(0);
+  // Token reported by the widget — submit waits for it (the real Managed token
+  // takes ~1s; the TEST key was instant).
+  const [tsToken, setTsToken] = useState('');
+  // After a failure the single-use token is spent: clear it (disables submit) and
+  // remount the widget to mint a fresh one.
+  const resetTurnstile = () => {
+    setTsToken('');
+    resetTurnstile();
+  };
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,7 +48,7 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
     const email = String(form.get('email') ?? '').trim();
     const password = String(form.get('password') ?? '');
     const name = String(form.get('name') ?? '').trim();
-    const turnstileToken = String(form.get('cf-turnstile-response') ?? '');
+    const turnstileToken = tsToken || String(form.get('cf-turnstile-response') ?? '');
     setSubmitting(true);
     setError(null);
 
@@ -58,13 +67,13 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
         });
         if (!res.ok) {
           setError('Verification failed. Please try again.');
-          setTsKey((k) => k + 1);
+          resetTurnstile();
           setSubmitting(false);
           return;
         }
       } catch {
         setError('Verification failed. Please try again.');
-        setTsKey((k) => k + 1);
+        resetTurnstile();
         setSubmitting(false);
         return;
       }
@@ -82,7 +91,7 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-      setTsKey((k) => k + 1); // single-use token consumed → fresh widget for the retry
+      resetTurnstile(); // single-use token consumed → fresh widget for the retry
       setSubmitting(false);
     }
   }
@@ -156,20 +165,22 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
 
             {/* Bot gate — injects cf-turnstile-response into this form; verified
                 server-side in onSubmit before the Medusa call. Remounts on retry. */}
-            <TurnstileWidget key={tsKey} />
+            <TurnstileWidget key={tsKey} onToken={setTsToken} />
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || (Boolean(TURNSTILE_SITE_KEY) && !tsToken)}
               className="w-full rounded-full bg-accent px-8 py-4 font-display text-lg text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting
                 ? isSignup
                   ? 'Creating account…'
                   : 'Signing in…'
-                : isSignup
-                  ? 'Create account'
-                  : 'Sign in'}
+                : Boolean(TURNSTILE_SITE_KEY) && !tsToken
+                  ? 'Verifying…'
+                  : isSignup
+                    ? 'Create account'
+                    : 'Sign in'}
             </button>
 
             {error ? (

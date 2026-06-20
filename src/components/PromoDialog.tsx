@@ -1,6 +1,6 @@
 'use client';
 
-import TurnstileWidget from '@/components/TurnstileWidget';
+import TurnstileWidget, { TURNSTILE_ENABLED } from '@/components/TurnstileWidget';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { X } from 'lucide-react';
@@ -29,6 +29,10 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
   const { hasConsent, record } = useConsent();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
+  // Wait for the real Managed Turnstile token before enabling submit; remount the
+  // single-use widget on failure (see TurnstileWidget).
+  const [tsToken, setTsToken] = useState('');
+  const [tsKey, setTsKey] = useState(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -73,7 +77,7 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
         policyVersion: String(CONSENT_VERSION),
         source: 'form-checkbox',
       },
-      turnstileToken: get('cf-turnstile-response'),
+      turnstileToken: tsToken || get('cf-turnstile-response'),
       honeypot: get('company_website'),
     };
     try {
@@ -87,6 +91,8 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
       setStatus('done');
     } catch {
       setStatus('error');
+      setTsToken('');
+      setTsKey((k) => k + 1);
     }
   }
 
@@ -167,12 +173,16 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
                 />
                 <button
                   type="submit"
-                  disabled={status === 'submitting'}
+                  disabled={status === 'submitting' || (TURNSTILE_ENABLED && !tsToken)}
                   className="inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-6 py-3 font-display text-sm text-white transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-60"
                 >
-                  {status === 'submitting' ? 'Sending…' : 'Sign Me Up'}
+                  {status === 'submitting'
+                    ? 'Sending…'
+                    : TURNSTILE_ENABLED && !tsToken
+                      ? 'Verifying…'
+                      : 'Sign Me Up'}
                 </button>
-                <TurnstileWidget className="sm:basis-full" />
+                <TurnstileWidget key={tsKey} onToken={setTsToken} className="sm:basis-full" />
               </form>
               <p className="mt-3 text-neutral-400 text-xs">
                 {status === 'error'

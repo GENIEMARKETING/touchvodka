@@ -1,7 +1,7 @@
 'use client';
 
 import NotifyModal from '@/components/NotifyModal';
-import TurnstileWidget from '@/components/TurnstileWidget';
+import TurnstileWidget, { TURNSTILE_ENABLED } from '@/components/TurnstileWidget';
 import { CONSENT_VERSION, useConsent } from '@geniemarketing/foundation/consent';
 import type { LeadPayload } from '@geniemarketing/foundation/lead-contract';
 import { ArrowRight } from 'lucide-react';
@@ -42,6 +42,11 @@ export default function AreaInterest({
   const [status, setStatus] = useState<'idle' | 'submitting' | 'error'>('idle');
   const [modalOpen, setModalOpen] = useState(false);
   const [email, setEmail] = useState('');
+  // Turnstile readiness: the real Managed widget issues a token ~1s after mount,
+  // so submit waits for it (empty token → /api/lead 400). `tsKey` remounts the
+  // single-use widget for a fresh token after a failed attempt.
+  const [tsToken, setTsToken] = useState('');
+  const [tsKey, setTsKey] = useState(0);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,7 +69,7 @@ export default function AreaInterest({
         policyVersion: String(CONSENT_VERSION),
         source: 'form-checkbox',
       },
-      turnstileToken: get('cf-turnstile-response'),
+      turnstileToken: tsToken || get('cf-turnstile-response'),
       honeypot: get('company_website'),
       meta: { interest: 'area', zipcode: get('zipcode') },
     };
@@ -83,6 +88,9 @@ export default function AreaInterest({
     } catch {
       track('area_interest_failed', {});
       setStatus('error');
+      // Single-use token consumed → mint a fresh one for the retry.
+      setTsToken('');
+      setTsKey((k) => k + 1);
     }
   }
 
@@ -151,13 +159,17 @@ export default function AreaInterest({
                 className="w-full flex-1 rounded-full bg-white/15 px-5 py-4 text-white placeholder:text-white/60 focus:bg-white/25 focus:outline-none"
               />
             </div>
-            <TurnstileWidget />
+            <TurnstileWidget key={tsKey} onToken={setTsToken} />
             <button
               type="submit"
-              disabled={status === 'submitting'}
+              disabled={status === 'submitting' || (TURNSTILE_ENABLED && !tsToken)}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 font-display text-accent text-lg transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-60"
             >
-              {status === 'submitting' ? 'Sending…' : 'Show your interest'}
+              {status === 'submitting'
+                ? 'Sending…'
+                : TURNSTILE_ENABLED && !tsToken
+                  ? 'Verifying…'
+                  : 'Show your interest'}
               <ArrowRight className="h-5 w-5" />
             </button>
             <p aria-live="polite" className={status === 'error' ? 'text-sm text-white' : 'sr-only'}>
