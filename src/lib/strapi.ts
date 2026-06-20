@@ -14,7 +14,14 @@
  * imported into the shared Strapi, every fetch FALLS BACK to the local seed so
  * the rebuild renders + the production build is never gated on the CMS being up.
  * Remove the fallbacks once content is migrated and verified.
+ *
+ * ⚠️ SERVER-ONLY: this module holds the Strapi API token and must NEVER run in
+ * the browser. A client import that loops `getSiteConfig`/`strapiFetch` floods
+ * the shared Strapi edge → trips the WAF rate limit → 403s login + cart for that
+ * IP (2026-06-20 incident). The `server-only` import makes any client import a
+ * BUILD ERROR so it can never regress.
  */
+import 'server-only';
 import { COCKTAILS, type Cocktail } from '@/data/cocktails';
 import { CITIES, type CityEntry, type ExploreEntry, OCCASIONS, SEASONS } from '@/data/explore';
 import { PRODUCTS, type Product } from '@/data/products';
