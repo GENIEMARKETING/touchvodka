@@ -8,7 +8,14 @@
  * appear immediately (the list re-fetches no-store after a successful POST).
  */
 import { useAuth } from '@/components/vinny/commerce/auth-context';
-import { type Review, listReviews, submitReview } from '@/lib/reviews';
+import {
+  REVIEW_SUBMITTED_EVENT,
+  type Review,
+  type ReviewSummary,
+  getReviewSummary,
+  listReviews,
+  submitReview,
+} from '@/lib/reviews';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -55,6 +62,7 @@ function StarPicker({ value, onChange }: { value: number; onChange: (n: number) 
 export function ProductReviews({ productId, productName }: { productId: string; productName: string }) {
   const { customer, ready, configured } = useAuth();
   const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [summary, setSummary] = useState<ReviewSummary | null>(null);
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -63,8 +71,12 @@ export function ProductReviews({ productId, productName }: { productId: string; 
   const [done, setDone] = useState(false);
 
   const load = useCallback(async () => {
-    const res = await listReviews(productId, { cache: 'no-store' });
-    setReviews(res.reviews);
+    const [list, sum] = await Promise.all([
+      listReviews(productId, { cache: 'no-store' }),
+      getReviewSummary(productId, { cache: 'no-store' }),
+    ]);
+    setReviews(list.reviews);
+    setSummary(sum);
   }, [productId]);
 
   useEffect(() => {
@@ -82,6 +94,8 @@ export function ProductReviews({ productId, productName }: { productId: string; 
       setBody('');
       setRating(5);
       await load();
+      // Refresh the hero rating island immediately too (separate component).
+      window.dispatchEvent(new Event(REVIEW_SUBMITTED_EVENT));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit your review.');
     } finally {
@@ -91,6 +105,18 @@ export function ProductReviews({ productId, productName }: { productId: string; 
 
   return (
     <div className="mt-10">
+      {/* Live summary — client-rendered so it reflects new reviews instantly,
+          instead of the ISR-cached server header. */}
+      {summary && summary.count > 0 ? (
+        <div className="mb-8 flex items-center gap-3">
+          <Stars value={summary.average} className="h-5 w-5" />
+          <span className="font-display text-fg text-lg">{summary.average.toFixed(1)}</span>
+          <span className="text-neutral-500 text-sm">
+            from {summary.count} review{summary.count === 1 ? '' : 's'}
+          </span>
+        </div>
+      ) : null}
+
       {/* Review list */}
       {reviews === null ? (
         <p className="text-neutral-500 text-sm">Loading reviews…</p>

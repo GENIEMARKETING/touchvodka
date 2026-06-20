@@ -15,6 +15,11 @@ import { medusa } from '@/lib/commerce';
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL;
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
 
+/** Browser event fired after a successful review submit so other islands on the
+ *  page (the hero rating, the section summary) refresh immediately rather than
+ *  wait for the server ISR window. */
+export const REVIEW_SUBMITTED_EVENT = 'tv:review-submitted';
+
 export type Review = {
   id: string;
   product_id: string;
@@ -47,13 +52,19 @@ function headers(auth?: string): Record<string, string> {
   return h;
 }
 
-/** Aggregate rating for a product. Empty (not an error) when commerce is off. */
-export async function getReviewSummary(productId: string): Promise<ReviewSummary> {
+/** Aggregate rating for a product. Empty (not an error) when commerce is off.
+ *  Pass `{ cache: 'no-store' }` from the browser for an up-to-the-second read. */
+export async function getReviewSummary(
+  productId: string,
+  opts: { cache?: RequestCache } = {},
+): Promise<ReviewSummary> {
   if (!BASE || !PK || !productId) return EMPTY_SUMMARY(productId);
   try {
     const res = await fetch(
       `${BASE}/store/reviews/summary?product_id=${encodeURIComponent(productId)}`,
-      { headers: headers(), next: { revalidate: 60 } },
+      opts.cache
+        ? { headers: headers(), cache: opts.cache }
+        : { headers: headers(), next: { revalidate: 60 } },
     );
     if (!res.ok) return EMPTY_SUMMARY(productId);
     const { summary } = (await res.json()) as { summary: ReviewSummary };

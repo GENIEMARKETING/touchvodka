@@ -6,6 +6,7 @@ import { COCKTAILS } from '@/data/cocktails';
 import { PRODUCTS, getProductBySlug } from '@/data/products';
 import { STOCKISTS } from '@/data/stockists';
 import { ProductReviews } from '@/components/reviews/product-reviews';
+import { RatingStat } from '@/components/reviews/rating-stat';
 import { availabilityOf, getCommerceProduct, priceOf, schemaAvailability } from '@/lib/commerce';
 import { getReviewSummary } from '@/lib/reviews';
 import { mediaUrl } from '@/lib/media';
@@ -222,19 +223,22 @@ export default async function ProductDetailPage({ params }: Params) {
                 <p className="font-mono text-neutral-400 text-xs uppercase tracking-[0.2em]">
                   Rating
                 </p>
-                <a href="#reviews" className="mt-1 flex items-center gap-2">
-                  {reviewSummary.count > 0 ? (
-                    <>
-                      <StarRating value={reviewSummary.average} className="h-4 w-4" />
-                      <span className="font-display text-fg text-xl">
-                        {reviewSummary.average.toFixed(1)}
-                      </span>
-                      <span className="text-neutral-500 text-sm">({reviewSummary.count})</span>
-                    </>
-                  ) : (
-                    <span className="font-display text-fg text-base">Be the first to review</span>
-                  )}
-                </a>
+                {commerce ? (
+                  // Live, client-fetched rating (updates the instant a review posts).
+                  <RatingStat
+                    productId={commerce.id}
+                    initialAverage={reviewSummary.average}
+                    initialCount={reviewSummary.count}
+                  />
+                ) : (
+                  <a href="#reviews" className="mt-1 flex items-center gap-2">
+                    <StarRating value={reviewSummary.average} className="h-4 w-4" />
+                    <span className="font-display text-fg text-xl">
+                      {reviewSummary.average.toFixed(1)}
+                    </span>
+                    <span className="text-neutral-500 text-sm">({reviewSummary.count})</span>
+                  </a>
+                )}
               </div>
               {/* Price intentionally omitted here — the buy box below shows the
                   canonical Medusa price (formatted, in the right currency). */}
@@ -361,7 +365,7 @@ export default async function ProductDetailPage({ params }: Params) {
           <h2 className="mt-3 font-display text-4xl text-fg uppercase md:text-5xl">
             What people are saying
           </h2>
-          {reviewSummary.count > 0 ? (
+          {!commerce && reviewSummary.count > 0 ? (
             <div className="mt-3 flex items-center gap-3">
               <StarRating value={reviewSummary.average} className="h-5 w-5" />
               <span className="font-display text-fg text-lg">
