@@ -9,9 +9,11 @@ import { type FormEvent, useState } from 'react';
 /**
  * SurveyForm — the $10-off survey (Figma Survey 543:3554). Five quick questions
  * + email → POST `/api/lead` with `source: 'survey'` and the answers in `meta`.
- * On success it reveals a discount code. The code is display-only here; issuing a
- * real Medusa promotion + emailing it via SMTP2GO is the operator/data step
- * (DEV-HANDOFF "Survey → $10 code").
+ * The answers are persisted to Twenty + Mautic (n8n lead-capture maps `meta.*`)
+ * and captured in PostHog. On success it reveals SURVEY_CODE — a REAL reusable
+ * Medusa promo (infrastructure/commerce/phase8-survey-promo) which the n8n
+ * lead-capture flow also emails via SMTP2GO ("Send survey $10" branch, fires for
+ * `source: 'survey'` regardless of marketing consent — it's transactional).
  */
 type Q = { name: string; label: string; options: string[] };
 
@@ -50,16 +52,17 @@ function track(event: string, props: Record<string, unknown>): void {
   ).posthog?.capture(event, props);
 }
 
-/** Deterministic-enough display code; the real promo lives in Medusa later. */
-function makeCode(): string {
-  const n = Math.floor(1000 + Math.random() * 9000);
-  return `TOUCH10-${n}`;
-}
+/**
+ * The real, reusable Medusa promo code handed out for completing the survey.
+ * MUST stay in sync with three places: the Medusa promotion
+ * (infrastructure/commerce/phase8-survey-promo/create-survey-promo.ts) and the
+ * n8n lead-capture "Send survey $10 (SMTP2GO)" email. Change here → change both.
+ */
+const SURVEY_CODE = 'TOUCHSURVEY10';
 
 export default function SurveyForm() {
   const { hasConsent, record } = useConsent();
   const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
-  const [code, setCode] = useState('');
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -94,8 +97,7 @@ export default function SurveyForm() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(`lead ${res.status}`);
-      track('survey_completed', {});
-      setCode(makeCode());
+      track('survey_completed', answers);
       setStatus('done');
     } catch {
       setStatus('error');
@@ -109,9 +111,11 @@ export default function SurveyForm() {
           <Check className="h-7 w-7" />
         </div>
         <h2 className="font-display text-3xl text-fg">Here's your $10 off</h2>
-        <p className="mt-3 text-neutral-600">Use this code at checkout — we've emailed it too.</p>
+        <p className="mt-3 text-neutral-600">
+          Use this code at checkout — we've emailed it to you too.
+        </p>
         <p className="mt-6 inline-block rounded-xl border-2 border-accent border-dashed bg-white px-8 py-4 font-mono text-2xl text-accent tracking-widest">
-          {code}
+          {SURVEY_CODE}
         </p>
       </div>
     );
