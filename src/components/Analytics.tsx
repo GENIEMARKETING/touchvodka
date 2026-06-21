@@ -34,8 +34,9 @@
  *     where_to_buy_click, lead_captured, …) map onto each platform's standard
  *     events via foundation's PIXEL_EVENT_MAP.
  */
-import { initRudderStack, initTracking } from '@geniemarketing/foundation/tracking';
+import { initRudderStack, initTracking, tagLoader } from '@geniemarketing/foundation/tracking';
 import { useEffect } from 'react';
+import { googleTagFixed } from '@/lib/gtag';
 import { initPostHogFull } from '@/lib/posthog-full';
 
 export default function Analytics() {
@@ -58,12 +59,23 @@ export default function Analytics() {
     // Marketing pixels (marketing category) — one consent-gated call. Each id is
     // optional; unset ids are skipped. Was Google-only via pixels.google(); now
     // also Meta/TikTok/GTM so the demand-sensing track() events reach every pixel.
+    //
+    // googleId is intentionally OMITTED from initTracking and registered separately
+    // via googleTagFixed below: the foundation pixels.google() pushes a malformed
+    // dataLayer command (a spread ARRAY, not the `arguments` object gtag.js requires),
+    // so `config` is silently ignored and GA4 NEVER collects ("Data collection isn't
+    // active"). Proven on touchvodka.com 2026-06-21. The corrected tag reuses the same
+    // id ('google-gtag') so it dedupes; revert to a plain googleId once the foundation
+    // fix is published. See src/lib/gtag.ts.
     initTracking({
-      googleId: process.env.NEXT_PUBLIC_GA_ID,
       metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID,
       tiktokPixelId: process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID,
       gtmId: process.env.NEXT_PUBLIC_GTM_ID,
     });
+    const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    if (gaId) {
+      tagLoader.register(googleTagFixed(gaId));
+    }
   }, []);
 
   return null;
