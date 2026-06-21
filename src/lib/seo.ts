@@ -42,8 +42,9 @@ export const BRAND_SLOGAN = 'Industrial elegance in every bottle.';
 
 /** Authoritative profiles for entity resolution (socials today; add Wikidata if minted). */
 export const BRAND_SAMEAS = [
-  'https://instagram.com/touchvodka',
-  'https://twitter.com/touchvodka',
+  'https://www.instagram.com/touch.vodka/',
+  'https://www.facebook.com/touchvodka',
+  'https://www.youtube.com/@fatdogspirits2929',
 ];
 
 /**

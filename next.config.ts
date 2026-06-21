@@ -83,6 +83,11 @@ const nextConfig: NextConfig = {
     GA4_MEASUREMENT_ID: process.env.GA4_MEASUREMENT_ID,
     GA4_API_SECRET: process.env.GA4_API_SECRET,
     TIKTOK_ACCESS_TOKEN: process.env.TIKTOK_ACCESS_TOKEN,
+    // Instagram feed (CommunityGrid via lib/instagram.ts) — Meta Graph API.
+    // Long-lived token (ideally a Business Manager System User token) + the IG
+    // Business account id. Server-only; the grid falls back to placeholders until set.
+    INSTAGRAM_ACCESS_TOKEN: process.env.INSTAGRAM_ACCESS_TOKEN,
+    INSTAGRAM_BUSINESS_ACCOUNT_ID: process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID,
   },
 };
 

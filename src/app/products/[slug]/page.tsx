@@ -1,5 +1,6 @@
 import AreaInterest from '@/components/AreaInterest';
 import CocktailCard from '@/components/CocktailCard';
+import CommunityGrid from '@/components/CommunityGrid';
 import PageShell from '@/components/PageShell';
 import { AddToCart } from '@/components/vinny/commerce/add-to-cart';
 import { COCKTAILS } from '@/data/cocktails';
@@ -402,23 +403,8 @@ export default async function ProductDetailPage({ params }: Params) {
         </div>
       </section>
 
-      {/* Tagged #TouchVodka — UGC tiles (placeholder). */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-        <p className="font-mono text-accent text-xs uppercase tracking-[0.25em]">From the community</p>
-        <h2 className="mt-3 font-display text-4xl text-fg uppercase md:text-5xl">Tagged #TouchVodka</h2>
-        <div className="mt-8 grid grid-cols-3 gap-3 sm:grid-cols-6">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="flex aspect-square items-center justify-center rounded-xl bg-warm"
-            >
-              <span className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest">
-                photo
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Tagged #TouchVodka — live Instagram feed (Meta Graph API; placeholder fallback). */}
+      <CommunityGrid />
 
       {/* Make it into — related serves → recipes. */}
       {cocktails.length > 0 ? (

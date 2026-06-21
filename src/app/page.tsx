@@ -1,3 +1,4 @@
+import CommunityGrid from '@/components/CommunityGrid';
 import Header from '@/components/Header';
 import SiteFooterData from '@/components/SiteFooterData';
 import Collection from '@/components/home/Collection';
@@ -75,6 +76,7 @@ export default async function Home() {
       <Stats />
       <PromoBanner />
       <Recipes />
+      <CommunityGrid className="bg-warm" />
       <Signup />
       <SiteFooterData />
       {/* Interactions: "Join the insiders" promo overlay ~3s after landing (S7-consent-aware). */}

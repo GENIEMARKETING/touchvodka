@@ -1,7 +1,8 @@
 'use client';
 
 import AreaInterest from '@/components/AreaInterest';
-import { Instagram, Twitter } from 'lucide-react';
+import { SOCIALS } from '@/lib/socials';
+import { Facebook, Instagram, Youtube } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { DoNotSellLink, openConsentPreferences } from './vinny/consent-banner/consent-banner';
@@ -48,20 +49,23 @@ const DEFAULTS = {
   siteName: 'Touch Vodka',
   tagline:
     'Elevating spirits since 2012. Crafted for those who appreciate the finer details. Industrial precision meets artisanal soul.',
-  instagram: 'https://instagram.com',
-  twitter: 'https://twitter.com',
+  instagram: SOCIALS.instagram,
+  facebook: SOCIALS.facebook,
+  youtube: SOCIALS.youtube,
 };
 
 export default function SiteFooter({
   siteName = DEFAULTS.siteName,
   tagline = DEFAULTS.tagline,
   instagram = DEFAULTS.instagram,
-  twitter = DEFAULTS.twitter,
+  facebook = DEFAULTS.facebook,
+  youtube = DEFAULTS.youtube,
 }: {
   siteName?: string;
   tagline?: string;
   instagram?: string;
-  twitter?: string;
+  facebook?: string;
+  youtube?: string;
 } = {}) {
   return (
     <>
@@ -125,17 +129,30 @@ export default function SiteFooter({
             <div className="flex gap-3">
               <a
                 href={instagram}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
                 className="rounded-full border border-white/15 p-3 transition-colors hover:border-accent hover:text-accent"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href={twitter}
-                aria-label="Twitter / X"
+                href={facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
                 className="rounded-full border border-white/15 p-3 transition-colors hover:border-accent hover:text-accent"
               >
-                <Twitter className="h-5 w-5" />
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a
+                href={youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="rounded-full border border-white/15 p-3 transition-colors hover:border-accent hover:text-accent"
+              >
+                <Youtube className="h-5 w-5" />
               </a>
             </div>
           </div>

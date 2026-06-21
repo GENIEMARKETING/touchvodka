@@ -20,7 +20,8 @@ export default async function SiteFooterData() {
       siteName={str(c.siteName ?? c.site_name)}
       tagline={str(c.footerText ?? c.footer_text)}
       instagram={str(socials.instagram)}
-      twitter={str(socials.twitter ?? socials.x)}
+      facebook={str(socials.facebook)}
+      youtube={str(socials.youtube)}
     />
   );
 }
