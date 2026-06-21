@@ -116,7 +116,7 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
         className="absolute inset-0 h-full w-full cursor-default"
         onClick={close}
       />
-      <div className="relative z-10 grid w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-soft-lg sm:grid-cols-2">
+      <div className="relative z-10 grid w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-soft-lg sm:grid-cols-2">
         <div className="relative hidden min-h-[280px] bg-warm sm:block">
           <Image
             src="/cocktails/touch-key-lime-0.webp"
@@ -154,7 +154,7 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
               <p className="mt-4 text-neutral-600 leading-relaxed">
                 Early drops, new recipes, and members-only tastings — straight to your inbox.
               </p>
-              <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3">
                 <input
                   type="text"
                   name="company_website"
@@ -163,26 +163,32 @@ export default function PromoDialog({ delayMs = 3000 }: { delayMs?: number }) {
                   aria-hidden="true"
                   className="hidden"
                 />
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="Email address"
-                  aria-label="Email address"
-                  className="min-w-0 flex-1 rounded-full border border-concrete px-5 py-3 text-fg placeholder:text-neutral-400 focus:border-accent focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={status === 'submitting' || (TURNSTILE_ENABLED && !tsToken)}
-                  className="inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-6 py-3 font-display text-sm text-white transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-60"
-                >
-                  {status === 'submitting'
-                    ? 'Sending…'
-                    : TURNSTILE_ENABLED && !tsToken
-                      ? 'Verifying…'
-                      : 'Sign Me Up'}
-                </button>
-                <TurnstileWidget key={tsKey} onToken={setTsToken} className="sm:basis-full" />
+                {/* Email pill with the submit button inset on the right edge
+                    (matches Figma Promo Dialog 109:74). The pill is always
+                    full-width so the email never collapses; the real Turnstile
+                    widget gets its own line below (it is NOT in the Figma mock). */}
+                <div className="relative">
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="Email address"
+                    aria-label="Email address"
+                    className="w-full rounded-full border border-concrete py-3 pr-36 pl-5 text-fg placeholder:text-neutral-400 focus:border-accent focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === 'submitting' || (TURNSTILE_ENABLED && !tsToken)}
+                    className="absolute inset-y-1.5 right-1.5 inline-flex items-center justify-center rounded-full bg-accent px-5 font-display text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  >
+                    {status === 'submitting'
+                      ? 'Sending…'
+                      : TURNSTILE_ENABLED && !tsToken
+                        ? 'Verifying…'
+                        : 'Sign Me Up'}
+                  </button>
+                </div>
+                <TurnstileWidget key={tsKey} onToken={setTsToken} />
               </form>
               <p className="mt-3 text-neutral-400 text-xs">
                 {status === 'error'
