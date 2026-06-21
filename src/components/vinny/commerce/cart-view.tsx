@@ -55,15 +55,13 @@ export function CartView({
           className="flex gap-4 rounded-2xl border border-concrete/60 bg-white p-4 shadow-soft"
         >
           <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-warm">
-            {item.thumbnail ? (
-              <Image
-                src={item.thumbnail}
-                alt={item.title}
-                fill
-                sizes="80px"
-                className="object-contain p-2"
-              />
-            ) : null}
+            <Image
+              src={item.thumbnail || '/brand/touch-logo-blue.svg'}
+              alt={item.title}
+              fill
+              sizes="80px"
+              className={item.thumbnail ? 'object-contain p-2' : 'object-contain p-4 opacity-40'}
+            />
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-fg uppercase">{item.title}</p>
@@ -150,7 +148,13 @@ export function CartView({
         ) : null}
         <div className="flex justify-between">
           <dt className="text-neutral-500">Shipping</dt>
-          <dd className="text-fg">{cart.shipping_total > 0 ? money(cart.shipping_total) : '$10.00'}</dd>
+          <dd className="text-fg">
+            {cart.shipping_total > 0 ? (
+              money(cart.shipping_total)
+            ) : (
+              <span className="text-neutral-500">Calculated at checkout</span>
+            )}
+          </dd>
         </div>
         {cart.tax_total > 0 ? (
           <div className="flex justify-between">
@@ -183,7 +187,7 @@ export function CartView({
         </Link>
       )}
       <p className="mt-3 text-center text-neutral-400 text-xs">
-        Secure checkout · 21+ · Ships where legal
+        Secure checkout · 21+ · Ships within Florida
       </p>
     </div>
   );

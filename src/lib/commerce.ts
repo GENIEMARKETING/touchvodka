@@ -67,11 +67,51 @@ export async function getCommerceProducts(limit = 24): Promise<StoreProduct[]> {
 export async function getCommerceProduct(handle: string): Promise<StoreProduct | null> {
   if (!commerceConfigured()) return null;
   try {
-    return await medusa.getProduct(handle);
+    return await withInventory(await medusa.getProduct(handle));
   } catch (err) {
     console.warn(`[commerce] getProduct(${handle}) failed:`, err);
     return null;
   }
+}
+
+/**
+ * Merge live inventory onto a product's variants. The published commerce client
+ * requests price/options/images but NOT `inventory_quantity` / `manage_inventory`,
+ * so `availabilityOf()` would always read "In stock". We fetch those two fields
+ * directly from the Store API (publishable-key scoped) and patch them on — keeping
+ * the package as the source of truth for everything else. Best-effort: on any
+ * failure the product is returned unchanged (degrades to "In stock", never throws).
+ */
+async function withInventory(product: StoreProduct | null): Promise<StoreProduct | null> {
+  if (!product?.variants?.length) return product;
+  const base = process.env.NEXT_PUBLIC_MEDUSA_URL;
+  const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
+  if (!base || !pk) return product;
+  try {
+    const url = new URL(`/store/products/${product.id}`, base);
+    url.searchParams.set(
+      'fields',
+      'id,variants.id,variants.manage_inventory,variants.inventory_quantity',
+    );
+    const res = await fetch(url, { headers: { 'x-publishable-api-key': pk }, cache: 'no-store' });
+    if (!res.ok) return product;
+    const { product: fresh } = (await res.json()) as {
+      product?: { variants?: Array<{ id: string } & VariantLike> };
+    };
+    const inv = new Map((fresh?.variants ?? []).map((v) => [v.id, v]));
+    product.variants = product.variants.map((v) => {
+      const x = inv.get(v.id);
+      if (!x) return v;
+      return {
+        ...v,
+        manage_inventory: x.manage_inventory,
+        inventory_quantity: x.inventory_quantity ?? null,
+      } as typeof v;
+    });
+  } catch (err) {
+    console.warn('[commerce] inventory merge failed:', err);
+  }
+  return product;
 }
 
 /** Instant/typeahead product search (Meilisearch, search-only key, browser-safe). */

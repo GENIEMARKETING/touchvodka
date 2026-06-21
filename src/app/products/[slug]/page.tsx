@@ -146,7 +146,7 @@ export default async function ProductDetailPage({ params }: Params) {
       q: 'How should I serve it?',
       a: 'Neat, over a large cube, or in any of our signature cocktails. Chill the bottle for the smoothest pour.',
     },
-    { q: 'Where do you ship?', a: 'We ship where legal across the US, with flat $10 shipping and adult-signature delivery.' },
+    { q: 'Where do you ship?', a: 'We currently ship direct-to-consumer within Florida, with live carrier rates calculated at checkout and adult-signature (21+) delivery.' },
   ];
 
   return (
@@ -326,9 +326,9 @@ export default async function ProductDetailPage({ params }: Params) {
           </h2>
           <div className="mt-10 grid gap-8 md:grid-cols-3">
             {[
-              { t: 'Flat $10 shipping', b: 'One flat rate to anywhere we ship — no surprises at checkout.' },
+              { t: 'Live shipping rates', b: 'Real carrier rates are calculated at checkout — no flat-fee guesswork.' },
               { t: 'Adult signature · 21+', b: 'An adult 21+ signature is required on delivery, every time.' },
-              { t: 'Ships where legal', b: 'We ship across the US wherever DTC spirits delivery is permitted.' },
+              { t: 'Florida only', b: 'We currently ship direct-to-consumer within Florida, where DTC spirits delivery is permitted.' },
             ].map((c) => (
               <div key={c.t}>
                 <h3 className="font-display text-fg text-xl">{c.t}</h3>

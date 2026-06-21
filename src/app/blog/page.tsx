@@ -1,7 +1,7 @@
 import BlogImage from '@/components/BlogImage';
 import PageShell, { PageHero } from '@/components/PageShell';
 import { getAllPosts } from '@/lib/blog';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -19,9 +19,22 @@ const BLOG_SCENES = [
   '/scenes/banner_cocktails.webp',
 ];
 
-export default async function BlogPage() {
+/** Posts per page in the grid (the featured story sits above page 1 only). */
+const PAGE_SIZE = 9;
+
+type Params = { searchParams: Promise<{ page?: string }> };
+
+export default async function BlogPage({ searchParams }: Params) {
   const posts = await getAllPosts();
   const [featured, ...rest] = posts;
+
+  // URL-driven pagination (SSR + SEO-friendly). The featured story is excluded
+  // from the paginated set, so the offset math stays clean.
+  const totalPages = Math.max(1, Math.ceil(rest.length / PAGE_SIZE));
+  const requested = Number.parseInt((await searchParams).page ?? '1', 10);
+  const page = Number.isNaN(requested) ? 1 : Math.min(Math.max(requested, 1), totalPages);
+  const pageItems = rest.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const isFirst = page === 1;
 
   return (
     <PageShell>
@@ -33,8 +46,8 @@ export default async function BlogPage() {
       />
 
       <div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-        {/* Featured story */}
-        {featured ? (
+        {/* Featured story — page 1 only */}
+        {isFirst && featured ? (
           <Link
             href={`/blog/${featured.slug}`}
             className="group mb-14 grid items-center gap-8 overflow-hidden rounded-3xl border border-concrete/60 bg-white shadow-soft transition-all duration-300 ease-brand hover:-translate-y-1 hover:shadow-soft-lg md:grid-cols-2"
@@ -69,7 +82,7 @@ export default async function BlogPage() {
 
         {/* Post grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {rest.map((post, idx) => (
+          {pageItems.map((post, idx) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
@@ -78,7 +91,9 @@ export default async function BlogPage() {
               <div className="relative aspect-[4/3] overflow-hidden">
                 <BlogImage
                   src={post.thumbnail}
-                  fallbackSrc={post.image || BLOG_SCENES[idx % BLOG_SCENES.length]}
+                  fallbackSrc={
+                    post.image || BLOG_SCENES[((page - 1) * PAGE_SIZE + idx) % BLOG_SCENES.length]
+                  }
                   alt={post.title}
                   label={post.category}
                   sizes="(max-width:768px) 100vw, 33vw"
@@ -103,6 +118,62 @@ export default async function BlogPage() {
             </Link>
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 ? (
+          <nav
+            aria-label="Blog pages"
+            className="mt-14 flex items-center justify-center gap-2 font-display text-sm"
+          >
+            {page > 1 ? (
+              <Link
+                href={page - 1 === 1 ? '/blog' : `/blog?page=${page - 1}`}
+                rel="prev"
+                aria-label="Previous page"
+                className="inline-flex items-center gap-1.5 rounded-full border border-concrete px-5 py-2.5 text-fg transition-colors hover:border-fg"
+              >
+                <ArrowLeft className="h-4 w-4" /> Prev
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-concrete/50 px-5 py-2.5 text-neutral-300">
+                <ArrowLeft className="h-4 w-4" /> Prev
+              </span>
+            )}
+
+            <ul className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <li key={n}>
+                  <Link
+                    href={n === 1 ? '/blog' : `/blog?page=${n}`}
+                    aria-current={n === page ? 'page' : undefined}
+                    className={`inline-flex h-10 min-w-10 items-center justify-center rounded-full px-3 transition-colors ${
+                      n === page
+                        ? 'bg-accent text-white'
+                        : 'border border-concrete text-fg hover:border-fg'
+                    }`}
+                  >
+                    {n}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {page < totalPages ? (
+              <Link
+                href={`/blog?page=${page + 1}`}
+                rel="next"
+                aria-label="Next page"
+                className="inline-flex items-center gap-1.5 rounded-full border border-concrete px-5 py-2.5 text-fg transition-colors hover:border-fg"
+              >
+                Next <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-concrete/50 px-5 py-2.5 text-neutral-300">
+                Next <ArrowRight className="h-4 w-4" />
+              </span>
+            )}
+          </nav>
+        ) : null}
       </div>
     </PageShell>
   );
