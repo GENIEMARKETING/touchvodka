@@ -125,6 +125,21 @@ function mapArticle(rec: StrapiArticle): BlogPost {
 
 const byDateDesc = (a: BlogPost, b: BlogPost): number => (a.date < b.date ? 1 : -1);
 
+/**
+ * Defensive dedupe by slug — keep the first occurrence (newest, after byDateDesc).
+ * The CMS should hold one entry per slug, but the content-autopilot can briefly
+ * create two docs with the same slug (Strapi `slug` isn't unique), and a duplicate
+ * card must never reach the page. Belt-and-suspenders alongside the workflow dedupe.
+ */
+function dedupeBySlug(posts: BlogPost[]): BlogPost[] {
+  const seen = new Set<string>();
+  return posts.filter((p) => {
+    if (!p.slug || seen.has(p.slug)) return false;
+    seen.add(p.slug);
+    return true;
+  });
+}
+
 async function readMdxPosts(): Promise<BlogPost[]> {
   const files = (await readdir(BLOG_DIR)).filter((f) => f.endsWith('.mdx') || f.endsWith('.md'));
   const posts = await Promise.all(files.map(readPost));
@@ -133,14 +148,14 @@ async function readMdxPosts(): Promise<BlogPost[]> {
 
 export async function getAllPosts(): Promise<BlogPost[]> {
   const cms = await getArticles();
-  if (cms) return cms.map(mapArticle).sort(byDateDesc);
+  if (cms) return dedupeBySlug(cms.map(mapArticle).sort(byDateDesc));
   return readMdxPosts();
 }
 
 export async function getPostSlugs(): Promise<string[]> {
   const cms = await getArticles();
   if (cms) {
-    return cms.map((r) => str((r as Record<string, unknown>).slug)).filter(Boolean);
+    return [...new Set(cms.map((r) => str((r as Record<string, unknown>).slug)).filter(Boolean))];
   }
   const files = await readdir(BLOG_DIR);
   return files
