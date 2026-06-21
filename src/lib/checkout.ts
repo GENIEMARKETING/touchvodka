@@ -46,9 +46,22 @@ export type ShippingOption = {
   amount: number;
   /** Some options price per-cart at calculation time. */
   price_type?: 'flat' | 'calculated';
+  provider_id?: string;
 };
 
 export type Region = { id: string; name: string; currency_code: string };
+
+/**
+ * Touch Vodka ships DTC within Florida only. The authoritative gate is the
+ * Medusa service zone (geo-restricted to US/FL → no shipping option resolves for
+ * a non-FL address), but we also validate up front for a clear message instead of
+ * an empty delivery step. Accepts "FL" or "Florida" in any case.
+ */
+export const SHIPS_TO_LABEL = 'Florida';
+export function isShippableProvince(province?: string | null): boolean {
+  const p = (province ?? '').trim().toLowerCase();
+  return p === 'fl' || p === 'florida';
+}
 
 async function store<T>(
   path: string,
@@ -89,13 +102,64 @@ export async function setAddresses(
   return cart;
 }
 
-/** Shipping options available for this cart (after an address is set). */
+type RawOption = {
+  id: string;
+  name: string;
+  amount?: number | null;
+  price_type?: 'flat' | 'calculated';
+  provider_id?: string;
+  calculated_price?: { calculated_amount?: number | null } | null;
+};
+
+/**
+ * Resolve a calculated (carrier-priced, e.g. Shippo) option's real amount for
+ * this cart. Flat options already carry `amount`; calculated ones must be priced
+ * per-cart via the dedicated endpoint — which is why they showed as $0 / never
+ * appeared before. Returns null if it can't be priced (Shippo unreachable etc.).
+ */
+async function calculatedAmount(optionId: string, cartId: string): Promise<number | null> {
+  try {
+    const { shipping_option } = await store<{ shipping_option: RawOption }>(
+      `shipping-options/${optionId}/calculate`,
+      { method: 'POST', body: { cart_id: cartId, data: {} } },
+    );
+    return shipping_option.calculated_price?.calculated_amount ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Shipping options for this cart (after an address is set), priced and ready to
+ * display. Touch Vodka shows the **live Shippo rate only** — the flat fallback is
+ * filtered out of the customer view. If no calculated rate resolves (Shippo down
+ * / misconfig) we fall back to whatever options exist so checkout never dead-ends.
+ */
 export async function listShippingOptions(cartId: string): Promise<ShippingOption[]> {
-  const { shipping_options } = await store<{ shipping_options: ShippingOption[] }>(
-    'shipping-options',
-    { params: { cart_id: cartId } },
+  const { shipping_options } = await store<{ shipping_options: RawOption[] }>('shipping-options', {
+    params: { cart_id: cartId },
+  });
+
+  const priced: ShippingOption[] = await Promise.all(
+    shipping_options.map(async (o) => {
+      let amount = o.amount ?? o.calculated_price?.calculated_amount ?? 0;
+      if (o.price_type === 'calculated' && !amount) {
+        amount = (await calculatedAmount(o.id, cartId)) ?? 0;
+      }
+      return {
+        id: o.id,
+        name: o.name,
+        amount,
+        price_type: o.price_type,
+        provider_id: o.provider_id,
+      };
+    }),
   );
-  return shipping_options;
+
+  // Shippo-only customer view: prefer carrier-calculated rates, drop the flat
+  // manual fallback. Keep everything if nothing calculable so we never dead-end.
+  const live = priced.filter((o) => o.price_type === 'calculated' && o.amount > 0);
+  return live.length > 0 ? live : priced;
 }
 
 /** Choose a shipping method; returns the recalculated cart. */

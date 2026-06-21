@@ -19,7 +19,9 @@ import { StripePayment } from '@/components/vinny/commerce/stripe-payment';
 import {
   type Address,
   type ShippingOption,
+  SHIPS_TO_LABEL,
   addShippingMethod,
+  isShippableProvince,
   listRegions,
   listShippingOptions,
   setAddresses,
@@ -127,6 +129,12 @@ export function Checkout() {
   function submitDetails(e: FormEvent) {
     e.preventDefault();
     if (!cart) return;
+    // Florida-only DTC: block non-FL addresses with a clear message rather than
+    // an empty delivery step (the Medusa zone enforces this too).
+    if (!isShippableProvince(address.province)) {
+      setError(`We currently ship within ${SHIPS_TO_LABEL} only — please use a Florida address.`);
+      return;
+    }
     guard(async () => {
       await setEmail(email);
       await setAddresses(cart.id, address);
@@ -242,6 +250,10 @@ export function Checkout() {
               </div>
               <div>
                 <p className={SECTION_LABEL}>Shipping</p>
+                <p className="mb-4 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3 text-fg text-sm">
+                  We currently ship within <span className="font-display">Florida</span> only. Live
+                  carrier rates are calculated at checkout.
+                </p>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <input
@@ -275,7 +287,7 @@ export function Checkout() {
                   />
                   <div className="grid grid-cols-3 gap-4">
                     <input
-                      placeholder="State"
+                      placeholder="State (FL)"
                       className={INPUT_CLS}
                       value={address.province}
                       onChange={(e) => setAddress((a) => ({ ...a, province: e.target.value }))}
@@ -405,7 +417,11 @@ export function Checkout() {
                 <div className="flex justify-between">
                   <dt className="text-neutral-500">Shipping</dt>
                   <dd className="text-fg">
-                    {cart.shipping_total > 0 ? money(cart.shipping_total) : '$10.00'}
+                    {cart.shipping_total > 0 ? (
+                      money(cart.shipping_total)
+                    ) : (
+                      <span className="text-neutral-500">Calculated at checkout</span>
+                    )}
                   </dd>
                 </div>
                 <div className="flex justify-between border-concrete border-t pt-3 font-display text-fg text-lg">
