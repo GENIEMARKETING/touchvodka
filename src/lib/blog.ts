@@ -22,6 +22,8 @@ const BLOG_DIR = join(process.cwd(), 'src/content/blog');
 export type BlogPost = {
   slug: string;
   title: string;
+  /** Optional concise SEO <title> (≤60 chars). Falls back to a clamped `title`. Fixes title_too_long. */
+  metaTitle?: string;
   date: string;
   excerpt: string;
   author: string;
@@ -64,6 +66,7 @@ async function readPost(file: string): Promise<BlogPost> {
   return {
     slug: file.replace(/\.mdx?$/, ''),
     title: String(data.title ?? ''),
+    metaTitle: data.metaTitle ? String(data.metaTitle) : undefined,
     date: String(data.date ?? ''),
     excerpt: String(data.excerpt ?? ''),
     author: String(data.author ?? ''),
@@ -112,6 +115,7 @@ function mapArticle(rec: StrapiArticle): BlogPost {
   return {
     slug: str(r.slug),
     title: str(r.title),
+    metaTitle: str(r.metaTitle ?? r.seoTitle ?? r.meta_title) || undefined,
     date: str(r.date ?? r.publishedAt ?? r.published_at),
     excerpt: str(r.excerpt),
     author: str(r.author, 'admin'),

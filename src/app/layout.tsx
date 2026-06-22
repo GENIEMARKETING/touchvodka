@@ -34,35 +34,28 @@ const mono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://touchvodka.com'),
   title: {
-    default: 'Touch Vodka | Premium Craft Vodka with Industrial Elegance',
+    default: 'Touch Vodka | 10× Distilled Florida Craft Vodka',
     template: '%s | Touch Vodka',
   },
   description:
-    'Discover Touch Vodka — brutalist, high-contrast premium spirits crafted with precision. Explore our collection of artisan-distilled vodkas and signature cocktails.',
-  keywords: [
-    'premium vodka',
-    'craft spirits',
-    'artisan vodka',
-    'luxury alcohol',
-    'high-proof vodka',
-    'distillery',
-    'cocktails',
-  ],
+    'Touch Vodka is a 10× distilled premium craft vodka from Tampa, Florida. Explore our artisan and flavored vodkas — Key Lime, Ruby & Orange — plus signature cocktail recipes.',
+  // No `keywords` meta tag: Google ignores it and DataForSEO flags it as
+  // irrelevant. Real keyword targeting lives in titles, headings and body copy.
   authors: [{ name: 'Touch Vodka' }],
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Touch Vodka | Premium Craft Vodka with Industrial Elegance',
+    title: 'Touch Vodka | 10× Distilled Florida Craft Vodka',
     description:
-      'Brutalist premium spirits. Crafted with precision. Industrial elegance in every bottle.',
+      '10× distilled premium craft vodka from Tampa, Florida. Artisan & flavored vodkas plus signature cocktail recipes.',
     url: 'https://touchvodka.com/',
     siteName: 'Touch Vodka',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Touch Vodka | Premium Craft Vodka with Industrial Elegance',
+    title: 'Touch Vodka | 10× Distilled Florida Craft Vodka',
     description:
-      'Brutalist premium spirits. Crafted with precision. Industrial elegance in every bottle.',
+      '10× distilled premium craft vodka from Tampa, Florida. Artisan & flavored vodkas plus signature cocktail recipes.',
     creator: '@touchvodka',
   },
   robots: { index: true, follow: true },

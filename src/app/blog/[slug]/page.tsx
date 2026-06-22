@@ -15,17 +15,31 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
+/**
+ * Concise SEO <title> (Google truncates ~60 chars). The full, keyword-rich title
+ * stays as the page <h1>; this clamps only the <title> and is returned as
+ * `absolute` so the root "%s | Touch Vodka" template can't push it back over 60.
+ */
+function blogSeoTitle(post: { title: string; metaTitle?: string }): string {
+  if (post.metaTitle) return post.metaTitle.slice(0, 60);
+  const suffix = ' | Touch Vodka';
+  if (post.title.length + suffix.length <= 60) return post.title + suffix;
+  if (post.title.length <= 60) return post.title;
+  return `${post.title.slice(0, 57).replace(/\s+\S*$/, '')}…`; // clamp at a word boundary
+}
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return { title: 'Not found' };
-  return pageMetadata({
+  const meta = pageMetadata({
     title: post.title,
     description: post.excerpt,
     path: `/blog/${slug}`,
     ogType: 'article',
     ...(post.image?.trim() ? { images: [{ url: post.image, alt: post.title }] } : {}),
   });
+  return { ...meta, title: { absolute: blogSeoTitle(post) } };
 }
 
 export default async function BlogDetailPage({ params }: Params) {

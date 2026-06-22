@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const product = getProductBySlug(slug);
   if (!product) return { title: 'Not found' };
   return pageMetadata({
-    title: product.name,
-    description: product.description,
+    // Keyword-rich SEO title (was just `product.name` → "… | Touch Vodka" = too short).
+    title: product.seoTitle ?? product.name,
+    description: product.seoDescription ?? product.description,
     path: `/products/${slug}`,
     ogType: 'product',
     images: [{ url: mediaUrl(product.image), alt: product.name }],

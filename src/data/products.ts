@@ -28,6 +28,10 @@ export interface Product {
   distillationProcess: string;
   relatedCocktailIds?: string[];
   beaconPosition?: { top: string; left: string };
+  /** SEO <title> (~40–46 chars; the "| Touch Vodka" template suffix is appended). Fixes title_too_short. */
+  seoTitle?: string;
+  /** SEO meta description (~150–160 chars). Falls back to `description`. */
+  seoDescription?: string;
 }
 
 /**
@@ -49,6 +53,9 @@ export const PRODUCTS: Product[] = [
       'Our artisanal blend, carefully crafted using traditional distillation methods. A smooth, elegant vodka that honors time-tested techniques.',
     color: '#D4A574',
     image: `${REDESIGN_PRODUCTS}/artisan.webp`,
+    seoTitle: 'Touch Artisan — 10× Distilled Craft Vodka',
+    seoDescription:
+      'Touch Artisan is a small-batch, 10× distilled craft vodka from Tampa, Florida — smooth, elegant and traditional. Shop the Artisan blend or mix a classic cocktail.',
     proof: '80 PROOF',
     category: '10X Premium Distilled Spirit',
     distillationProcess: '10x Distilled',
@@ -70,6 +77,9 @@ export const PRODUCTS: Product[] = [
       'Vibrant key lime essence perfectly balanced with our signature smooth vodka base. A refreshing tropical escape in every sip.',
     color: '#7FDB00',
     image: `${REDESIGN_PRODUCTS}/keylime.webp`,
+    seoTitle: 'Touch Key Lime — Key Lime Flavored Vodka',
+    seoDescription:
+      'Touch Key Lime is a 10× distilled key lime flavored vodka from Tampa, Florida. Bright tropical citrus — perfect for key lime martinis and summer cocktails.',
     proof: '80 PROOF',
     category: '10X Citrus Infused Spirit',
     distillationProcess: '10x Distilled',
@@ -91,6 +101,9 @@ export const PRODUCTS: Product[] = [
       'A sophisticated blend of ruby-red berries, offering depth, complexity, and natural sweetness that elevates any cocktail.',
     color: '#E63946',
     image: `${REDESIGN_PRODUCTS}/ruby.webp`,
+    seoTitle: 'Touch Ruby — Red Berry Flavored Vodka',
+    seoDescription:
+      'Touch Ruby is a 10× distilled red-berry flavored vodka from Tampa, Florida — blackberry, raspberry and dark cherry. Ideal in a cosmopolitan or berry cocktail.',
     proof: '80 PROOF',
     category: '10X Berry Infused Spirit',
     distillationProcess: '10x Distilled',
@@ -112,6 +125,9 @@ export const PRODUCTS: Product[] = [
       'The flagship of our collection. A premium vodka crafted for those who appreciate excellence, clarity, and uncompromising quality.',
     color: '#0055FF',
     image: `${REDESIGN_PRODUCTS}/one.webp`,
+    seoTitle: 'Touch One — Premium 10× Distilled Vodka',
+    seoDescription:
+      'Touch One is our flagship premium vodka — 10× distilled and charcoal filtered in Tampa, Florida for exceptional smoothness. The base for a perfect martini or mule.',
     proof: '80 PROOF',
     category: '10X Premium Distilled Spirit',
     distillationProcess: '10x Distilled + Charcoal Filtered',
@@ -133,6 +149,9 @@ export const PRODUCTS: Product[] = [
       'Bright orange notes with a vibrant kick. A bold infusion that brings energy and sophistication to the classic vodka profile.',
     color: '#FF8C00',
     image: `${REDESIGN_PRODUCTS}/orange.webp`,
+    seoTitle: 'Touch Orange — Orange Flavored Vodka',
+    seoDescription:
+      'Touch Orange is a 10× distilled orange flavored vodka from Tampa, Florida — bold, zesty citrus. Great in a screwdriver, vodka soda or orange cocktail.',
     proof: '80 PROOF',
     category: '10X Citrus Infused Spirit',
     distillationProcess: '10x Distilled',
