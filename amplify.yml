@@ -13,6 +13,12 @@ frontend:
       commands:
         - corepack enable
         - corepack prepare pnpm@10.28.1 --activate
+        # GitHub Packages auth for @geniemarketing/* from a TRUSTED source.
+        # pnpm >=10.34 refuses to expand ${NODE_AUTH_TOKEN} in the committed
+        # project .npmrc (security: a committed file could leak the secret), so we
+        # write the RESOLVED token to the user-level ~/.npmrc the build always
+        # trusts. This is version-proof — it unblocks pnpm/Renovate upgrades.
+        - printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" >> "$HOME/.npmrc"
         - pnpm install --frozen-lockfile
     build:
       commands:
