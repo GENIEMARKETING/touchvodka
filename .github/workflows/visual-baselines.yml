@@ -49,7 +49,7 @@ jobs:
       # this, mediaUrl() would emit the removed local /public paths → broken images.
       NEXT_PUBLIC_MEDIA_BASE: https://img.fatdogspirits.com/touch-vodka
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
