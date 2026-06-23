@@ -33,7 +33,7 @@
     "remark-gfm": "^4.0.0",
     "react-simple-maps": "^3.0.0",
     "vanilla-cookieconsent": "^3.0.1",
-    "nodemailer": "^6.9.7"
+    "nodemailer": "^9.0.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
