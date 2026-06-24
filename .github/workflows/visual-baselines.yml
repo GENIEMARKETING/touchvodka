@@ -49,13 +49,13 @@ jobs:
       # this, mediaUrl() would emit the removed local /public paths → broken images.
       NEXT_PUBLIC_MEDIA_BASE: https://img.fatdogspirits.com/touch-vodka
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://npm.pkg.github.com
           cache: pnpm
 
@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload report + diffs
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-keyframes
           path: |
