@@ -9,6 +9,12 @@
       "automerge": true,
       "automergeType": "branch",
       "schedule": ["before 6am on monday"]
+    },
+    {
+      "description": "Deferred major migrations. Each was evaluated and intentionally held — it needs a dedicated, tested upgrade, not an auto-PR: Tailwind v4 (CSS-engine rewrite; closed #51/#60), lucide v1 (removed brand icons, breaks the build; #58/#61), pnpm v11 (build-script allowlist + node_modules-purge/Amplify-cache; #50), Biome v2 (117 new lint issues; #46). Minor/patch updates for these still flow. To do one of these migrations, remove its name from matchPackageNames.",
+      "matchPackageNames": ["tailwindcss", "@tailwindcss/postcss", "lucide-react", "@biomejs/biome", "pnpm"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }
