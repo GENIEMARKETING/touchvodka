@@ -19,6 +19,25 @@ import { type StrapiArticle, getArticles } from '@/lib/strapi';
 
 const BLOG_DIR = join(process.cwd(), 'src/content/blog');
 
+/**
+ * Structured schema.org Recipe data for cocktail how-to posts — set by the
+ * content-autopilot pipeline (Strapi `article.recipe` JSON field) so the blog page
+ * can emit Recipe rich-result JSON-LD. Ratings/video are intentionally NOT part of
+ * this shape — they require real data, never auto-generated.
+ */
+export type BlogRecipe = {
+  name: string;
+  ingredients: string[];
+  instructions: Array<string | { text: string; name?: string }>;
+  category?: string;
+  cuisine?: string;
+  keywords?: string[];
+  prepTimeMin?: number;
+  cookTimeMin?: number;
+  yield?: string;
+  calories?: number;
+};
+
 export type BlogPost = {
   slug: string;
   title: string;
@@ -33,6 +52,8 @@ export type BlogPost = {
   /** Bold card thumbnail (auto-blog `<slug>-thumb.png`). Falls back to `image`. */
   thumbnail: string;
   body: string;
+  /** Present only for cocktail how-to posts (auto-blog Recipe schema). */
+  recipe?: BlogRecipe;
 };
 
 function parseFrontmatter(raw: string): { data: Record<string, unknown>; body: string } {
@@ -103,6 +124,58 @@ function mediaField(v: unknown): string {
   return '';
 }
 
+/**
+ * Validate the Strapi `article.recipe` JSON into a `BlogRecipe`, or `undefined`.
+ * Tolerant of the content-autopilot field names (recipeIngredient/recipeInstructions/
+ * recipeCategory/recipeCuisine/recipeYield). Requires a name + ≥1 ingredient AND ≥1
+ * instruction (a Recipe with no steps isn't a valid rich result). Drops anything
+ * rating/video-shaped — those must never come from the auto-blog.
+ */
+function parseRecipe(v: unknown): BlogRecipe | undefined {
+  if (!v || typeof v !== 'object') return undefined;
+  const o = v as Record<string, unknown>;
+  const name = str(o.name).trim();
+  const rawIngredients = (o.recipeIngredient ?? o.ingredients) as unknown;
+  const ingredients = Array.isArray(rawIngredients)
+    ? rawIngredients.map((i) => str(i).trim()).filter(Boolean)
+    : [];
+  const rawSteps = (o.recipeInstructions ?? o.instructions) as unknown;
+  const instructions = Array.isArray(rawSteps)
+    ? rawSteps
+        .map((s) =>
+          typeof s === 'string'
+            ? s.trim()
+            : {
+                text: str((s as Record<string, unknown>)?.text).trim(),
+                name: str((s as Record<string, unknown>)?.name).trim() || undefined,
+              },
+        )
+        .filter((s) => (typeof s === 'string' ? s : s.text))
+    : [];
+  if (!name || ingredients.length === 0 || instructions.length === 0) return undefined;
+  const num = (x: unknown): number | undefined => {
+    const n = Number(x);
+    return Number.isFinite(n) && n > 0 ? n : undefined;
+  };
+  const kw = o.keywords;
+  return {
+    name,
+    ingredients,
+    instructions,
+    category: str(o.recipeCategory ?? o.category).trim() || undefined,
+    cuisine: str(o.recipeCuisine ?? o.cuisine).trim() || 'Cocktail',
+    keywords: Array.isArray(kw)
+      ? kw.map((k) => str(k).trim()).filter(Boolean)
+      : str(kw).trim()
+        ? [str(kw).trim()]
+        : undefined,
+    prepTimeMin: num(o.prepTimeMin),
+    cookTimeMin: Number.isFinite(Number(o.cookTimeMin)) ? Number(o.cookTimeMin) : undefined,
+    yield: str(o.recipeYield ?? o.yield).trim() || undefined,
+    calories: num(o.calories),
+  };
+}
+
 function mapArticle(rec: StrapiArticle): BlogPost {
   const r = rec as Record<string, unknown>;
   const category = r.category;
@@ -124,6 +197,7 @@ function mapArticle(rec: StrapiArticle): BlogPost {
     image,
     thumbnail: thumb ? mediaUrl(thumb) : image,
     body: str(r.body ?? r.content),
+    recipe: parseRecipe(r.recipe),
   };
 }
 

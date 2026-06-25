@@ -1,7 +1,13 @@
 import BlogImage from '@/components/BlogImage';
 import PageShell from '@/components/PageShell';
 import { getPost, getPostSlugs } from '@/lib/blog';
-import { articleJsonLd, breadcrumbJsonLd, jsonLdScript, pageMetadata } from '@/lib/seo';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  jsonLdScript,
+  pageMetadata,
+  recipeJsonLd,
+} from '@/lib/seo';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -49,6 +55,27 @@ export default async function BlogDetailPage({ params }: Params) {
 
   const path = `/blog/${slug}`;
 
+  // Cocktail how-to posts (auto-blog Recipe schema) also emit Recipe JSON-LD. The hero
+  // image fills each HowToStep image (clears GSC's "image or video in recipeInstructions");
+  // datePublished falls back to the post date. Rating/video are never auto-generated.
+  const recipeLd = post.recipe
+    ? recipeJsonLd({
+        name: post.recipe.name,
+        description: post.excerpt,
+        image: post.image?.trim() ? [post.image] : [],
+        path,
+        ingredients: post.recipe.ingredients,
+        instructions: post.recipe.instructions,
+        category: post.recipe.category,
+        yield: post.recipe.yield,
+        keywords: post.recipe.keywords,
+        prepTimeMin: post.recipe.prepTimeMin,
+        cookTimeMin: post.recipe.cookTimeMin,
+        calories: post.recipe.calories,
+        datePublished: post.date || undefined,
+      })
+    : null;
+
   return (
     <PageShell>
       <script
@@ -68,6 +95,7 @@ export default async function BlogDetailPage({ params }: Params) {
               { name: 'Journal', path: '/blog' },
               { name: post.title, path },
             ]),
+            ...(recipeLd ? [recipeLd] : []),
           ]),
         }}
       />

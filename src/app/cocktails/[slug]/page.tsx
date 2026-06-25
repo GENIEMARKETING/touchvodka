@@ -1,5 +1,5 @@
 import PageShell from '@/components/PageShell';
-import { COCKTAILS, getCocktailBySlug, titleCase } from '@/data/cocktails';
+import { COCKTAILS, COCKTAILS_PUBLISHED, getCocktailBySlug, titleCase } from '@/data/cocktails';
 import { getProductByName } from '@/data/products';
 import {
   SITE_ORIGIN,
@@ -72,6 +72,12 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
               category: 'Cocktail',
               yield: `${c.serves} serving`,
               keywords: [c.baseSpirit, c.season, c.event, 'vodka cocktail'],
+              prepTimeMin: c.prepTimeMin ?? 5,
+              cookTimeMin: c.cookTimeMin ?? 0,
+              datePublished: COCKTAILS_PUBLISHED,
+              // `rating`/`video` intentionally omitted — emitted only from real data,
+              // never fabricated (Google reviews spam policy). Recipe ratings ship on
+              // the redesign (which has customer auth); aggregateRating auto-lights then.
             }),
           ),
         }}
@@ -133,7 +139,8 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
             <h2 className="font-display text-2xl text-fg">Method</h2>
             <ol className="mt-6 space-y-5">
               {steps.map((step, i) => (
-                <li key={step} className="flex items-start gap-4">
+                // id matches the HowToStep `url` anchor (#step-N) emitted in recipeJsonLd.
+                <li key={step} id={`step-${i + 1}`} className="flex scroll-mt-24 items-start gap-4">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent font-display text-sm text-white">
                     {i + 1}
                   </span>
