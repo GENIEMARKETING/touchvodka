@@ -15,6 +15,10 @@ export interface Cocktail {
   /** Serving glass + count — derived placeholders until the Strapi `cocktail` type lands. */
   glass: string;
   serves: string;
+  /** Active prep time in minutes → Recipe prepTime. Defaulted in enrich() (cocktails are quick). */
+  prepTimeMin?: number;
+  /** Cook time in minutes → Recipe cookTime. 0 for cocktails (no cooking). Defaulted in enrich(). */
+  cookTimeMin?: number;
   /** Filter / explore taxonomy — derived placeholders until Strapi owns the tags. */
   season: Season;
   event: Occasion;
@@ -598,6 +602,10 @@ function enrich(c: RawCocktail, i: number, image: string): Cocktail {
     image,
     glass: glassFor(c),
     serves: '1',
+    // Cocktails are quick + uncooked; a single sensible estimate satisfies Google's
+    // recommended prep/cook time fields. Per-recipe overrides land when Strapi owns this.
+    prepTimeMin: c.prepTimeMin ?? 5,
+    cookTimeMin: c.cookTimeMin ?? 0,
     season: seasonFor(c, i),
     event: eventFor(c, i),
   };
@@ -615,6 +623,13 @@ export const COCKTAILS: Cocktail[] = RAW_COCKTAILS.map((c, i) => {
 
 export const ALL_SEASONS: readonly Season[] = SEASONS;
 export const ALL_OCCASIONS: readonly Occasion[] = OCCASIONS;
+
+/**
+ * Publish date for the evergreen cocktail cluster (Recipe `datePublished`, recommended
+ * by Google). A single cluster date is accurate enough for the recommended field until
+ * Strapi owns per-recipe dates.
+ */
+export const COCKTAILS_PUBLISHED = '2026-06-22';
 
 /** SKU display order used by the per-expression menu on /cocktails. */
 const SKU_ORDER = ['Touch Artisan', 'Touch Key Lime', 'Touch Ruby', 'Touch One', 'Touch Orange'];
