@@ -1,6 +1,8 @@
 import PageShell from '@/components/PageShell';
+import { RecipeReviews } from '@/components/reviews/recipe-reviews';
 import { COCKTAILS, COCKTAILS_PUBLISHED, getCocktailBySlug, titleCase } from '@/data/cocktails';
 import { getProductByName } from '@/data/products';
+import { getRecipeReviewSummary } from '@/lib/reviews';
 import {
   SITE_ORIGIN,
   breadcrumbJsonLd,
@@ -55,6 +57,10 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
   const path = `/cocktails/${c.slug}`;
   const imageAbs = c.image.startsWith('http') ? c.image : `${SITE_ORIGIN}${c.image}`;
 
+  // Genuine recipe ratings (shared reviews module, recipe target). Feeds the real
+  // aggregateRating into the JSON-LD below; the widget loads its own fresh data client-side.
+  const ratingSummary = await getRecipeReviewSummary(c.slug);
+
   return (
     <PageShell>
       <script
@@ -75,9 +81,16 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
               prepTimeMin: c.prepTimeMin ?? 5,
               cookTimeMin: c.cookTimeMin ?? 0,
               datePublished: COCKTAILS_PUBLISHED,
-              // `rating`/`video` intentionally omitted — emitted only from real data,
-              // never fabricated (Google reviews spam policy). Recipe ratings ship on
-              // the redesign (which has customer auth); aggregateRating auto-lights then.
+              // Real aggregateRating only — omitted until genuine ratings exist (helper
+              // also guards count>0). Never fabricated (Google reviews spam policy).
+              ...(ratingSummary.count > 0
+                ? {
+                    rating: {
+                      ratingValue: Number(ratingSummary.average.toFixed(1)),
+                      ratingCount: ratingSummary.count,
+                    },
+                  }
+                : {}),
             }),
           ),
         }}
@@ -177,6 +190,9 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
           </dl>
         </div>
       </section>
+
+      {/* Genuine recipe ratings → aggregateRating. Signed-in submit; never fabricated. */}
+      <RecipeReviews recipeSlug={c.slug} recipeName={display} />
 
       {/* CTA — "Make it a Touch night" → Shop the SKU + more cocktails. */}
       <section className="bg-[#e9e0d0] py-16 text-center md:py-24">
