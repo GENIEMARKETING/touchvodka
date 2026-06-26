@@ -35,10 +35,11 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
   // takes ~1s; the TEST key was instant).
   const [tsToken, setTsToken] = useState('');
   // After a failure the single-use token is spent: clear it (disables submit) and
-  // remount the widget to mint a fresh one.
+  // bump the key to REMOUNT the widget so it mints a fresh one. (Previously this
+  // called itself → infinite recursion / stack overflow on every failed attempt.)
   const resetTurnstile = () => {
     setTsToken('');
-    resetTurnstile();
+    setTsKey((k) => k + 1);
   };
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -89,8 +90,14 @@ export default function AuthScreen({ mode }: { mode: 'login' | 'signup' }) {
       const next = new URLSearchParams(window.location.search).get('next');
       router.push(next?.startsWith('/') ? next : '/');
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } catch {
+      // Show a friendly, user-facing message — not the raw Medusa SDK error
+      // (e.g. "medusa.getCustomer …") which leaked through before.
+      setError(
+        isSignup
+          ? 'We couldn’t create that account. The email may already be registered.'
+          : 'Incorrect email or password.',
+      );
       resetTurnstile(); // single-use token consumed → fresh widget for the retry
       setSubmitting(false);
     }
