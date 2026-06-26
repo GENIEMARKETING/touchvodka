@@ -123,3 +123,101 @@ export async function submitReview(input: SubmitReviewInput): Promise<Review> {
   const { review } = (await res.json()) as { review: Review };
   return review;
 }
+
+// ── Recipe (cocktail) ratings ────────────────────────────────────────────────
+// Same Medusa `product_review` module, recipe-target variant (`recipe_slug` instead
+// of `product_id` — deployed + verified on the shared Medusa 2026-06-25). Mirrors the
+// product helpers above so /cocktails ratings reuse the proven, signed-in flow.
+
+export type RecipeReview = {
+  id: string;
+  recipe_slug: string;
+  rating: number;
+  title?: string;
+  body: string;
+  author_name: string;
+  created_at: string;
+  verified_purchase: boolean;
+};
+
+export type RecipeReviewSummary = {
+  recipe_slug: string;
+  average: number;
+  count: number;
+  histogram: [number, number, number, number, number];
+};
+
+const EMPTY_RECIPE_SUMMARY = (slug: string): RecipeReviewSummary => ({
+  recipe_slug: slug,
+  average: 0,
+  count: 0,
+  histogram: [0, 0, 0, 0, 0],
+});
+
+/** Aggregate rating for a recipe. Empty (not an error) when commerce is off. */
+export async function getRecipeReviewSummary(
+  slug: string,
+  opts: { cache?: RequestCache } = {},
+): Promise<RecipeReviewSummary> {
+  if (!BASE || !PK || !slug) return EMPTY_RECIPE_SUMMARY(slug);
+  try {
+    const res = await fetch(
+      `${BASE}/store/reviews/summary?recipe_slug=${encodeURIComponent(slug)}`,
+      opts.cache
+        ? { headers: headers(), cache: opts.cache }
+        : { headers: headers(), next: { revalidate: 60 } },
+    );
+    if (!res.ok) return EMPTY_RECIPE_SUMMARY(slug);
+    const { summary } = (await res.json()) as { summary: RecipeReviewSummary };
+    return summary ?? EMPTY_RECIPE_SUMMARY(slug);
+  } catch {
+    return EMPTY_RECIPE_SUMMARY(slug);
+  }
+}
+
+/** Approved reviews for a recipe, newest first. */
+export async function listRecipeReviews(
+  slug: string,
+  opts: { limit?: number; offset?: number; cache?: RequestCache } = {},
+): Promise<{ reviews: RecipeReview[]; count: number }> {
+  if (!BASE || !PK || !slug) return { reviews: [], count: 0 };
+  const { limit = 20, offset = 0 } = opts;
+  try {
+    const res = await fetch(
+      `${BASE}/store/reviews?recipe_slug=${encodeURIComponent(slug)}&limit=${limit}&offset=${offset}`,
+      opts.cache ? { headers: headers(), cache: opts.cache } : { headers: headers(), next: { revalidate: 60 } },
+    );
+    if (!res.ok) return { reviews: [], count: 0 };
+    return (await res.json()) as { reviews: RecipeReview[]; count: number };
+  } catch {
+    return { reviews: [], count: 0 };
+  }
+}
+
+export type SubmitRecipeReviewInput = {
+  recipe_slug: string;
+  rating: number;
+  title?: string;
+  body: string;
+};
+
+/** Submit a recipe rating as the signed-in customer (client-only; 401 if logged out). */
+export async function submitRecipeReview(input: SubmitRecipeReviewInput): Promise<RecipeReview> {
+  if (!BASE || !PK) throw new Error('Ratings are unavailable right now.');
+  const token = medusa.getAuthToken?.();
+  if (!token) throw new Error('Please sign in to rate this recipe.');
+  if (input.rating < 1 || input.rating > 5) throw new Error('Pick a rating from 1 to 5 stars.');
+  const res = await fetch(`${BASE}/store/reviews`, {
+    method: 'POST',
+    headers: headers(token),
+    cache: 'no-store',
+    body: JSON.stringify(input),
+  });
+  if (res.status === 401) throw new Error('Please sign in to rate this recipe.');
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message || 'Could not submit your rating. Please try again.');
+  }
+  const { review } = (await res.json()) as { review: RecipeReview };
+  return review;
+}
