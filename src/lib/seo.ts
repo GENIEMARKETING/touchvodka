@@ -143,6 +143,9 @@ export function articleJsonLd(input: ArticleJsonLdInput): JsonLd {
   };
 }
 
+/** A single method step: a plain string, or an object carrying an optional title/photo. */
+export type RecipeStep = string | { text: string; name?: string; image?: string };
+
 export type RecipeJsonLdInput = {
   name: string;
   description?: string;
@@ -150,10 +153,32 @@ export type RecipeJsonLdInput = {
   path: string;
   ingredients: string[];
   /** Ordered method steps (each becomes a HowToStep). */
-  instructions: string[];
+  instructions: RecipeStep[];
   category?: string;
   yield?: string;
   keywords?: string[];
+  /** Active prep time in minutes → ISO-8601 (PT#M). Recommended by Google. */
+  prepTimeMin?: number;
+  /** Cook time in minutes. Cocktails don't cook → 0 (still emitted; Google pairs prep+cook). */
+  cookTimeMin?: number;
+  /** ISO date the recipe was published (recommended). */
+  datePublished?: string;
+  /** kcal per serving → nutrition.calories. Omit unless a real estimate exists. */
+  calories?: number;
+  /**
+   * ⚠️ Pass ONLY genuine, user-generated ratings — NEVER fabricate (Google reviews
+   * spam policy). Emitted only when count > 0.
+   */
+  rating?: { ratingValue: number; ratingCount: number };
+  /** ⚠️ Pass ONLY when a real video asset exists (all VideoObject fields required). */
+  video?: {
+    name: string;
+    description: string;
+    thumbnailUrl: string;
+    uploadDate: string;
+    contentUrl?: string;
+    embedUrl?: string;
+  };
 };
 
 /**
@@ -161,26 +186,63 @@ export type RecipeJsonLdInput = {
  * ships Article/Product/Breadcrumb only, so this is hand-rolled here (the same
  * pattern as the brand-only Product fallback above). Drives the Recipe rich
  * result + AEO/AI-crawler answers.
+ *
+ * Emits Google's RECOMMENDED Recipe fields by construction (the "Improve item
+ * appearance" set): prep/cook/total time, datePublished, and a per-step name/url/
+ * image on every HowToStep (the hero image fills each step, clearing the "image or
+ * video in recipeInstructions" notice). The policy-sensitive `rating` (real reviews
+ * only) and `video` (real asset only) emit only when their data is present.
  */
 export function recipeJsonLd(input: RecipeJsonLdInput): JsonLd {
+  const url = `${SITE_ORIGIN}${input.path}`;
+  const hero = input.image?.[0];
+  const prep = input.prepTimeMin ?? 0;
+  const cook = input.cookTimeMin ?? 0;
   return {
     '@context': 'https://schema.org',
     '@type': 'Recipe',
     name: input.name,
     ...(input.description ? { description: input.description } : {}),
     image: input.image,
-    url: `${SITE_ORIGIN}${input.path}`,
+    url,
     author: { '@type': 'Organization', name: BRAND },
+    ...(input.datePublished ? { datePublished: input.datePublished } : {}),
     recipeCategory: input.category ?? 'Cocktail',
     recipeCuisine: 'Cocktail',
     ...(input.yield ? { recipeYield: input.yield } : {}),
     ...(input.keywords?.length ? { keywords: input.keywords.join(', ') } : {}),
+    // Google pairs prepTime+cookTime (or totalTime); emit all three. Cocktails: cook = PT0M.
+    prepTime: `PT${prep}M`,
+    cookTime: `PT${cook}M`,
+    totalTime: `PT${prep + cook}M`,
+    ...(input.calories
+      ? { nutrition: { '@type': 'NutritionInformation', calories: `${input.calories} calories` } }
+      : {}),
+    ...(input.rating && input.rating.ratingCount > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: input.rating.ratingValue,
+            ratingCount: input.rating.ratingCount,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
+    ...(input.video ? { video: { '@type': 'VideoObject', ...input.video } } : {}),
     recipeIngredient: input.ingredients,
-    recipeInstructions: input.instructions.map((step, i) => ({
-      '@type': 'HowToStep',
-      position: i + 1,
-      text: step,
-    })),
+    recipeInstructions: input.instructions.map((step, i) => {
+      const s = typeof step === 'string' ? { text: step } : step;
+      const stepImage = s.image ?? hero;
+      return {
+        '@type': 'HowToStep',
+        position: i + 1,
+        name: s.name ?? `Step ${i + 1}`,
+        text: s.text,
+        url: `${url}#step-${i + 1}`,
+        ...(stepImage ? { image: stepImage } : {}),
+      };
+    }),
   };
 }
 

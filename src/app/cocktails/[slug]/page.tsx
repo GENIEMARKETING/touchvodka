@@ -1,6 +1,8 @@
 import PageShell from '@/components/PageShell';
-import { COCKTAILS, getCocktailBySlug, titleCase } from '@/data/cocktails';
+import RecipeReviews from '@/components/RecipeReviews';
+import { COCKTAILS, COCKTAILS_PUBLISHED, getCocktailBySlug, titleCase } from '@/data/cocktails';
 import { getProductByName } from '@/data/products';
+import { getRecipeRatingSummary, getRecipeReviews } from '@/lib/recipe-reviews';
 import {
   SITE_ORIGIN,
   breadcrumbJsonLd,
@@ -55,6 +57,13 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
   const path = `/cocktails/${c.slug}`;
   const imageAbs = c.image.startsWith('http') ? c.image : `${SITE_ORIGIN}${c.image}`;
 
+  // Genuine recipe ratings (shared reviews module, recipe target). Null until real
+  // ratings exist — never fabricated. Feeds aggregateRating + the ratings widget.
+  const [ratingSummary, recipeReviews] = await Promise.all([
+    getRecipeRatingSummary(c.slug),
+    getRecipeReviews(c.slug),
+  ]);
+
   return (
     <PageShell>
       <script
@@ -72,6 +81,12 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
               category: 'Cocktail',
               yield: `${c.serves} serving`,
               keywords: [c.baseSpirit, c.season, c.event, 'vodka cocktail'],
+              prepTimeMin: c.prepTimeMin ?? 5,
+              cookTimeMin: c.cookTimeMin ?? 0,
+              datePublished: COCKTAILS_PUBLISHED,
+              ...(ratingSummary
+                ? { rating: { ratingValue: ratingSummary.average, ratingCount: ratingSummary.count } }
+                : {}),
             }),
           ),
         }}
@@ -133,7 +148,8 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
             <h2 className="font-display text-2xl text-fg">Method</h2>
             <ol className="mt-6 space-y-5">
               {steps.map((step, i) => (
-                <li key={step} className="flex items-start gap-4">
+                // id matches the HowToStep `url` anchor (#step-N) emitted in recipeJsonLd.
+                <li key={step} id={`step-${i + 1}`} className="flex scroll-mt-24 items-start gap-4">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent font-display text-sm text-white">
                     {i + 1}
                   </span>
@@ -170,6 +186,14 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
           </dl>
         </div>
       </section>
+
+      {/* Genuine recipe ratings → aggregateRating. Signed-in submit; never fabricated. */}
+      <RecipeReviews
+        recipeSlug={c.slug}
+        recipeName={display}
+        summary={ratingSummary}
+        initialReviews={recipeReviews}
+      />
 
       {/* CTA — "Make it a Touch night" → Shop the SKU + more cocktails. */}
       <section className="bg-[#e9e0d0] py-16 text-center md:py-24">
