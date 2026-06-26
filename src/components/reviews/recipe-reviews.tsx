@@ -143,7 +143,11 @@ export function RecipeReviews({
                     ) : null}
                   </div>
                   {r.title ? <p className="mb-2 font-display text-fg text-lg">{r.title}</p> : null}
-                  <blockquote className="flex-1 text-neutral-700 leading-relaxed">“{r.body}”</blockquote>
+                  {r.body ? (
+                    <blockquote className="flex-1 text-neutral-700 leading-relaxed">“{r.body}”</blockquote>
+                  ) : (
+                    <div className="flex-1" />
+                  )}
                   <figcaption className="mt-5">
                     <p className="font-display text-fg">{r.author_name}</p>
                     <p className="text-neutral-500 text-sm">
@@ -211,22 +215,21 @@ export function RecipeReviews({
               </label>
               <label className="block">
                 <span className="mb-1 block font-mono text-neutral-400 text-xs uppercase tracking-[0.2em]">
-                  Your note
+                  Your note <span className="text-neutral-300">(optional)</span>
                 </span>
                 <textarea
                   value={body}
-                  required
                   rows={4}
                   maxLength={5000}
                   onChange={(e) => setBody(e.target.value)}
                   className="w-full rounded-xl border border-concrete bg-white px-4 py-3 text-fg"
-                  placeholder={`How was your ${recipeName}?`}
+                  placeholder={`How was your ${recipeName}? (optional)`}
                 />
               </label>
               {error ? <p className="text-red-600 text-sm">{error}</p> : null}
               <button
                 type="submit"
-                disabled={submitting || body.trim().length === 0}
+                disabled={submitting}
                 className="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3 font-display text-white shadow-brand-glow transition-transform duration-300 ease-brand hover:-translate-y-0.5 disabled:opacity-50"
               >
                 {submitting ? 'Posting…' : 'Post rating'}
