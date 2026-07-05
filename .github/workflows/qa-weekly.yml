@@ -1,0 +1,22 @@
+name: QA weekly (deep)
+
+# Sunday deep pass: everything nightly runs PLUS the advisory local
+# visual-regression drift check. checkout-live stays OFF here: the manual
+# (pp_system_default) path creates a REAL order Vinny must archive, and Stripe
+# on the region is still operator-gated (S10) — flip it on once Stripe lands.
+# k6 SPIKE is deliberately absent — shared Medusa; spikes are operator-triggered.
+
+on:
+  schedule:
+    - cron: "0 9 * * 0"
+  workflow_dispatch:
+
+jobs:
+  qa:
+    uses: GENIEMARKETING/.github/.github/workflows/qa-live.yml@main
+    secrets: inherit
+    with:
+      site-url: "https://touchvodka.com"
+      layer: weekly
+      run-k6-smoke: true
+      run-visual-regression: true

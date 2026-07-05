@@ -1,0 +1,30 @@
+{
+  "//": "Lighthouse-CI budgets vs the LIVE deploy (qa-live.yml nightly/post-deploy). Same budgets as lighthouserc.json (the pre-merge gate) but collected straight from production URLs — no build, no server boot.",
+  "ci": {
+    "collect": {
+      "url": [
+        "https://touchvodka.com/",
+        "https://touchvodka.com/products",
+        "https://touchvodka.com/find-us"
+      ],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 200 }],
+        "largest-contentful-paint": ["warn", { "maxNumericValue": 2500 }],
+        "interactive": ["warn", { "maxNumericValue": 3500 }],
+        "categories:performance": ["warn", { "minScore": 0.8 }],
+        "categories:accessibility": ["error", { "minScore": 0.9 }],
+        "categories:seo": ["error", { "minScore": 0.9 }]
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
