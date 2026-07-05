@@ -157,7 +157,12 @@ export function Checkout() {
       if (!regionId) throw new Error('No region configured for this store');
       const providers = await payments.listProviders(regionId);
       const stripe = providers.find((p) => describeProvider(p.id).kind === 'stripe');
-      const provider = STRIPE_PK && stripe ? stripe : providers[0];
+      // GUARD (2026-07-05): only pick providers this checkout can actually
+      // render. The shared US region now also carries pp_square_square (Liquid
+      // Heaven's processor) and it lists FIRST — a bare providers[0] fallback
+      // would select it and dead-end this checkout on an unrenderable kind.
+      const manual = providers.find((p) => describeProvider(p.id).kind === 'manual');
+      const provider = (STRIPE_PK && stripe ? stripe : null) ?? manual ?? null;
       if (!provider) throw new Error('No payment provider enabled for this region');
       const session = await payments.initSession(cart.id, provider.id);
       setSession({
