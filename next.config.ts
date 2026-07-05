@@ -4,6 +4,26 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // @geniemarketing/ui ships ESM with 'use client' banners; transpile it through Next.
   transpilePackages: ['@geniemarketing/ui', '@geniemarketing/foundation'],
+  // Security-response headers (QA: ZAP flagged missing CSP + anti-clickjacking,
+  // 2026-07-05). Hardening-only CSP — frame-ancestors/base-uri/object-src close
+  // the clickjacking/base/object-embed vectors and satisfy "CSP present" WITHOUT
+  // a default-src/script-src lockdown that would break Stripe/Square/Turnstile/
+  // analytics (that stricter allowlist is a separate, tested hardening pass).
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'" },
+        ],
+      },
+    ];
+  },
   images: {
     // Registry trap `nextjs-image-remote-host-allowlist`: every next/image host
     // must be allowlisted. Production media (bottle/blog shots) resolves via
