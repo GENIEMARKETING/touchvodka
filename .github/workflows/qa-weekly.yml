@@ -11,6 +11,12 @@ on:
     - cron: "0 9 * * 0"
   workflow_dispatch:
 
+# The reusable workflow files bug issues; grant its token that (repo default is
+# read-only, and a called workflow can't request more than its caller allows).
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   qa:
     uses: GENIEMARKETING/.github/.github/workflows/qa-live.yml@main
