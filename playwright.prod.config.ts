@@ -23,19 +23,31 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
-    // Present as a real visitor (consent lib hides its banner from webdriver;
-    // keeps live behavior identical to what customers see).
-    launchOptions: { args: ['--disable-blink-features=AutomationControlled'] },
   },
   expect: { timeout: 10_000 },
   projects: [
     {
       name: 'prod-desktop',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
+      // `--disable-blink-features` is a CHROMIUM-only flag (present as a real
+      // visitor — the consent lib hides its banner from webdriver). It must NOT
+      // be on the global `use`: WebKit rejects the Blink flag and fails to launch
+      // (false-positive smoke failure). Apply it only to the Chromium projects.
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        launchOptions: { args: ['--disable-blink-features=AutomationControlled'] },
+      },
     },
-    { name: 'prod-mobile', use: { ...devices['Pixel 5'] } },
+    {
+      name: 'prod-mobile',
+      use: {
+        ...devices['Pixel 5'],
+        launchOptions: { args: ['--disable-blink-features=AutomationControlled'] },
+      },
+    },
     {
       // Real WebKit vs production — smoke only (a11y results are engine-independent).
+      // No Blink launch args here.
       name: 'prod-webkit-iphone',
       testMatch: /smoke\.spec\.ts/,
       use: { ...devices['iPhone 13'] },
