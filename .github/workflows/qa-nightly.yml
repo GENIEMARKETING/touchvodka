@@ -1,0 +1,21 @@
+name: QA nightly (live site)
+
+# Thin caller — all logic lives in the org reusable workflow (do not fork it;
+# change the shared workflow). Schedule must live HERE: reusable workflows
+# cannot carry cron for their callers. 08:10 UTC = 03:10/04:10 ET, staggered
+# 30 min from the other brands so the shared Medusa/Strapi sees one site's
+# crawl at a time. Failures become deduplicated `qa-bot` issues in this repo.
+
+on:
+  schedule:
+    - cron: "10 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  qa:
+    uses: GENIEMARKETING/.github/.github/workflows/qa-live.yml@main
+    secrets: inherit
+    with:
+      site-url: "https://touchvodka.com"
+      layer: nightly
+      run-k6-smoke: true
