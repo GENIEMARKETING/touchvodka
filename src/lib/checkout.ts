@@ -142,14 +142,23 @@ async function calculatedAmount(optionId: string, cartId: string): Promise<numbe
 
 /**
  * Shipping options for this cart (after an address is set), priced and ready to
- * display. Touch Vodka shows the **live Shippo rate only** — the flat fallback is
- * filtered out of the customer view. If no calculated rate resolves (Shippo down
- * / misconfig) we fall back to whatever options exist so checkout never dead-ends.
+ * display. Touch Vodka shows the **live Shippo rate** plus a **qualifying free
+ * option** — the flat fallback is filtered out of the customer view. If no
+ * calculated rate resolves (Shippo down / misconfig) we fall back to whatever
+ * options exist so checkout never dead-ends.
  */
 export async function listShippingOptions(cartId: string): Promise<ShippingOption[]> {
   const { shipping_options } = await store<{ shipping_options: RawOption[] }>('shipping-options', {
     params: { cart_id: cartId },
   });
+
+  // A free-shipping option only QUALIFIES when the raw list already prices it at 0
+  // (the cart met the item_total threshold set in Medusa). Below the threshold Medusa
+  // returns it with no amount (null) — check the RAW value here, before the null→0
+  // defaulting below would otherwise make an unqualified free option look like $0.
+  const qualifiesFree = new Set(
+    shipping_options.filter((o) => o.amount === 0 && /free/i.test(o.name)).map((o) => o.id),
+  );
 
   const priced: ShippingOption[] = await Promise.all(
     shipping_options.map(async (o) => {
@@ -167,9 +176,12 @@ export async function listShippingOptions(cartId: string): Promise<ShippingOptio
     }),
   );
 
-  // Shippo-only customer view: prefer carrier-calculated rates, drop the flat
-  // manual fallback. Keep everything if nothing calculable so we never dead-end.
-  const live = priced.filter((o) => o.price_type === 'calculated' && o.amount > 0);
+  // Shippo-only customer view: live carrier rates + any qualifying free option (a
+  // $0 "Free Shipping" once the cart hits the threshold). Keep everything if nothing
+  // shows so we never dead-end.
+  const live = priced.filter(
+    (o) => (o.price_type === 'calculated' && o.amount > 0) || qualifiesFree.has(o.id),
+  );
   return live.length > 0 ? live : priced;
 }
 
