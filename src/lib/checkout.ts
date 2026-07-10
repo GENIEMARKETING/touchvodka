@@ -176,13 +176,13 @@ export async function listShippingOptions(cartId: string): Promise<ShippingOptio
     }),
   );
 
-  // Shippo-only customer view: live carrier rates + any qualifying free option (a
-  // $0 "Free Shipping" once the cart hits the threshold). Keep everything if nothing
-  // shows so we never dead-end.
-  const live = priced.filter(
-    (o) => (o.price_type === 'calculated' && o.amount > 0) || qualifiesFree.has(o.id),
-  );
-  return live.length > 0 ? live : priced;
+  // Free shipping qualified ($0) → show ONLY it, no reason to offer paid rates.
+  const free = priced.filter((o) => qualifiesFree.has(o.id));
+  if (free.length > 0) return free;
+  // Otherwise the live Shippo service tiers (Ground / 2-Day / Overnight); the flat
+  // manual fallback is dropped. Keep everything if nothing prices so we never dead-end.
+  const tiers = priced.filter((o) => o.price_type === 'calculated' && o.amount > 0);
+  return tiers.length > 0 ? tiers : priced;
 }
 
 /** Choose a shipping method; returns the recalculated cart. */
